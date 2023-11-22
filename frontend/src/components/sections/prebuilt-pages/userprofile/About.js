@@ -79,6 +79,7 @@ const About = () => {
         { title: 'Home', text: `${selectedHome(selected_resident.home, homes)}` },
         { title: 'National insurance', text: `${selected_resident.national_id}` },
         { title: 'NHS Number', text: `${selected_resident.NHS_number}` },
+        { title: 'Next of Kin', text: `${selected_resident.next_of_kin}` },
     ];
 
     const columns = [

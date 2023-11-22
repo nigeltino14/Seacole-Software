@@ -11,6 +11,7 @@ import dateToYMD from '../utils/dates'
 import logo from '../../assets/img/Seacole-Logo.png';
 import ProtectedRoute from '../protected/ProtectedRoute'
 
+
 const Topbar = () => {
     const user = useSelector((state) => state.auth.user)
     const isLoggedIn = useSelector((state) => state.auth.loggedin)
@@ -24,6 +25,20 @@ const Topbar = () => {
 
     const dispatch = useDispatch()
 
+
+    const getUserLocation = () => {
+       if ("geolocation" in navigator) {
+          navigator.geolocation.getCurrentPosition(
+             (position) => {
+               const { latitude, longitude } = position.coords;
+              // Do something with the user's location (e.g., store it in state)
+          },
+          (error) => {
+            console.error("Error getting user location:", error);
+          }
+        );
+      }
+    };
 
     const [state, setState] = useState({
         showappointment: false,
@@ -72,7 +87,7 @@ const Topbar = () => {
                         <span className="ms-toggler-bar bg-black" />
                         <span className="ms-toggler-bar bg-black" />
                     </div>
-                    <div className="logo-sn logo-sm"> Clinx (admin@seacolesoftwaresolutions.co.uk)
+                    <div className="logo-sn logo-sm"> Clinix (Seacole Health Systems)
                         <Link className="pl-0 ml-0 text-center navbar-brand mr-0" to="/">
                             <img src={logo} alt="logo" />
                         </Link>
@@ -174,9 +189,9 @@ const Topbar = () => {
                 </Modal>
             </Fragment>
             }
-
+{/*            <button onClick={getUserLocation}>Get Location</button> */}
         </>
-
+       
     );
 }
 

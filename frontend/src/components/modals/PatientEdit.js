@@ -41,6 +41,7 @@ const PatientEdit = (props) => {
                 formData.append('address', selected_resident.address);
                 formData.append('height', selected_resident.height);
                 formData.append('profile_pic', selected_resident.profile_pic);
+		formData.append('next_of_kin', selected_resident.next_of_kin);
                 putApi(_ => {
                     props.handleClose()
                 }, token, `/api/resident/`,
@@ -147,6 +148,13 @@ const PatientEdit = (props) => {
                 break;
 
             case 'height':
+                dispatch(residentActions.setSelectedResident({
+                    ...selected_resident,
+                    height: event.target.value
+                }))
+                break;
+    
+            case 'next_of_kin':
                 dispatch(residentActions.setSelectedResident({
                     ...selected_resident,
                     height: event.target.value
@@ -353,6 +361,22 @@ const PatientEdit = (props) => {
                                     />
                                 </InputGroup>
                             </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom12">
+                                <Form.Label>Next of Kin</Form.Label>
+                                {errors.next_of_kin && errors.next_of_kin.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="next_of_kin"
+                                        onChange={handleChange}
+                                        required
+                                        value={selected_resident.next_of_kin} // Use the "next_of_kin" value from the selected resident
+                                        type="text"
+                                        placeholder="Next of Kin"
+
+                                    />
+                                </InputGroup>
+                             </Form.Group>
+
                         </Form.Row>
                         <Button type="submit" className="mt-4 d-inline w-20 ">Save</Button>
                     </Form>

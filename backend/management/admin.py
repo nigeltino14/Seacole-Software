@@ -61,12 +61,32 @@ admin.site.register(Choice)
 
 admin.site.register(ReminderEvaluationScheduler)
 
-admin.site.register(PosibleAnswear)
+admin.site.register(PosibleAnswer)
 
 
 admin.site.register(Permission)
 
 admin.site.register(ReminderRota)
+
+admin.site.register(InventoryItem)
+
+admin.site.register(Category)
+
+admin.site.register(UserHistory)
+
+admin.site.register(HouseAssets)
+
+admin.site.register(HouseStock)
+
+admin.register(RepairRecord)
+
+admin.site.register(ConfidentialRecord)
+
+admin.site.register(DeletionRecords)
+
+admin.site.register(AllowedLocations)
+
+admin.site.register(AllowedUserGroup)
 #
 
 

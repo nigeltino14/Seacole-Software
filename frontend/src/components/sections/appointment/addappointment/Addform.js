@@ -23,7 +23,7 @@ const Addform = () => {
         resident: '',
         start_time: '',
         due_time: '',
-        recur: 'no'
+        recur: ''
     }
     const [state, setState] = useState(initialState)
     const homes = useSelector((state) => state.home.homeList)

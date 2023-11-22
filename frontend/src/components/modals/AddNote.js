@@ -12,7 +12,7 @@ const AddWeight = (props) => {
     const token = useSelector((state) => state.auth.token).token
     const dispatch = useDispatch()
     const [state, setState] = useState({
-        description: '',
+        entry: '',
         resident: '',
         staff: '',
         subject: '',
@@ -41,10 +41,10 @@ const AddWeight = (props) => {
     const handleChange = (event) => {
         switch (event.target.name) {
 
-            case 'description':
+            case 'entry':
                 setState({
                     ...state,
-                    description: event.target.value
+                    entry: event.target.value
                 })
                 break;
 
@@ -95,18 +95,18 @@ const AddWeight = (props) => {
                                 </InputGroup>
                             </Form.Group>
                             <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
-                                <Form.Label>Description</Form.Label>
-                                {errors.description && errors.description.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <Form.Label>Entry</Form.Label>
+                                {errors.entry && errors.entry.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
                                 <InputGroup>
                                     <Form.Control
-                                        name="description"
+                                        name="entry"
                                         required
                                         onChange={handleChange}
-                                        value={state.description}
+                                        value={state.entry}
                                         type="text"
                                         as="textarea"
                                         rows={3}
-                                        placeholder="Description"
+                                        placeholder="Entry"
                                     />
                                 </InputGroup>
                             </Form.Group>

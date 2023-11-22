@@ -13,6 +13,7 @@ import { selectedResident, selectedStaff } from '../../../utils/expand'
 import dateToYMD from '../../../utils/dates'
 import { Modal } from 'react-bootstrap';
 import ProtectedRoute from '../../../protected/ProtectedRoute'
+import PrintButton from '../../../utils/print'
 
 
 const Paymentlist = () => {
@@ -31,6 +32,9 @@ const Paymentlist = () => {
     const [showHandover, setshowHandover] = useState(false)
     const [total, setTotal] = useState(0)
     const [total_value, setTotalValue] = useState(0)
+    const [selectedPaymentsHandover, setSelectedPaymentsHandover] = useState(null);
+    const [showEdit, setshowEdit] = useState(false)
+
 
     const handleSetHandoverPayment = () => {
         setshowHandover(true)
@@ -39,6 +43,10 @@ const Paymentlist = () => {
     const handleClose = (id) => {
         setshowHandover(false)
     }
+   
+    const handleRowClick = (row) => {
+        setSelectedPaymentsHandover(row);
+    };
 
     const getReceiptLink = (id) => {
         return [...attachments].find(item => item.id === id)
@@ -134,6 +142,46 @@ const Paymentlist = () => {
         setTotalValue(findTotal()[1])
     }, [selected_transaction_list])
 
+ 
+    //The function below allows for the selection of a certain note to see in detail
+    const SelectedTransactionModal = () => {
+        if (!selectedPaymentsHandover) {
+            return null;
+        }
+
+    const onClose = () => {
+        setSelectedPaymentsHandover(null);
+        setshowEdit(false);
+    };
+
+        return (
+            <Modal show={true} className="ms-modal-dialog-width ms-modal-content-width" onHide={onClose} centered>
+                <Modal.Header className="ms-modal-header-radius-0">
+                 <div>
+                    <h1>Seacole Health</h1>
+                    <h2 className="modal-title text-white">Selected Transaction</h2>
+                    <p>Date recorded: {selectedPaymentsHandover.created_on}</p>
+                 </div>
+                    <button type="button" className="close text-red w-20 mr-2" onClick={onClose}>x</button>
+                    <PrintButton/>
+                </Modal.Header>
+                <Modal.Body style={{ padding: '20px', fontSize: '16px', lineHeight: '1.5' }}>
+                    <div>
+                        <h2>Transaction Statement for: {selectedPaymentsHandover.resident}</h2>
+                        <p>Description: {selectedPaymentsHandover.description}</p>
+                        <p>Receipt Number: {selectedPaymentsHandover.receipt_number}</p>
+                        <p>Type of note: {selectedPaymentsHandover.state}</p>
+                        <p>Staff responsible: {selectedPaymentsHandover.staff_id}</p>
+                        <p>Type of transaction: {selectedPaymentsHandover.transaction_type}</p>
+                        <p>Staff responsible: {selectedPaymentsHandover.staff}</p>
+                        
+                        {/* Display other note details here */}
+                    </div>
+                </Modal.Body>
+            </Modal>
+        );
+    };
+
     return (
         <div className="ms-panel">
             <div className="ms-panel-header ms-panel-custome">
@@ -161,6 +209,7 @@ const Paymentlist = () => {
                             pagination
                             responsive={true}
                             noHeader
+                            onRowClicked={handleRowClick}
                         />
                     </DataTableExtensions>
                 </div>
@@ -174,6 +223,7 @@ const Paymentlist = () => {
                     </Modal.Body>
                 </Modal>
             </div>
+             <SelectedTransactionModal onClose={() => setshowEdit(false)} />
         </div>
     );
 }

@@ -5,7 +5,9 @@ import Config from "../config.json";
 const baseURl = Config.BACKEND_HOST
 
 const errorHandler = (error, ...args) => {
-    const status = error.response.status
+
+    const status = error?.response?.status;
+
     if (status === 0) {
         toastdanger("The server is probably down check your network.")
     } else if (status === 400) {
@@ -36,7 +38,6 @@ const errorHandler = (error, ...args) => {
         toastdanger("Server Error Contact Admin.")
     }
 }
-
 export const getToken = (handler, url, body) => {
     axios.post(
         `${baseURl}${url}`,
@@ -102,14 +103,48 @@ export const truePutApi = (handler, token, url, body, ...args) => {
 }
 
 export const deleteApi = (handler, token, url, id) => {
-    axios.delete(`${baseURl}${url}${id}`, {
+    axios.delete(`${baseURl}${url}`, {
         headers: { Authorization: ` Token ${token}` },
     })
         .then((response) => {
-            handler(response)
+            handler(response) 
         }).catch((error) => {
             errorHandler(error)
         })
 }
 
+// ... (existing imports and code)
 
+export const patchApi = (handler, token, id, url, body, ...args) => {
+  axios.patch(
+    `${baseURl}${url}${id}`,
+    body,
+    {
+      headers: { Authorization: ` Token ${token}` },
+    }
+  )
+  .then((response) => {
+    handler(response);
+  })
+  .catch((error) => {
+    errorHandler(error, ...args);
+  })
+}
+
+
+// ... (existing imports and code)
+
+export const deleteInventoryItem = (handler, token, id) => {
+  axios.delete(
+    `${baseURl}/api/inventory/${id}/`, 
+    {
+      headers: { Authorization: ` Token ${token}` },
+    }
+  )
+  .then((response) => {
+    handler(response);
+  })
+  .catch((error) => {
+    errorHandler(error);
+  });
+};

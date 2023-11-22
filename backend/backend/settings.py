@@ -10,22 +10,31 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import os
+
 from pathlib import Path
+import environ
+from decouple import config
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = config('SECRET_KEY')
+env = environ.Env()
+environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-import os
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = (
-    "django-insecure-yov2df57p=ugg^x_+gr$0$pmyylx987cs)h*p-a=3m1t+u@2b_"
-)
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True if os.environ["DEBUG"] == "debug" else False
+# settings.py
+
+DEBUG = False
+
+
 
 ALLOWED_HOSTS = ["*"]
 
@@ -60,6 +69,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+
 ]
 
 ROOT_URLCONF = "backend.urls"
@@ -87,26 +97,27 @@ LOGIN_REDIRECT_URL = "management:mainmenu"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-if os.environ["DEBUG"] == "debug":
+if os.environ.get("DEBUG", "debug") == "debug":
+
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.environ["POSTGRES_DB"],
-            "USER": os.environ["POSTGRES_USER"],
-            "PASSWORD": os.environ["POSTGRES_PASSWORD"],
-            "HOST": os.environ["POSTGRES_HOST"],
-            "PORT": os.environ["POSTGRES_PORT"],
+            "NAME": 'seacole_staging',
+            "USER": 'doadmin',
+            "PASSWORD": 'AVNS_P2v-z3kK_178BxBTvfO',
+            "HOST": 'seacole-do-user-14823812-0.c.db.ondigitalocean.com',
+            "PORT": '25060',
         }
     }
 else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.environ["POSTGRES_DB"],
-            "USER": os.environ["POSTGRES_USER"],
-            "PASSWORD": os.environ["POSTGRES_PASSWORD"],
-            "HOST": os.environ["POSTGRES_HOST"],
-            "PORT": os.environ["POSTGRES_PORT"],
+            "NAME": os.environ.get("POSTGRES_DB"),
+            "USER": os.environ.get("POSTGRES_USER"),
+            "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
+            "HOST": os.environ.get("POSTGRES_HOST"),
+            "PORT": os.environ.get("POSTGRES_PORT"),
             "OPTIONS": {"sslmode": "require"},
         }
     }
@@ -162,26 +173,33 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.TokenAuthentication",
     ),
+
 }
 
 
 CORS_ALLOWED_ORIGINS = [
-    "https://clinixhealthsystems.co.uk",
+    "https://seacolehealthsystems.co.uk",
     "http://localhost:3000",
-    "https://staging.clinixhealthsystems.co.uk",
+    "https://staging.seacolehealthsystems.co.uk",
 ]
 
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
-    "https://clinixhealthsystems.co.uk",
-    "https://staging.clinixhealthsystems.co.uk",
+    "https://seacolehealthsystems.co.uk",
+    "https://staging.seacolehealthsystems.co.uk",
 ]
 
-CRF_TRUESTED_ORIGINS = [
+CRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
-    "https://clinixhealthsystems.co.uk",
-    "https://staging.clinixhealthsystems.co.uk",
+    "https://seacolehealthsystems.co.uk",
+    "https://staging.seacolehealthsystems.co.uk",
 ]
+
+
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
 
 USE_SPACES = os.getenv("USE_SPACES") == "true"
 if USE_SPACES:
@@ -214,8 +232,8 @@ else:
 EMAIL_HOST = os.environ.get("EMAIL_HOST", default="mail.privateemail.com")
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+EMAIL_HOST_USER = 'nigeltino98@gmail.com'
+EMAIL_HOST_PASSWORD = 'opsalygeebnzkffb'
 SERVER_EMAIL = EMAIL_HOST_USER
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 

@@ -15,6 +15,7 @@ import { incidentActions } from '../../../../store/incident'
 import { getApi } from '../../../../api/api'
 import { selectedResident, selectedStaff, addEmojis } from '../../../utils/expand'
 import dateToYMD from '../../../utils/dates'
+import { homeActions } from '../../../../store/home'
 
 
 
@@ -39,6 +40,7 @@ const Schedulelist = () => {
     const selectedMorningRoutines = useSelector((state) => state.resident.selectedMorningRoutine)
     const selectedAfternoonRoutines = useSelector((state) => state.resident.selectedAfternoonRoutine)
     const selectedIncident = useSelector((state) => state.resident.selectedIncident)
+    const homes = useSelector((state) => state.home.homeList);
 
     const token = useSelector((state) => state.auth.token).token
 
@@ -47,9 +49,21 @@ const Schedulelist = () => {
     const [present_care, setPresentCare] = useState();
     const [fromdate, setFromDate] = useState(Date.now());
     const [todate, setToDate] = useState(Date.now());
+    const [selectedHome, setSelectedHome] = useState(null);
 
 
-
+    const handleHomeChange = (event) => {
+        const selectedHomeId = event.target.value;
+        setSelectedHome(selectedHomeId);
+        dispatch(residentActions.setSelectedResident({})); // Clear selected resident when home changes
+        // Fetch residents based on the selected home ID and dispatch the action to update the resident list
+        if (selectedHomeId) {
+            getApi(response => { dispatch(residentActions.setResidents(response.data)); }, token, `/api/resident?home=${selectedHomeId}`);
+        } else {
+            // If no home is selected, fetch all residents
+            getApi(response => { dispatch(residentActions.setResidents(response.data)); }, token, '/api/resident');
+        }
+    };
 
     const weight_columns = [
         {
@@ -288,7 +302,7 @@ const Schedulelist = () => {
         getApi(response => { dispatch(morningRoutineActions.setMorningRoutine(response.data)) }, token, "/api/morning-routine")
         getApi(response => { dispatch(afternoonRoutineActions.setAfternoonRoutine(response.data)) }, token, "/api/afternoon-routine")
         getApi(response => { dispatch(incidentActions.setIncident(response.data)); }, token, "/api/suggestion")
-
+        getApi(response => { dispatch(homeActions.setHomes(response.data)); }, token, "/api/home");
     }, [dispatch, token])
 
 
@@ -339,9 +353,12 @@ const Schedulelist = () => {
                 data: selectedIncident,
 
             })
-        }
+        } if (selectedHome) {
+            const filteredResidents = residents.filter(resident => resident.home === selectedHome);
+            }
+
     }, [showCare, selectedWeights, selectedBaths, selectedFluids, selectedMoods, selectedSleeps, selected_resident,
-        selectedMorningRoutines, selectedAfternoonRoutines, selectedIncident])
+        selectedMorningRoutines, selectedAfternoonRoutines, selectedIncident, selectedHome])
 
     useEffect(() => {
         if (JSON.stringify(selected_resident) === '{}') {
@@ -373,6 +390,8 @@ const Schedulelist = () => {
 
     }, [selected_resident])
 
+
+
     const handleChange = (event) => {
         switch (event.target.name) {
             case 'resident':
@@ -393,6 +412,14 @@ const Schedulelist = () => {
                 setToDate(event.target.value)
                 break;
 
+            case 'selectedHome':
+               if (event.target.value === 'all') {
+                  setSelectedHome(null);
+               } else {
+                   const selectedHome = homes.find(home => home.id === event.target.value);
+                   setSelectedHome(selectedHome);
+               }
+               break;
             default:
         }
     }
@@ -471,7 +498,7 @@ const Schedulelist = () => {
         }
     }
 
-
+ 
     return (
         <div className="ms-panel">
             <div className="ms-panel-header ms-panel-custome">
@@ -537,6 +564,17 @@ const Schedulelist = () => {
                                 />
                             </InputGroup>
                         </Form.Group>
+                        <Form.Group as={Col} md="3" className="mb-3" controlId="validationCustom01">
+                            <Form.Label>Home</Form.Label>
+                            <InputGroup>
+                                <Form.Control as="select" onChange={handleHomeChange} value={selectedHome}>
+                                   <option value="">All Homes</option>
+                                   {homes.map(home => (
+                                       <option key={home.id} value={home.id}>{home.name}</option>
+                                   ))}
+                                </Form.Control>
+                            </InputGroup>
+                       </Form.Group>
                     </Form.Row>
                 </Form>
             </div>

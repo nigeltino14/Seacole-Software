@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux'
-import { deleteApi, getApi } from '../../../../api/api'
+import { deleteApi, getApi, putApi } from '../../../../api/api'
 import { noteActions } from '../../../../store/note'
 import { staffActions } from '../../../../store/staff'
 import { residentActions } from '../../../../store/resident'
@@ -14,6 +14,7 @@ import ProtectedRoute from '../../../protected/ProtectedRoute'
 import DataTable from 'react-data-table-component';
 import DataTableExtensions from 'react-data-table-component-extensions';
 import { print } from '../../../utils/pdf-export'
+import PrintButton from '../../../utils/print'
 
 
 const Reportlist = () => {
@@ -27,11 +28,17 @@ const Reportlist = () => {
     const token = useSelector((state) => state.auth.token).token
     const dispatch = useDispatch()
     const residents = useSelector((state) => state.resident.residentList)
+    const [selectedNote, setSelectedNote] = useState(null);
+    const user = useSelector((state) => state.auth.user);
 
     const handleCloseEdit = () => {
         setshowEdit(false)
     }
-
+    
+    const handleRowClick = (row) => {
+        setSelectedNote(row);
+    };
+   
     const handleDelete = (id) => {
         const note_list = [...note]
         const selected = note_list.find(item => item.id === id);
@@ -52,11 +59,53 @@ const Reportlist = () => {
             }
         });
     }
+
+// Adding the archive function, this is being used to delete items
+
+  const handleArchive = (id) => {
+    const note_list = [...note]
+    const selected = note_list.find(item => item.id === id);
+    Swal.fire({
+      title: 'Are you sure you want to delete this item?',
+      text: 'This action might be permanent.',
+      input: 'text',
+      inputPlaceholder: 'Please provide a reason for deletion...',
+      inputValidator: (value) => {
+         if (!value) {
+           return 'You need to provide a reason!';
+         }
+      },
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const reason = Swal.getInput().value;
+        const temp_note = { is_deleted: true, deletion_reason: reason };
+        const userId = user.id;
+        putApi(
+          () => {
+            
+             setDisplayNotes((prevDisplayNotes) => prevDisplayNotes.filter((item) => item.id !== id));
+             Swal.fire('Deleted', 'Stock item has been deleted.', 'success'); 
+         },
+         token,
+         `/api/note/`,
+         {...temp_note, },
+         id
+       );
+      }
+    });
+  };
+
+
     const columns = [
 
         { name: "Number", selector: "id", sortable: true },
         { name: "Subject", selector: "subject", sortable: true },
-        { name: "Description", selector: "description", sortable: true },
+        { name: "Entry", selector: "entry", sortable: true },
         { name: "Note Type", selector: "type_of_note", sortable: true },
         {
             name: "Resident", cell: row => <div data-tag="allowRowEvents" >
@@ -84,10 +133,26 @@ const Reportlist = () => {
             </div>, sortable: true
         },
 
+       {
+            name: "Action", cell: row =>
+                <div data-tag="allowRowEvents" >
+                    <ProtectedRoute perm="delete_note">
+                        <Link to='#' onClick={() => handleArchive(row.id)}>
+                            <i className='fas fa-trash-alt ms-text-info  mr-4' />
+                        </Link>
+                    </ProtectedRoute>
+       
+                </div>, sortable: true
+       },
+
     ];
+
+    console.log("Notes to display:", diplay_notes)
+    const filteredNotes = diplay_notes.filter((item) => item.is_deleted !==true)
+
     const tableData = {
         columns,
-        data: diplay_notes,
+        data: filteredNotes,
     };
     useEffect(() => {
         getApi(response => { dispatch(noteActions.setNote(response.data)) }, token, "/api/note")
@@ -103,6 +168,47 @@ const Reportlist = () => {
             setDisplayNotes(data)
         }
     }, [dispatch, token, note, selected_resident])
+
+
+
+//The function below allows for the selection of a certain note to see in detail
+    const SelectedNoteModal = () => {
+        if (!selectedNote) {
+            return null;
+        }
+
+    const onClose = () => {
+        setSelectedNote(null);
+        setshowEdit(false);
+    };
+
+        return (
+            <Modal show={true} className="ms-modal-dialog-width ms-modal-content-width" onHide={onClose} centered>
+                <Modal.Header className="ms-modal-header-radius-0">
+                 <div>
+                    <h1 style={{ fontSize: '24px', marginBottom: '0' }}>Seacole Health</h1>
+                    <h4 className="modal-title text-white">Selected Note</h4>
+                    <p>Date recorded: {selectedNote.created_on}</p>
+                 </div>
+                    <button type="button" className="close text-red w-20 mr-2" onClick={onClose}>x</button>
+                    <PrintButton />
+                </Modal.Header>
+                <Modal.Body style={{ padding: '20px', fontSize: '16px', lineHeight: '1.5' }}>
+                    <div>
+                        <h5>Subject: {selectedNote.subject}</h5>
+                        <p>Entry: {selectedNote.entry}</p>
+                        <p>Resident: {selectedNote.resident}</p>
+                        <p>Type of note: {selectedNote.type_of_note}</p>
+                        <p>Staff responsible: {selectedNote.staff}</p>
+                        
+                        {/* Display other note details here */}
+                    </div>
+                </Modal.Body>
+            </Modal>
+        );
+    };
+  
+    console.log("Filtered:", filteredNotes)
     return (
         <div className="col-xl-12 col-md-12">
             <div className="ms-panel ms-panel-fh">
@@ -122,15 +228,17 @@ const Reportlist = () => {
                             <DataTableExtensions {...tableData} print={false} export={false} >
                                 <DataTable
                                     columns={columns}
-                                    data={diplay_notes}
+                                    data={filteredNotes}
                                     pagination
                                     responsive={true}
                                     striped
                                     noHeader
+                                    onRowClicked={handleRowClick}
                                 />
                             </DataTableExtensions>
                         </div>
                     </div>
+                     <SelectedNoteModal onClose={() => setshowEdit(false)} />
                 </div>
             </div>
             <Modal show={showEdit} className="ms-modal-dialog-width ms-modal-content-width" onHide={handleCloseEdit} centered>
@@ -140,6 +248,7 @@ const Reportlist = () => {
                 </Modal.Header>
                 <Modal.Body className="p-0 text-left">
                     <NoteEdit handleClose={handleCloseEdit} />
+                    
                 </Modal.Body>
             </Modal>
         </div>

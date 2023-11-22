@@ -12,6 +12,8 @@ import { homeActions } from '../../../../store/home'
 import Swal from 'sweetalert2'
 import ProtectedRoute from '../../../protected/ProtectedRoute'
 import { print } from '../../../utils/pdf-export'
+import { genderActions } from '../../../../store/gender'
+import GenderFilter from '../../../modals/GenderFilter';
 
 const Doctorlist = () => {
     const [showEdit, setshowEdit] = useState(false)
@@ -19,7 +21,13 @@ const Doctorlist = () => {
     const [showdelete, setshowdelete] = useState("")
     const staff = useSelector((state) => state.staff.staffList)
     const token = useSelector((state) => state.auth.token).token
+    //const selectedGender = useSelector((state) => state.gender.selectedGender)
     const dispatch = useDispatch()
+
+    const [selectedGender, setSelectedGender] = useState("");
+    const [deletionReason, setDeletionReason] = useState('');
+    const [enableReason, setEnableReason] = useState('');
+
 
     const handleShowEdit = (id) => {
         const staff_list = [...staff]
@@ -58,14 +66,23 @@ const Doctorlist = () => {
             Swal.fire({
                 title: 'Are you sure you to Enable :?',
                 text: `Staff  : ${selected.first_name} ${selected.last_name}`,
+                input: 'text',
+                inputPlaceholder: 'Please provide a reason for enabling...',
+                inputValidator: (value) => {
+                   if (!value) {
+                     return 'You need to provide a reason!';
+                   }
+                },
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Yes, enable it!'
             }).then(function (result) {
-                if (result.value) {
-                    putApi(_ => { Swal.fire('Enable!', 'Staff has been disabled.', 'success') }, token, `/api/staff/`, temp_staff, selected.id)
+                if (result.isConfirmed) {
+                    const reason = Swal.getInput().value;
+                    const temp_staff = { is_active: true, enable_reason: reason };
+                    putApi(_ => { Swal.fire('Enable!', 'Staff has been enabled.', 'success') }, token, `/api/staff/`, temp_staff, selected.id)
                 }
                 setRefresh(selected.national_id);
             });
@@ -74,13 +91,22 @@ const Doctorlist = () => {
             Swal.fire({
                 title: 'Are you sure you to Disable :?',
                 text: `Staff  : ${selected.first_name} ${selected.last_name}`,
+                input: 'text',
+                inputPlaceholder: 'Please provide a reason for deletion...',
+                inputValidator: (value) => {
+                   if (!value) {
+                     return 'You need to provide a reason!';
+                   }
+                },
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Yes, disable it!'
             }).then(function (result) {
-                if (result.value) {
+                if (result.isConfirmed) {
+                    const reason = Swal.getInput().value;
+                    const temp_staff = { is_active: false, deletion_reason: reason };
                     putApi(_ => { Swal.fire('Disable!', 'Staff has been disabled.', 'success') }, token, `/api/staff/`, temp_staff, selected.id)
                 }
                 setRefresh(selected.national_id);
@@ -136,7 +162,7 @@ const Doctorlist = () => {
             name: "Active", cell: row =>
                 <div>
                     <label className="ms-switch">
-                        <input type="checkbox" id={row.id} value={row.id} checked={row.is_active} onChange={() => handleArchive(row.id)} />
+                        <input type="checkbox" id={row.id} value={row.id} checked={row.is_active} onChange={() => handleArchive(row.id)}/>
                         <span className="ms-switch-slider round" />
                     </label>                </div>
             , sortable: true
@@ -149,9 +175,9 @@ const Doctorlist = () => {
                             <i className='fas fa-pencil-alt ms-text-info mr-4' />
                         </Link>
                     </ProtectedRoute>
-                    <Link to='#' onClick={() => { handleDelete(row.id) }}>
+{/*                 <Link to='#' onClick={() => { handleDelete(row.id) }}>
                         <i className='far fa-trash-alt ms-text-danger mr-4' />
-                    </Link>
+                    </Link> */}
                 </div>, sortable: true
 
         },
@@ -161,9 +187,25 @@ const Doctorlist = () => {
         data: staff,
     };
     useEffect(() => {
+
+        let apiUrl = '/api/staff';
+        
+        if (selectedGender) {
+           apiUrl += `?gender=${selectedGender}`;
+        }
+        //console.log('Selected Gender in useEffect:', selectedGender);
         getApi(response => { dispatch(homeActions.setHome(response.data)) }, token, "/api/home")
-        getApi(response => { dispatch(staffActions.setStaff(response.data)) }, token, "/api/staff")
-    }, [showdelete, showEdit, refresh, token, dispatch])
+        getApi(response => { dispatch(staffActions.setStaff(response.data)) }, token, apiUrl)
+    }, [selectedGender, showdelete, showEdit, refresh, token, dispatch])
+    
+    const handleGenderChange = (event) => {
+        const newSelectedGender = event.target.value;
+        //console.log('Selected Gender:', SelectedGender);
+        const filteredStaff = staff.filter(item => !newSelectedGender || item.gender === newSelectedGender)
+        dispatch(staffActions.setStaff(filteredStaff));
+        dispatch(genderActions.setSelectedGender(selectedGender));
+        
+    }
 
     return (
         <div className="ms-panel">
@@ -172,17 +214,24 @@ const Doctorlist = () => {
                 <Link to="#" onClick={print}>
                     <i className='fa fa-print ms-text-info  mr-4' />
                 </Link>
+                
                 <ProtectedRoute perm="add_user">
                     <Link to="/staff/add-staff">Add Staff</Link>
                 </ProtectedRoute>
-            </div>
+                <ProtectedRoute perm="view_user_history"> {/* Add the permission here */}
+                    <Link to="staff/UserHistory">User History</Link>
+                </ProtectedRoute>
+
+            </div> 
+                
+                
             <div className="ms-panel-body">
                 <div className="thead-primary datatables">
 
                     <DataTableExtensions {...tableData} print={false} export={false} >
                         <DataTable
                             columns={columns}
-                            data={data}
+                            data={staff.filter(item => !selectedGender || item.gender === selectedGender)}
                             pagination
                             responsive={true}
                             striped

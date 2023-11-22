@@ -21,7 +21,7 @@ const AddWeight = (props) => {
         follow_up_notes: '',
         future_preventative_action: '',
         action_taken: '',
-        inident_details: '',
+        incident_details: '',
         date_occured: '',
         status: 'low',
         location: '',
@@ -85,10 +85,10 @@ const AddWeight = (props) => {
                 break;
 
 
-            case 'inident_details':
+            case 'incident_details':
                 setState({
                     ...state,
-                    inident_details: event.target.value
+                    incident_details: event.target.value
                 })
                 break;
 
@@ -222,17 +222,17 @@ const AddWeight = (props) => {
                                 </InputGroup>
                             </Form.Group>
                             <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
-                                <Form.Label>Inident Details</Form.Label>
-                                {errors.inident_details && errors.inident_details.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <Form.Label>Incident Details</Form.Label>
+                                {errors.incident_details && errors.incident_details.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
                                 <InputGroup>
                                     <Form.Control
-                                        name="inident_details"
+                                        name="incident_details"
                                         required
                                         as="textarea"
                                         onChange={handleChange}
-                                        value={state.inident_details}
+                                        value={state.incident_details}
                                         type="text"
-                                        placeholder="Inident Details"
+                                        placeholder="Incident Details"
                                     />
                                 </InputGroup>
                             </Form.Group>

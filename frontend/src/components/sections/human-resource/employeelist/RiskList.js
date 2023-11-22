@@ -10,6 +10,7 @@ import { getApi, deleteApi } from '../../../../api/api'
 import { selectedResident, selectedStaff } from '../../../utils/expand'
 import Swal from 'sweetalert2'
 import ProtectedRoute from '../../../protected/ProtectedRoute'
+import PrintButton from '../../../utils/print'
 
 const Addform = () => {
     const [showEdit, setShowEdit] = useState(false)
@@ -21,7 +22,12 @@ const Addform = () => {
     const staff = useSelector((state) => state.staff.staffList)
     const residents = useSelector((state) => state.resident.residentList)
     const dispatch = useDispatch()
+    const [selectedrisk, setSelectedrisk] = useState(null);
 
+    const handleRowClick = (row) => {
+        setSelectedrisk(row);
+    };
+    
     const columns = [
         {
             name: "Title", cell: row =>
@@ -29,7 +35,7 @@ const Addform = () => {
                 </Link>, sortable: true
 
         }, { name: "Category", selector: "category", sortable: true },
-        { name: "identified Risk", selector: "identified_risk", sortable: true },
+        { name: "Identified Risk", selector: "identified_risk", sortable: true },
         { name: "Details", selector: "details", sortable: true },
         { name: "Triggers", selector: "triggers", sortable: true },
         { name: "Support Needs", selector: "support_needs", sortable: true },
@@ -110,6 +116,45 @@ const Addform = () => {
         getApi(response => { dispatch(riskActions.setRisk(response.data)); }, token, "/api/risk")
     }, [dispatch, token, showEdit, showDelete])
 
+//The function below allows for the selection of a certain risk to see in detail
+    const SelectedRiskModal = () => {
+        if (!selectedrisk) {
+            return null;
+        }
+
+    const onClose = () => {
+        setSelectedrisk(null);
+        setShowEdit(false);
+    };
+
+        return (
+            <Modal show={true} className="ms-modal-dialog-width ms-modal-content-width" onHide={onClose} centered>
+                <Modal.Header className="ms-modal-header-radius-0">
+                 <div>
+                   <h1 style={{ fontSize: '24px', marginBottom: '0' }}>Seacole Health</h1>
+                    <h4 className="modal-title text-white">Selected Risk</h4>
+                    <p>Date recorded: {selectedrisk.created_on}</p>
+                 </div>
+                    <button type="button" className="close text-red w-20 mr-2" onClick={onClose}>x</button>
+                    <PrintButton />
+                </Modal.Header>
+                <Modal.Body style={{ padding: '20px', fontSize: '16px', lineHeight: '1.5' }}>
+                    <div>
+                        <h5>Risk statement for: {selectedrisk.resident}</h5>
+                        <p>Risk Identified: {selectedrisk.identified_risk}</p>
+                        <p>Risk details: {selectedrisk.details}</p>
+                        <p>Any triggers: {selectedrisk.triggers}</p>
+                        <p>Support needed: {selectedrisk. support_needs}</p>
+                        <p>Furhter info needed: {selectedrisk.is_further_information_needed}</p>
+                        <p>Staff responsible: {selectedrisk.created_by}</p>
+                        
+                        {/* Display other note details here */}
+                    </div>
+                </Modal.Body>
+            </Modal>
+        );
+    };
+  
     return (
         <div className="ms-panel">
             <div className="ms-panel-header ms-panel-custome">
@@ -117,6 +162,7 @@ const Addform = () => {
                 <ProtectedRoute perm="add_riskactionplan">
                     <Link to="/riskassessment/add-riskassessment">Start Risk Assessment</Link>
                 </ProtectedRoute>
+                <PrintButton /> 
             </div>
 
 
@@ -130,9 +176,11 @@ const Addform = () => {
                             responsive={true}
                             striped
                             noHeader
+                            onRowClicked={handleRowClick}
                         />
                     </DataTableExtensions>
                 </div>
+                 <SelectedRiskModal onClose={() => setShowEdit(false)} />
             </div>
             <Modal show={showEdit} className="ms-modal-dialog-width ms-modal-content-width" onHide={handleCloseEdit} centered>
                 <Modal.Header className="ms-modal-header-radius-0">
@@ -152,6 +200,7 @@ const Addform = () => {
                     <EditRisk handleClose={handleCloseDEtails} />
                 </Modal.Body>
             </Modal>
+       
         </div>
 
 

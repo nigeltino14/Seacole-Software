@@ -306,8 +306,8 @@ const Addform = () => {
                                         value={state.resident}
                                     >
                                         <option key="2a" > ------------- </option>
-                                        {residents.map(user => (
-                                            <option key={user.id} value={user.id}>{user.first_name} {user.last_name}</option>
+                                        {residents.map(resident => (
+                                            <option key={resident.national_id} value={resident.national_id}>{resident.first_name} {resident.last_name}</option>
                                         ))}
                                     </Form.Control>
                                 </InputGroup>

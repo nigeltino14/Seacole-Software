@@ -7,6 +7,13 @@ import { residentActions } from './store/resident'
 import { appointmentActions } from './store/appointment'
 import { attachmentActions } from './store/attachment'
 import { notificationActions } from './store/notification'
+import { inventoryActions } from './store/inventory'
+import { userHistoryActions } from './store/userHistory'
+import { houseAssetActions }  from './store/assets'
+import { stockActions } from './store/stock'
+import { repairActions } from './store/repairs'
+import { confidentialActions } from './store/confidential'
+import { noteActions } from './store/note'
 
 import { getApi } from './api/api'
 import { useDispatch, useSelector } from 'react-redux'
@@ -51,6 +58,7 @@ const Noticelist = React.lazy(() => import("./components/pages/notice/Noticelist
 // patient
 const Addpatient = React.lazy(() => import("./components/pages/patient/Addpatient"));
 const Patientlist = React.lazy(() => import("./components/pages/patient/Patientlist"));
+const Dischargedpatient = React.lazy(() => import("./components/pages/patient/Dischargedpatient"))
 // payment
 const AddNote = React.lazy(() => import("./components/pages/payment/AddNote"));
 const Addpayment = React.lazy(() => import("./components/pages/payment/Addpayment"));
@@ -66,8 +74,27 @@ const Userprofile = React.lazy(() => import("./components/pages/prebuilt-pages/U
 // reports
 const Patientreport = React.lazy(() => import("./components/pages/reports/Patientreport"));
 
+// note
+const DailyNote = React.lazy(() => import("./components/modals/DailyNote"));
+const DeletedNote = React.lazy(() => import("./components/pages/notes/DeletedNote"));
+
 const DrawingApp = React.lazy(() => import("./components/pages/Drawing"))
 const Drawinglist = React.lazy(() => import("./components/pages/bed-manager/DrawingList"));
+const AddInventory = React.lazy(() => import ("./components/modals/AddInventory"));
+const EditInventory = React.lazy(() => import("./components/modals/EditInventory"));
+const InventoryList = React.lazy (() => import("./components/pages/patient/InventoryList"));
+const UserHistory = React.lazy (() => import("./components/modals/UserHistory"));
+const DeleteUser = React.lazy (() => import("./components/modals/DeleteUser"));
+const AddAssets = React.lazy (() => import("./components/modals/AddAssets"));
+const AddStock = React.lazy (() => import("./components/modals/AddStock"));
+const AssetList = React.lazy (() => import("./components/pages/assets_stock/AssetList"));
+const HouseOverview = React.lazy (() => import("./components/pages/house/house-overview"));
+
+const StockList = React.lazy (() => import("./components/pages/assets_stock/StockList"));
+const AddRepairs = React.lazy ( () => import("./components/modals/AddRepairs"));
+const RepairList = React.lazy ( () => import("./components/pages/assets_stock/RepairList"));
+const AddConfidential = React.lazy ( () => import("./components/modals/AddConfidential"));
+const ConfidentialList = React.lazy ( () => import("./components/pages/confidential/ConfidentialList"));
 
 const App = () => {
     const dispatch = useDispatch()
@@ -92,6 +119,15 @@ const App = () => {
             getApi(response => { dispatch(authActions.setUser(response.data)) }, token, "/api/me")
             getApi(response => { dispatch(residentActions.setResidents(response.data)) }, token, "/api/resident")
             getApi(response => { dispatch(notificationActions.setNotification(response.data)) }, token, "/api/reminder")
+            getApi(response => { dispatch(inventoryActions.setInventory(response.data)) }, token, "/api/inventory")
+            getApi(response => { dispatch(userHistoryActions.setUserHistory(response.data)) }, token, "/api/userHistory")
+            getApi(response => { dispatch(houseAssetActions.setHouseAsset(response.data)) }, token, "/api/house-asset")
+            getApi(response => { dispatch(stockActions.setStock(response.data)) }, token, "/api/house-stock")
+            getApi(response => { dispatch(repairActions.setRepair(response.data)) }, token, "/api/repair-record")
+            getApi(response => { dispatch(confidentialActions.setConfidential(response.data)) }, token, "/api/confidential-info")
+            getApi(response => { dispatch(noteActions.setNote(response.data)) }, token, "/api/note")
+
+
         }
     }, [dispatch, token])
 
@@ -147,13 +183,60 @@ const App = () => {
                         <Route path="/resdient/add-resdient" component={Addpatient} />
                         <Route exact path="/resident" component={Patientlist} />
                         <Route path="/resident/detail" component={Userprofile} />
+                        <Route path="/resident/discharged-resident" component={Dischargedpatient} />
                         {/* Notes */}
-                        <Route path="/note/add-note" component={AddNote} />
+                        <Route path="/note/add-note" component={DailyNote} />
                         <Route exact path="/note" component={Patientreport} />
+                        <Route path="/note/deleted-notes" component={DeletedNote} />
+
                         {/* Finance */}
                         <Route path="/payment/add-payment" component={Addpayment} />
                         <Route exact path="/payment" component={Paymentlist} />
                         <Route path="/notification" component={Notifications} />
+
+                        {/* Add Inventory */}
+                        <Route path="/resident/add-inventory" component={AddInventory}  />
+                        <Route exact path="resident" component={Patientlist}  />
+                        <Route path="/resident/edit-inventory" component={EditInventory}  />
+
+                        {/* EditInventory */}
+                        <Route path="/resident/edit-inventory" component={EditInventory}  />
+                        <Route exact path="resident" component={Patientlist} />
+
+                        {/* Inventory List */}
+                        <Route path="/resident/InventoryList" component={InventoryList} />
+                        <Route exact path="resident" component={Patientlist} />
+
+                        {/* UserHistory */}
+                        <Route path="/staff/UserHistory" component={UserHistory} />
+                        <Route exact path="staff" component={Doctorlist} />
+
+                        <Route path="/staff/delete-non-superusers" component={DeleteUser} />
+                        <Route exact path="staff" component={Doctorlist} />
+
+                        {/* HouseAssets */}
+                        <Route path="/house-asset" component={AddAssets} />
+                        <Route path="/asset-list"  component={AssetList} />
+
+                        {/* House overview */}
+                        <Route path="/house-overview" component={HouseOverview} />
+                        <Route path="/house-overview/asset-list"  component={AssetList} />
+                        <Route path="/house-overview/stock-list"  component={StockList} />
+                        <Route path="/house-overview/repair-list" component={RepairList} />
+
+                        {/* HouseStock */}
+                        <Route path="/house-stock" component={AddStock} />
+                        <Route path="/stock-list" component={StockList} />
+
+                        {/* House repairs */}
+                        <Route path="/repair-record" component={AddRepairs} />
+                        <Route path="/repair-list" component={RepairList} />
+
+                        {/* Confidential-info */}
+                        <Route path="/confidential-info" component={AddConfidential} />
+                        <Route path="/confidential-list" component={ConfidentialList} />
+
+
 
                         {/* uibasic */}
                         <Route path="/login" component={Defaultlogin} />

@@ -112,6 +112,9 @@ const Sidenav = () => {
                                     <ProtectedRoute perm="view_resident">
                                         <li> <Link to="/resident">Resident List</Link> </li>
                                     </ProtectedRoute>
+                                    <ProtectedRoute perm="view_resident">
+                                        <li> <Link to="/resident/discharged-resident">Discharged Resident List</Link> </li>
+                                    </ProtectedRoute>
                                 </ul>
                             </Accordion.Collapse>
                         </li>
@@ -119,16 +122,21 @@ const Sidenav = () => {
                     {/* Patient */}
 
                     {/* Schedule */}
-                    <li className="menu-item">
-                        <Accordion.Toggle as={NavLink} variant="link" eventKey="4" className="has-chevron">
-                            <span><i className="fas fa-list-alt" />Handover</span>
-                        </Accordion.Toggle>
-                        <Accordion.Collapse eventKey="4">
-                            <ul>
-                                <li> <Link to="/handover">HandOver</Link> </li>
-                            </ul>
-                        </Accordion.Collapse>
-                    </li>
+                    <ProtectedRoute perm="view_resident"> 
+                       <li className="menu-item">
+                           <Accordion.Toggle as={NavLink} variant="link" eventKey="4" className="has-chevron">
+                               <span><i className="fas fa-list-alt" />Handover</span>
+                           </Accordion.Toggle>
+                           <Accordion.Collapse eventKey="4">
+                              <ul>
+                                  <li> <Link to="/handover">HandOver</Link> </li>
+                                  <ProtectedRoute perm="view_note">
+                                        <li> <Link to="/note/deleted-notes">Deleted Daily Notes</Link> </li>
+                                  </ProtectedRoute>
+                              </ul>
+                           </Accordion.Collapse>
+                       </li>
+                    </ProtectedRoute>
                     {/* Schedule */}
                     {/* Appointment */}
                     <ProtectedRoute perm="view_appointment">
@@ -170,6 +178,22 @@ const Sidenav = () => {
                     </ProtectedRoute>
                     {/* Payment */}
                     {/* Report */}
+                    
+                    {/* House */}
+                    <li className="menu-item">
+                        <Accordion.Toggle as={NavLink} variant="link" eventKey="7" className="has-chevron">
+                             <span><i className="fas fa-home" />House</span>
+                        </Accordion.Toggle>
+                        <Accordion.Collapse eventKey="7">
+                            <ul>
+                                <li> <Link to="/house-overview">House Overview</Link> </li>
+                                <li> <Link to="/house-asset">House Assets</Link> </li>
+                                <li> <Link to="/house-stock">House Stock</Link> </li>
+                                <li> <Link to="/repair-record">House Repairs and Damages</Link> </li>
+                                {/* Add more links related to the House module here */}
+                            </ul>
+                        </Accordion.Collapse>
+                    </li>
                     {/* <li className="menu-item">
                         <Accordion.Toggle as={NavLink} variant="link" eventKey="7" className="has-chevron">
                             <span><i className="fas fa-file-alt" />Daily Notes</span>
@@ -276,17 +300,41 @@ const Sidenav = () => {
                             </Accordion.Collapse>
                         </li>
                     </ProtectedRoute>
-                    <li className="menu-item">
-                        <Accordion.Toggle as={NavLink} variant="link" eventKey="20" className="has-chevron">
-                            <span><i className="far fa-user" />Body Map </span>
-                        </Accordion.Toggle>
-                        <Accordion.Collapse eventKey="20">
-                            <ul>
-                            <li> <Link to="/body-map">Body Maps</Link> </li>
-                            <li> <Link to="/body-map/add">Add Body Map</Link> </li>
-                            </ul>
-                        </Accordion.Collapse>
-                    </li>
+                    <ProtectedRoute perm="view_bodymap">
+                       <li className="menu-item">
+                           <Accordion.Toggle as={NavLink} variant="link" eventKey="20" className="has-chevron">
+                               <span><i className="far fa-user" />Body Map </span>
+                           </Accordion.Toggle>
+                           <Accordion.Collapse eventKey="20">
+                               <ul>
+                                   <ProtectedRoute perm="view_bodymap">
+                                      <li> <Link to="/body-map">Body Maps</Link> </li>
+                                   </ProtectedRoute>
+                                   <ProtectedRoute perm="add_bodymap">
+                                      <li> <Link to="/body-map/add">Add Body Map</Link> </li>
+                                   </ProtectedRoute>
+                               </ul>
+                            </Accordion.Collapse>
+                        </li>
+                    </ProtectedRoute>
+                    <ProtectedRoute perm="view_confidentialrecord">
+                        <li className="menu-item">
+                            <Accordion.Toggle as={NavLink} variant="link" eventKey="20" className="has-chevron">
+                                <span><i className="far fa-file-alt" />Admin Panel</span>
+                            </Accordion.Toggle>
+                            <Accordion.Collapse eventKey="20">
+                                <ul>
+                                    <ProtectedRoute perm="add_confidentialrecord">
+                                        <li> <Link to="/confidential-info">Add Confidential Record</Link> </li>
+                                    </ProtectedRoute>
+                                    <ProtectedRoute perm="view_confidentialrecord">
+                                        <li> <Link to="/confidential-list">Confidential List</Link> </li>
+                                    </ProtectedRoute>
+                                   
+                                </ul>
+                            </Accordion.Collapse>
+                        </li>
+                    </ProtectedRoute>
                 </Accordion>
             </Scrollbar>
             <Modal show={showResident} className="ms-modal-dialog-width ms-modal-content-width" onHide={handleClose} centered>

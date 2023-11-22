@@ -11,6 +11,7 @@ import { selectedResident, selectedStaff } from '../../../utils/expand'
 import dateToYMD from '../../../utils/dates'
 import ProtectedRoute from '../../../protected/ProtectedRoute'
 import Swal from 'sweetalert2'
+import PrintButton from '../../../utils/print'
 
 
 const Addform = () => {
@@ -23,6 +24,11 @@ const Addform = () => {
     const residents = useSelector((state) => state.resident.residentList)
     const [showdelete, setshowdelete] = useState("")
     const dispatch = useDispatch()
+    const [selectedPlan, setSelectedPlan] = useState(null)
+
+    const handleRowClick = (row) => {
+        setSelectedPlan(row);
+    };
 
     const columns = [
         {
@@ -116,6 +122,49 @@ const Addform = () => {
         });
     }
 
+    //The function below allows for the selection of a certain note to see in detail
+    const SelectedSupportPlanModal = () => {
+        if (!selectedPlan) {
+            return null;
+        }
+
+    const onClose = () => {
+        setSelectedPlan(null);
+        setShowEdit(false);
+    };
+
+        return (
+            <Modal show={true} className="ms-modal-dialog-width ms-modal-content-width" onHide={onClose} centered>
+                <Modal.Header className="ms-modal-header-radius-0">
+                 <div>
+                    <h1 style={{ fontSize: '24px', marginBottom: '0' }}>Seacole Health</h1>
+                    <h2 className="modal-title text-white">Selected Support Plan</h2>
+                    <p>Date recorded: {selectedPlan.created_on}</p>
+                 </div>
+                    <button type="button" className="close text-red w-20 mr-2" onClick={onClose}>x</button>
+                    <PrintButton/>
+                </Modal.Header>
+                <Modal.Body style={{ padding: '20px', fontSize: '16px', lineHeight: '1.5' }}>
+                    <div>
+                        <h2>Resident: {selectedPlan.resident}</h2>
+                        <p>Title: {selectedPlan.title}</p>
+                        <p>Category: {selectedPlan.category}</p>
+                        <p>Issue: {selectedPlan.issue}</p>
+                        <p>Action Plan: {selectedPlan.action_plan}</p>
+                        <p>By who: {selectedPlan.by_who}</p>
+                        <p>By whom: {selectedPlan.by_whom}</p>
+                        <p>Staff responsible: {selectedPlan.created_by}</p>
+                        <p>By When: {selectedPlan.by_when}</p>
+                        <p>Goal: {selectedPlan.goal}</p>
+                        <p>Achievements: {selectedPlan.achievements}</p>
+                        <p>Next Evaluation Date: {selectedPlan.next_assement_date}</p>
+
+                        {/* Display other note details here */}
+                    </div>
+                </Modal.Body>
+            </Modal>
+        );
+    };
 
     useEffect(() => {
         getApi(response => { dispatch(planActions.setPlans(response.data)); }, token, "/api/plan")
@@ -124,7 +173,7 @@ const Addform = () => {
     return (
         <div className="ms-panel">
             <div className="ms-panel-header ms-panel-custome">
-                <h6>Support Plans : {selected_resident.first_name} {selected_resident.last_name}</h6>
+                <h6>Support Plans {/*: {selected_resident.first_name} {selected_resident.last_name}*/}</h6>
                 <ProtectedRoute perm="add_supportplan">
                     <ProtectedRoute perm="add_supportplan">
                         <Link to="/supportplan/add-supportplan">Add Plan</Link>
@@ -141,9 +190,11 @@ const Addform = () => {
                             responsive={true}
                             striped
                             noHeader
+                            onRowClicked={handleRowClick}
                         />
                     </DataTableExtensions>
                 </div>
+                 <SelectedSupportPlanModal onClose={() => setShowEdit(false)} />
             </div>
             <Modal show={showEdit} className="ms-modal-dialog-width ms-modal-content-width" onHide={handleCloseEdit} centered>
                 <Modal.Header className="ms-modal-header-radius-0">

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { Form, InputGroup, Button, Col } from 'react-bootstrap';
 import { postApi } from '../../../../api/api'
 import { useSelector } from 'react-redux'
@@ -10,10 +10,14 @@ const initialState = {
     address: '',
     capacity: 0
 }
+
+
 const Addform = () => {
     const [validated, setValidated] = useState(false);
     const [state, setState] = useState(initialState)
     const token = useSelector((state) => state.auth.token).token
+    
+    const history = useHistory();
 
     const handleReset = () => {
         setValidated(false);
@@ -61,6 +65,9 @@ const Addform = () => {
         }
     }
 
+      const handleGoBack = () => {
+       history.goBack();
+    };
 
     return (
         <div className="col-xl-12 col-md-12">
@@ -116,7 +123,8 @@ const Addform = () => {
                             </Form.Group>
                         </Form.Row>
                         <Button type="reset" variant="warning" className="mt-4 d-inline w-20 mr-2" onClick={handleReset}>Reset</Button>
-                        <Button type="submit" className="mt-4 d-inline w-20">Create Home</Button>
+                        <Button type="submit" className="mt-4 d-inline w-20 mr-2">Create Home</Button>
+                        <button onClick={handleGoBack} className="btn btn-primary">Back</button>
                     </Form>
                 </div>
             </div>

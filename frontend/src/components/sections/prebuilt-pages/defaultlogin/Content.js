@@ -145,7 +145,7 @@ const Content = () => {
                                         </Form.Check>
                                     </Form.Group>
                                     <Button type="submit" className="mt-4 d-block w-100">Sign In</Button>
-                                    <p className="mb-0 mt-3 text-center">Lost passowrd ? <Link className="btn-link" to="/password-reset-email">Reset Passoword</Link> </p>
+                                    <p className="mb-0 mt-3 text-center">Lost password ? <Link className="btn-link" to="/password-reset-email">Reset Password</Link> </p>
 
                                 </Form>
                             </div>

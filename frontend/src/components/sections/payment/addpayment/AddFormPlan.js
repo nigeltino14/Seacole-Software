@@ -20,14 +20,15 @@ const Addform = () => {
     const initialState = {
         title: '',
         category: 'Education',
-        identified_risk: '',
-        details: '',
-        resident: '',
+        issue: '',
+        action_plan: '',
+        by_who: '',
         created_by: '',
-        information_sources_used: false,
-        assesment_date: '',
-        discontinue: false,
-        next_assement_date: '',
+        by_whom: '',
+        by_when: '',
+        goal: '',
+        achievements: '',
+        
 
     }
     const [state, setState] = useState(initialState)
@@ -72,59 +73,59 @@ const Addform = () => {
                 })
                 break;
 
-            case 'identified_risk':
+            case 'issue':
                 setState({
                     ...state,
-                    identified_risk: event.target.value
+                    issue: event.target.value
                 })
                 break;
 
-            case 'details':
+            case 'action_plan':
                 setState({
                     ...state,
-                    details: event.target.value
+                    action_plan: event.target.value
                 })
                 break;
 
-            case 'resident':
+            case 'by_who':
                 setState({
                     ...state,
-                    resident: event.target.value
+                    by_who: event.target.value
                 })
                 break;
 
-            case 'information_sources_used':
+            case 'by_whom':
                 setState({
                     ...state,
-                    information_sources_used: event.target.checked
+                    by_whom: event.target.value
                 })
                 break;
 
-            case 'assesment_date':
+            case 'goal':
                 setState({
                     ...state,
-                    assesment_date: event.target.value
+                   goal: event.target.value
                 })
                 break;
 
-            case 'is_further_information_needed':
+            case 'achievements':
                 setState({
                     ...state,
-                    is_further_information_needed: event.target.checked
+                    achievements: event.target.value
                 })
                 break;
 
-            case 'discontinue':
+            case 'created_by':
                 setState({
                     ...state,
-                    discontinue: event.target.checked
+                    created_by: event.target.checked
                 })
                 break;
 
-            case 'next_assement_date':
+            case 'by_when':
                 setState({
                     ...state,
-                    next_assement_date: event.target.value
+                    by_when: event.target.value
                 })
                 break;
             default:

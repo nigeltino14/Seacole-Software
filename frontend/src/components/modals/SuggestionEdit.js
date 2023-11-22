@@ -72,10 +72,10 @@ const SuggestionEdit = (props) => {
                 break;
 
 
-            case 'inident_details':
+            case 'incident_details':
                 dispatch(suggestionActions.setSelectedSuggestion({
                     ...selected_suggestion,
-                    inident_details: event.target.value
+                    incident_details: event.target.value
                 }))
                 break;
 
@@ -203,15 +203,15 @@ const SuggestionEdit = (props) => {
                             </Form.Group>
                             <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
                                 <Form.Label>Inident Details</Form.Label>
-                                {errors.inident_details && errors.inident_details.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                {errors.incident_details && errors.incident_details.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
                                 <InputGroup>
                                     <Form.Control
-                                        name="inident_details"
+                                        name="incident_details"
                                         required
                                         onChange={handleChange}
-                                        value={selected_suggestion.inident_details}
+                                        value={selected_suggestion.incident_details}
                                         type="text"
-                                        placeholder="Inident Details"
+                                        placeholder="Incident Details"
                                     />
                                 </InputGroup>
                             </Form.Group>

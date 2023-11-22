@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Form, InputGroup, Button, Col } from 'react-bootstrap';
-import { postApi } from '../../api/api'
+import { postApi, putApi} from '../../api/api'
 import { useSelector, useDispatch } from 'react-redux'
 import { residentActions } from '../../store/resident'
 import { min_date, max_date } from '../utils/dob'
+import Swal from 'sweetalert2';
 
 const PatientEdit = (props) => {
     const [validated, setValidated] = useState(false);
@@ -17,6 +18,7 @@ const PatientEdit = (props) => {
     const user = useSelector((state) => state.auth.user)
     const selected_resident = useSelector((state) => state.resident.selectedResident)
     const token = useSelector((state) => state.auth.token).token
+    const residents = useSelector((state) => state.resident.residentList)
     const dispatch = useDispatch()
 
     const handleSubmit = (event) => {
@@ -26,14 +28,22 @@ const PatientEdit = (props) => {
         if (form.checkValidity() === false) {
             event.stopPropagation();
         } else {
-            postApi(_ => {
-                props.handleClose()
-            }, token, `/api/resident-discharge/`,
-                state
-                , errors_list => { setErrors(errors_list) })
-        }
-    };
 
+            postApi(_ => {
+              props.handleClose()
+              selected_resident.is_discharged_status = true;
+              dispatch(residentActions.dischargedResident(selected_resident.id));
+              console.log('Updated selected_resident:', selected_resident);
+              Swal.fire('Discharged!', 'Resident has been discharged.', 'success');
+            }, token, `/api/resident-discharge/`,
+               state
+               , (errors_list) => { setErrors(errors_list) })
+        }
+       };
+
+    
+
+  
     const handleChange = (event) => {
         switch (event.target.name) {
 
@@ -93,7 +103,7 @@ const PatientEdit = (props) => {
                                 </InputGroup>
                             </Form.Group>
                             <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom02">
-                                <Form.Label>Resdient</Form.Label>
+                                <Form.Label>Resident</Form.Label>
                                 {errors.last_name && errors.last_name.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
                                 <InputGroup>
                                     <Form.Control

@@ -21,6 +21,8 @@ const initialState = {
     email: '',
     address: '',
     height: '',
+    next_of_kin: '',
+
 }
 const Addform = () => {
 
@@ -50,6 +52,7 @@ const Addform = () => {
         formData.append('email', state.email);
         formData.append('address', state.address);
         formData.append('height', state.height);
+        formData.append('next_of_kin', state.next_of_kin);
 
         event.preventDefault();
         if (form.checkValidity() === false) {
@@ -157,6 +160,14 @@ const Addform = () => {
                     height: event.target.value
                 })
                 break;
+
+            case 'next_of_kin':
+		setState({
+		   ...state,
+		   next_of_kin: event.target.value
+                   
+		})
+		break;
             default:
 
         }
@@ -361,6 +372,21 @@ const Addform = () => {
                                     />
                                 </InputGroup>
                             </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom12">
+                                <Form.Label>Next of Kin</Form.Label>
+                                {errors.next_of_kin && errors.next_of_kin.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="next_of_kin"
+                                        onChange={handleChange}
+                                        value={state.next_of_kin}
+                                        type="text"
+                                        placeholder="Next of Kin"
+                                   />
+                               </InputGroup>
+                           </Form.Group>
+
+
                         </Form.Row>
                         <Button type="reset" variant="warning" className="mt-4 d-inline w-20 mr-2" onClick={handleReset}>Reset</Button>
                         <Button type="submit" className="mt-4 d-inline w-20">Create Resident</Button>

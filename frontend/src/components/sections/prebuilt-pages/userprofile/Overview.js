@@ -62,6 +62,15 @@ const Overview = () => {
                             <Nav.Item>
                                 {/* <Nav.Link eventKey="tab6">Archive History</Nav.Link> */}
                             </Nav.Item>
+                            <Nav.Item>
+                               <Nav.Link as={Link} to="/resident/add-inventory">Add Inventory</Nav.Link>
+                            </Nav.Item>
+                            <Nav.Item>
+                               <Nav.Link as={Link} to="/resident/edit-inventory">Edit Inventory</Nav.Link>
+                            </Nav.Item>
+                               <Nav.Item>
+                               <Nav.Link as={Link} to="/resident/InventoryList">InventoryList</Nav.Link>
+                            </Nav.Item> 
                         </Nav>
                     </div>
                     <Tab.Content>

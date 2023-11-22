@@ -61,7 +61,7 @@ const Paymentlist = () => {
     }
 
     const columns = [
-        { name: "Shift", selector: "description", sortable: true },
+        { name: "Shift", selector: "shift", sortable: true },
         { name: "Home", selector: "assigned_home", sortable: true },
         { name: "Start Time", selector: "start_date", sortable: true },
         { name: "End Time", selector: "end_date", sortable: true },
@@ -74,7 +74,7 @@ const Paymentlist = () => {
         {
             name: "Created By", cell: row =>
                 <div >
-                    {selectedStaff(row.crreated_by, staff)}
+                    {selectedStaff(row.created_by, staff)}
                 </div>, sortable: true
         },
         {
@@ -113,7 +113,7 @@ const Paymentlist = () => {
                 <div className="thead-primary datatables">
                     <DataTableExtensions {...tableData} print={false} export={false}>
                         <DataTable
-                            columns={columns}
+                            columns={tableData.columns}
                             data={tableData.data}
                             pagination
                             responsive={true}
