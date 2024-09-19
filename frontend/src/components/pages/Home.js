@@ -23,6 +23,7 @@ const Home = () => {
                 <main className="body-content">
                     <Topbar />
                     <Content />
+
                 </main>
             </div>
         </Fragment>

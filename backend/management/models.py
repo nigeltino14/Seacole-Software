@@ -34,9 +34,21 @@ STOOL_TYPE = (
 APPOINTMENT_STATUS = (("Done", "Done"), ("Pending", "Pending"))
 
 GENDER_CHIOCES = (("Male", "Male"), ("Female", "Female"), ("Other", "Other"))
+RATING_CHOICES = (("Low", "Low"), ("Medium", "Medium"), ("High", "High"))
+RISK_LEVELS = (("Low", "Low"), ("Medium", "Medium"), ("High", "High"))
+RISK_PERSONNEL = (("Service User", "Service User"), ("Staff", "Staff"),
+                  ("Family Member", "Family Member"), ("Other", "Other"))
+LIKELIHOOD = (("Unlikely", "Unlikely"), ("May Happen", "May Happen"), ("Likely", "Likely"))
+SEVERITY = (("Low", "Low"), ("Medium", "Medium"), ("High", "High"))
+DURATION_CHOICES = (
+    ("Standard Care Plan", "Standard Care Plan"),
+    ("ShortTerm", "Short Term"),
+    ("LongTerm", "Long Term"),
+)
 
 BATH_TYPE = (
     ("full", "full"),
+
     ("half", "half"),
 )
 
@@ -58,9 +70,7 @@ DAILY_CARE_OPTIONS = (("bath", "bath"),)
 
 CATEGORY_TYPE = (
     ("HousingTenancy", "Housing/Tenancy"),
-    ("Risk", "Risk"),
     ("FinanceMoneyBenefitManagement", "Finance/Money/Benefit Management"),
-    ("RentArrearsServiceUsers", "Rent Arrears - Service Users"),
     ("RentArrearsServiceUsers", "Rent Arrears - Service Users"),
     ("Education", "Education"),
     ("Training", "Training"),
@@ -71,10 +81,10 @@ CATEGORY_TYPE = (
     ("MovingOn", "Moving On"),
     ("FurtherConcernsNeeds", "Further Concerns/Needs -"),
     (
-        "ServicesprovidedbyHousingorEstateManagementService",
+        "ServicesProvidedByHousingOrEstateManagementService",
         "Services provided by Housing or Estate Management Service",
     ),
-    ("ServicesprovidedbySupportWorker", "Services provided by Support Worker"),
+    ("ServicesProvidedBySupportWorker", "Services provided by Support Worker"),
     (
         "SupportWorkersViewsofIssuesNeedsorActions",
         "Support Worker's Views of Issues, Needs or Actions",
@@ -108,9 +118,14 @@ MENTAL_STATE = (
 )
 EMOTION_CHOICES = (
     ("unknown", "Unknown"),
+    ("happy", "Happy"),
     ("joyful", "Joyful"),
     ("sad", "Sad"),
-    ("tearful", "Tearful"),
+    ("content", "Content"),
+    ("worried", "Worried"),
+    ("fearful", "Fearful"),
+    ("sleepy", "Sleepy"),
+    ("confused", "Confused"),
     ("angry", "Angry"),
     ("annoyed", "Annoyed"),
     ("sleeping", "Sleeping"),
@@ -200,7 +215,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    location = models.CharField(max_length=255, null=True, blank=True)
+ #   location = models.CharField(max_length=255, null=True, blank=True)
     home = models.ForeignKey(Home, on_delete=models.SET_NULL, null=True, blank=True)
     category = models.CharField(max_length= 30, null=True, blank=True)  #this is the position or rank in the addform
     dob = models.DateField(null=True, blank=True)
@@ -210,9 +225,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     nationality = models.CharField(max_length=255, null=True, blank=True)
     religion = models.CharField(max_length=30, null=True, blank=True)
     next_of_kin = models.TextField()
-    ethnic_origin = models.CharField(max_length=30, null=True, blank=True)
+    ethnic_origin = models.CharField(max_length=50, null=True, blank=True)
     address = models.CharField(max_length=100)
-    gender = models.CharField(choices=GENDER_CHIOCES, max_length=30)
+    gender = models.CharField(choices=GENDER_CHIOCES, max_length=50)
     tel1 = models.CharField(max_length=30, null=True, blank=True)
     tel2 = models.CharField(max_length=30, null=True, blank=True)
     mobile = models.CharField(max_length=30, null=True, blank=True)
@@ -236,14 +251,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     deletion_reason = models.TextField(null=True, blank=True, default="Not deleted")
     enable_reason = models.TextField(null=True, blank=True, default="Enabled")
-    locations = models.ManyToManyField("AllowedLocations", blank=True)
+
     USERNAME_FIELD = "email"
     objects = UserManager()
 
     def __str__(self):
-        return self.email
-
-
+        return f"{self.first_name} {self.last_name} {self.email}"
+    
+        
 class Reminder(models.Model):
     """Manages Sites"""
 
@@ -280,7 +295,7 @@ class Note(models.Model):
         max_length=50,
         choices=(("day", "day"), ("night", "night")),
     )
-    created_on = models.DateField(_("Created On"), auto_now_add=True)
+    created_on = models.DateTimeField(_("Created On"), auto_now_add=True)
     staff = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_("Created By"),
@@ -408,7 +423,7 @@ class BodyMap(models.Model):
         verbose_name="Staff",
         on_delete=models.CASCADE,
     )
-    treatment_plan = models.CharField(max_length=30, blank=True, null=True)
+    treatment_plan = models.CharField(max_length=500, blank=True, null=True)
 
     created_on = models.DateTimeField(_("Created On"), auto_now_add=True)
     comment = models.TextField(blank=True, null=True)
@@ -416,7 +431,7 @@ class BodyMap(models.Model):
     wound_width = models.IntegerField()
     pain = models.IntegerField()
     wound_depth = models.IntegerField()
-    condition = models.CharField(max_length=30, blank=True, null=True)
+    condition = models.CharField(max_length=150, blank=True, null=True)
     attachment = models.FileField(upload_to="attachments")
     next_assement_date = models.DateTimeField(
         _("Asssment date"), default=timezone.now
@@ -427,12 +442,12 @@ class Resident(models.Model):
     """Resident"""
 
     # make sure a discharged resident doesent show up @ queries
-    national_id = models.CharField(max_length=10, primary_key=True)
+    national_id = models.CharField(max_length=25, primary_key=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     gender = models.CharField(max_length=30, choices=GENDER_CHIOCES)
     date_of_birth = models.DateField()
-    next_of_kin = models.CharField(max_length=30, null=True, blank=False)
+    next_of_kin = models.CharField(max_length=100, null=True, blank=False)
     relative = models.CharField(max_length=40, null=True,blank=False)
     is_archived = models.BooleanField(
         default=False
@@ -451,7 +466,7 @@ class Resident(models.Model):
     profile_pic = models.ImageField(
         upload_to="profiles/", null=True, blank=True
     )
-    phone = models.CharField(_("Contact"), max_length=12)
+    phone = models.CharField(_("Contact"), max_length=20)
     email = models.EmailField(max_length=255, unique=False)
     address = models.TextField()
     created_by = models.ForeignKey('User', on_delete=models.CASCADE, null=True, blank=True)
@@ -551,7 +566,7 @@ class SuggestionComplains(models.Model):
     incident_details = models.TextField()
     location = models.TextField()
     date_occured = models.DateTimeField()
-    status = models.CharField(choices=SUGGESTION_STATUS, max_length=20)
+    status = models.CharField(choices=SUGGESTION_STATUS, max_length=40)
     created_on = models.DateTimeField(_("Created On"), auto_now_add=True)
     staff = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -569,7 +584,7 @@ class SuggestionComplains(models.Model):
 
 class Rota(models.Model):
     id = models.AutoField(primary_key=True)
-    shift = models.CharField(choices=SHIFT_CHOICES, max_length=30)
+    shift = models.CharField(choices=SHIFT_CHOICES, max_length=40)
     staff = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="Staff",
@@ -601,14 +616,16 @@ class Rota(models.Model):
 
 class SupportPlan(models.Model):
     title = models.CharField(max_length=30, null=True, blank=True)
-    created_on = models.DateField(_("Created On"), auto_now_add=True)
-    issue = models.CharField(max_length=30, null=True, blank=True)
-    action_plan = models.CharField(max_length=30, null=True, blank=True)
-    by_whom = models.CharField(max_length=30, null=True, blank=True)
-    by_who = models.CharField(max_length=30, null=True, blank=True)
-    by_when = models.CharField(max_length=30, null=True, blank=True)
-    goal = models.CharField(max_length=30, null=True, blank=True)
-    achievements = models.CharField(max_length=30, null=True, blank=True)
+    created_on = models.DateTimeField(_("Created On"), auto_now_add=True)
+    care_rating = models.CharField(_("Care Rating"), choices=RATING_CHOICES, max_length=40, null=True, blank=True)
+    approved_by = models.CharField(max_length=40, null=True, blank=True)
+    cp_duration = models.CharField(choices=DURATION_CHOICES, max_length=40, null=True, blank=True)
+    issue = models.CharField(max_length=500, null=True, blank=True)
+    action_plan = models.CharField(max_length=500, null=True, blank=True)
+    by_who = models.CharField(max_length=100, null=True, blank=True)
+    by_when = models.CharField(max_length=100, null=True, blank=True)
+    goal = models.CharField(max_length=500, null=True, blank=True)
+    achievements = models.CharField(max_length=100, null=True, blank=True)
     created_by = models.ForeignKey(
         "User", verbose_name=_(""), on_delete=models.CASCADE
     )
@@ -616,19 +633,46 @@ class SupportPlan(models.Model):
         "Resident", verbose_name=_(""), on_delete=models.CASCADE
     )
     next_assement_date = models.DateTimeField(
-        _("Asssment date"), default=timezone.now
+        _("Assessment date"), default=timezone.now
     )
+    next_eval_date = models.DateTimeField(
+        _("Evaluation Date"), default=timezone.now
+    )
+    evaluations = models.CharField(max_length=200, null=True, blank=True)
     discontinue = models.BooleanField(_("Discontinue"), default=False)
     category = models.CharField(choices=CATEGORY_TYPE, max_length=100)
+    last_evaluated_date = models.DateTimeField(auto_now=True, blank=True, null=True)
+    staff = models.CharField(blank=True, null=True)
+    is_deleted = models.BooleanField(default=False)
+    deletion_reason = models.TextField(null=True, blank=True, default="Not deleted")
 
     def __str__(self):
         return self.title
 
 
+class PlanEvaluation(models.Model):
+    support_plan = models.ForeignKey(SupportPlan, on_delete=models.CASCADE)
+    text = models.CharField(max_length=500, null=True, blank=True, default="")
+    staff = models.ForeignKey("User", on_delete=models.CASCADE,
+                              blank=True, null=True)
+    resident = models.ForeignKey("RESIDENT",  on_delete=models.CASCADE,
+                                 blank=True, null=True)
+    date = models.DateTimeField(auto_now_add=True)
+
+
+    def __str__(self):
+        return f"Evaluation for {self.support_plan.resident} on {self.date}"
+
+
 class RiskActionPlan(models.Model):
     title = models.CharField(max_length=30, null=True, blank=True)
     created_on = models.DateField(_("Created On"), auto_now_add=True)
-    identified_risk = models.CharField(max_length=30, null=True, blank=True)
+    identified_risk = models.CharField(max_length=100, null=True, blank=True)
+    risk_level = models.CharField(_("Risk Levels"), choices=RISK_LEVELS, max_length=40, null=True, blank=True)
+    at_risk = models.ManyToManyField( "AtRiskOption", choices= RISK_PERSONNEL)
+    likelihood = models.CharField(("Likelihood"), choices=LIKELIHOOD, max_length=40, null=True, blank=True)
+    severity = models.CharField(("Severity"), choices=SEVERITY, max_length=40, null=True, blank=True)
+    approved_by = models.CharField(max_length=40, null=True, blank=True)
     details = models.TextField(null=True)
     triggers = models.TextField(null=True)
     support_needs = models.CharField(max_length=30, null=True, blank=True)
@@ -646,7 +690,7 @@ class RiskActionPlan(models.Model):
     next_assement_date = models.DateTimeField(
         _("Asssment date"), default=timezone.now
     )
-    discontinue = models.BooleanField(_("Discontibnue"), default=False)
+    discontinue = models.BooleanField(_("Discontinue"), default=False)
     category = models.CharField(
         choices=CATEGORY_TYPE, default="Risk", max_length=100
     )
@@ -654,12 +698,16 @@ class RiskActionPlan(models.Model):
     def __str__(self):
         return self.title
 
+class AtRiskOption(models.Model):
+    name = models.CharField(max_length=100, blank=True, null=True)
 
+    def __str__(self):
+        return self.name
 class Appointment(models.Model):
     created_on = models.DateTimeField(_("Created On"), auto_now_add=True)
     start_time = models.DateTimeField(_("Start On"))
     due_time = models.DateTimeField(_("Due On"))
-    title = models.CharField(max_length=30)
+    title = models.CharField(max_length=100)
     description = models.TextField()
     status = models.CharField(choices=APPOINTMENT_STATUS, max_length=30)
     staff = models.ForeignKey(
@@ -746,7 +794,7 @@ class FluidIntake(models.Model):
     created_on = models.DateTimeField(_("Created On"), auto_now_add=True)
     amount = models.FloatField(_("Amount Taken "))
     amount_offered = models.FloatField(_("Amount Offered"))
-    type_of_fluid = models.CharField(_("Type Of Fluid"), max_length=20)
+    type_of_fluid = models.CharField(_("Type Of Fluid"), max_length=100)
     additional_info = models.TextField(_("Additional Infomation"))
     emotion = models.CharField(
         _("Emotion"), choices=EMOTION_CHOICES, max_length=10, default="unknown"
@@ -814,7 +862,7 @@ class Mood(models.Model):
     id = models.AutoField(primary_key=True)
     created_on = models.DateTimeField(_("Created On"), auto_now_add=True)
     emotion = models.CharField(
-        _("Emotion"), choices=EMOTION_CHOICES, max_length=10, default="unknown"
+        _("Emotion"), choices=EMOTION_CHOICES, max_length=20, default="unknown"
     )
     additional_info = models.TextField(_("Additional Infomation"))
 
@@ -837,7 +885,7 @@ class Bath(models.Model):
     id = models.AutoField(primary_key=True)
     created_on = models.DateTimeField(_("Created On"), auto_now_add=True)
     type_of_bath = models.CharField(
-        _("Bath Type"), choices=BATH_TYPE, max_length=10
+        _("Bath Type"), choices=BATH_TYPE, max_length=20
     )
     resident = models.ForeignKey(
         "Resident",
@@ -856,13 +904,13 @@ class Bath(models.Model):
 class MorningRoutine(models.Model):
     id = models.AutoField(primary_key=True)
     created_on = models.DateTimeField(_("Created On"), auto_now_add=True)
-    washing = models.TextField(max_length=20)
-    shaving = models.TextField(max_length=20)
-    prompting = models.TextField(max_length=20)
-    oral_care = models.TextField(max_length=20)
-    toilet_use = models.TextField(max_length=20)
-    getting_up = models.TextField(max_length=20)
-    getting_dressed = models.TextField(max_length=20)
+    washing = models.TextField(max_length=100)
+    shaving = models.TextField(max_length=100)
+    prompting = models.TextField(max_length=100)
+    oral_care = models.TextField(max_length=100)
+    toilet_use = models.TextField(max_length=100)
+    getting_up = models.TextField(max_length=100)
+    getting_dressed = models.TextField(max_length=100)
     emotion = models.CharField(
         _("Emotion"), choices=EMOTION_CHOICES, max_length=10, default="unknown"
     )
@@ -885,15 +933,15 @@ class MorningRoutine(models.Model):
 class AfternoonRoutine(models.Model):
     id = models.AutoField(primary_key=True)
     created_on = models.DateTimeField(_("Created On"), auto_now_add=True)
-    washing = models.TextField(max_length=20)
-    shaving = models.TextField(max_length=20)
-    prompting = models.TextField(max_length=20)
-    oral_care = models.TextField(max_length=20)
-    toilet_use = models.TextField(max_length=20)
-    getting_up = models.TextField(max_length=20)
-    getting_dressed = models.TextField(max_length=20)
+    washing = models.TextField(max_length=100)
+    shaving = models.TextField(max_length=100)
+    prompting = models.TextField(max_length=100)
+    oral_care = models.TextField(max_length=100)
+    toilet_use = models.TextField(max_length=100)
+    getting_up = models.TextField(max_length=100)
+    getting_dressed = models.TextField(max_length=100)
     emotion = models.CharField(
-        _("Emotion"), choices=EMOTION_CHOICES, max_length=10, default="unknown"
+        _("Emotion"), choices=EMOTION_CHOICES, max_length=30, default="unknown"
     )
     additional_info = models.TextField(_("Additional Infomation"))
     resident = models.ForeignKey(
@@ -1296,6 +1344,91 @@ class AllowedUserGroup(models.Model):
     def __str__(self):
         return f"{self.user.first_name} - {self.group.name}"
 
+@receiver(post_save, sender=Appointment)
+def create_reminder_for_appointment(sender, instance, created, **kwargs):
+    if created:
+        start_date_time = instance.start_time
+        end_date_time = instance.due_time
+
+        def create_reminder(reminder_date):
+            try:
+                reminder = Reminder.objects.create(
+                    start_date=reminder_date,
+                    end_date=reminder_date,
+                    staff=instance.staff,
+                    subject=instance.title,
+                    notes=instance.description,
+                    created_by=instance.created_by,
+                )
+                ReminderAppointment.objects.create(
+                    appointment=instance, reminder=reminder
+                )
+            except Exception as e:
+                print(e)
+
+        match instance.recur:
+            case "no":
+                create_reminder(start_date_time)
+
+            case "daily":
+                create_reminder(start_date_time)
+                next_reminder_date = start_date_time + timezone.timedelta(days=1)
+                while next_reminder_date <= end_date_time:
+                    create_reminder(next_reminder_date)
+                    next_reminder_date += timezone.timedelta(days=1)
+
+            case "weekly":
+                create_reminder(start_date_time)
+                next_reminder_date = start_date_time + timezone.timedelta(weeks=1)
+                while next_reminder_date <= end_date_time:
+                    create_reminder(next_reminder_date)
+                    next_reminder_date += timezone.timedelta(weeks=1)
+
+            case "monthly":
+                create_reminder(start_date_time)
+                next_reminder_date = start_date_time.replace(day=1)
+                while next_reminder_date <= end_date_time:
+                    month = next_reminder_date.month + 1
+                    year = next_reminder_date.year
+                    if month > 12:
+                        month = 1
+                        year += 1
+                    next_reminder_date = next_reminder_date.replace(year=year, month=month)
+                    create_reminder(next_reminder_date)
+
+            case "yearly":
+                create_reminder(start_date_time)
+                next_reminder_date = start_date_time
+                while next_reminder_date <= end_date_time:
+                    year = next_reminder_date.year + 1
+                    next_reminder_date = next_reminder_date.replace(year=year)
+                    create_reminder(next_reminder_date)
+
+        # Adjust the logic to ensure weekly reminders are created 7 days apart
+        if instance.recur == "weekly":
+            reminder_date = start_date_time
+            while reminder_date <= end_date_time:
+                create_reminder(reminder_date)
+                reminder_date += timezone.timedelta(weeks=1)
+
+        # Adjust the logic to ensure monthly reminders are created 1 month apart
+        if instance.recur == "monthly":
+            reminder_date = start_date_time
+            while reminder_date <= end_date_time:
+                create_reminder(reminder_date)
+                month = reminder_date.month + 1
+                year = reminder_date.year
+                if month > 12:
+                    month = 1
+                    year += 1
+                reminder_date = reminder_date.replace(year=year, month=month)
+
+        if instance.recur == "yearly":
+            reminder_date = start_date_time
+            while reminder_date <= end_date_time:
+                create_reminder(reminder_date)
+                year = reminder_date.year + 1
+                reminder_date = reminder_date.replace(year=year)
 @receiver(pre_delete, sender=Appointment)
 def delete_reminder_for_appointment(sender, instance, **kwargs):
     try:
@@ -1308,130 +1441,8 @@ def delete_reminder_for_appointment(sender, instance, **kwargs):
         print(e)
 
 
-@receiver(post_save, sender=Appointment)
-def create_reminder_for_appointment(sender, instance, created, **kwargs):
-    if created:
-        start_date_time = instance.start_time
-        end_date_time = instance.due_time
-        match instance.recur:
-            case "no":
-                try:
-                    reminder = Reminder.objects.create(
-                        start_date=start_date_time,
-                        end_date=end_date_time,
-                        staff=instance.staff,
-                        subject=instance.title,
-                        notes=instance.description,
-                        created_by=instance.created_by,
-                    )
-                    ReminderAppointment.objects.create(
-                        appointment=instance, reminder=reminder
-                    )
-                except Exception as e:
-                    print(e)
 
-            case "daily":
-                for _ in range(7):
-                    start_date_time = start_date_time + timezone.timedelta(
-                        days=1
-                    )
-                    end_date_time = end_date_time + timezone.timedelta(days=1)
 
-                    try:
-                        reminder = Reminder.objects.create(
-                            start_date=start_date_time,
-                            end_date=end_date_time,
-                            staff=instance.staff,
-                            subject=instance.title,
-                            notes=instance.description,
-                            created_by=instance.created_by,
-                        )
-                        ReminderAppointment.objects.create(
-                            appointment=instance, reminder=reminder
-                        )
-                    except Exception as e:
-                        print(e)
-
-            case "weekly":
-                for _ in range(48):
-                    start_date_time = start_date_time + timezone.timedelta(
-                        days=7
-                    )
-                    end_date_time = end_date_time + timezone.timedelta(days=7)
-
-                    try:
-                        reminder = Reminder.objects.create(
-                            start_date=start_date_time,
-                            end_date=end_date_time,
-                            staff=instance.staff,
-                            subject=instance.title,
-                            notes=instance.description,
-                            created_by=instance.created_by,
-                        )
-                        ReminderAppointment.objects.create(
-                            appointment=instance, reminder=reminder
-                        )
-                    except Exception as e:
-                        print(e)
-
-            case "monthly":
-                for _ in range(12):
-                    start_date_time = start_date_time + timezone.timedelta(
-                        days=30
-                    )
-                    end_date_time = end_date_time + timezone.timedelta(days=30)
-
-                    try:
-                        reminder = Reminder.objects.create(
-                            start_date=start_date_time,
-                            end_date=end_date_time,
-                            staff=instance.staff,
-                            subject=instance.title,
-                            notes=instance.description,
-                            created_by=instance.created_by,
-                        )
-                        ReminderAppointment.objects.create(
-                            appointment=instance, reminder=reminder
-                        )
-                    except Exception as e:
-                        print(e)
-
-            case "yearly":
-                for _ in range(3):
-                    start_date_time = start_date_time + timezone.timedelta(
-                        years=1
-                    )
-                    end_date_time = end_date_time + timezone.timedelta(years=1)
-
-                    try:
-                        reminder = Reminder.objects.create(
-                            start_date=start_date_time,
-                            end_date=end_date_time,
-                            staff=instance.staff,
-                            subject=instance.title,
-                            notes=instance.description,
-                            created_by=instance.created_by,
-                        )
-                        ReminderAppointment.objects.create(
-                            appointment=instance, reminder=reminder
-                        )
-                    except Exception as e:
-                        print(e)
-            case _:
-                try:
-                    reminder = Reminder.objects.create(
-                        start_date=instance.start_time,
-                        end_date=instance.due_time,
-                        staff=instance.staff,
-                        subject=instance.title,
-                        notes=instance.description,
-                        created_by=instance.created_by,
-                    )
-                    ReminderAppointment.objects.create(
-                        appointment=instance, reminder=reminder
-                    )
-                except Exception as e:
-                    print(e)
 
 
 @receiver(pre_delete, sender=Evaluation)

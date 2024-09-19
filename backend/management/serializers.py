@@ -30,6 +30,7 @@ class UserSerializer(serializers.ModelSerializer):
     groups = GroupSerializer(many=True, read_only=True)
     user_permissions = PermissionnsSerializer(many=True, read_only=True)
 
+
     def create(self, validated_data):
         groups_data = validated_data.pop("groups", [])  # Get groups data if available
         user = User.objects.create(**validated_data)
@@ -162,9 +163,52 @@ class RotaSerializer(serializers.ModelSerializer):
 
 
 class SupportPlanSerializer(serializers.ModelSerializer):
+    name_first = serializers.CharField(source='created_by.first_name', read_only=True)
+    name_last = serializers.CharField(source='created_by.last_name', read_only=True)
+    firstname = serializers.CharField(source='resident.first_name', read_only=True)
+    lastname = serializers.CharField(source='resident.last_name', read_only=True)
+    next_assement_date = serializers.DateTimeField()
+
+
     class Meta:
         model = SupportPlan
         fields = "__all__"
+
+    def get_created_by(self, obj):
+        return obj.created_by.username if obj.created_by else None
+
+    def get_resident_name(self, obj):
+        return f"{obj.resident.first_name} {obj.resident.last_name}"
+
+
+class PlanEvaluationSerializer(serializers.ModelSerializer):
+    name_first = serializers.CharField(source='staff.first_name', read_only=True)
+    name_last = serializers.CharField(source='staff.last_name', read_only=True)
+
+    class Meta:
+        model = PlanEvaluation
+        fields = "__all__"
+        extra_kwargs = {
+            'support_plan': {'read_only': True},
+            'staff': {'read_only': True},
+            'resident': {'read_only': True},
+
+        }
+
+    def create(self, validated_data):
+        # Ensure support_plan is not passed multiple times
+        support_plan = validated_data.pop('support_plan', None)
+        staff = validated_data.pop('staff', None)
+        resident = validated_data.pop('resident', None)
+
+        # Create the PlanEvaluation instance
+        instance = PlanEvaluation.objects.create(
+            support_plan=support_plan,
+            staff=staff,
+            resident=resident,
+            **validated_data  # Pass remaining validated_data
+        )
+        return instance
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
@@ -283,16 +327,40 @@ class AssignHomeUserSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class SupportPlanSerializer(serializers.ModelSerializer):
+class AtRiskOptionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = SupportPlan
-        fields = "__all__"
+        model = AtRiskOption
+        fields = ["name"]
 
 
 class RiskActionPlanSerializer(serializers.ModelSerializer):
+    name_first = serializers.CharField(source='created_by.first_name', read_only=True)
+    name_last = serializers.CharField(source='created_by.last_name', read_only=True)
+    firstname = serializers.CharField(source='resident.first_name', read_only=True)
+    lastname = serializers.CharField(source='resident.last_name', read_only=True)
+    riskperson = serializers.CharField(source='atriskoption.name', read_only=True)
+
+    at_risk = serializers.PrimaryKeyRelatedField(queryset=AtRiskOption.objects.all(), many=True)
+
     class Meta:
         model = RiskActionPlan
         fields = "__all__"
+
+    def create(self, validated_data):
+        # Django handles ManyToMany fields automatically if we use PrimaryKeyRelatedField
+        at_risk_data = validated_data.pop('at_risk', [])
+        risk_action_plan = RiskActionPlan.objects.create(**validated_data)
+        risk_action_plan.at_risk.set(at_risk_data)  # set handles the adding
+        return risk_action_plan
+
+    def update(self, instance, validated_data):
+        at_risk_data = validated_data.pop('at_risk', [])
+        instance = super().update(instance, validated_data)
+        instance.at_risk.set(at_risk_data)  # set handles clearing and adding new ones
+        return instance
+
+
+
 
 
 class RiskSchedulerSerializer(serializers.ModelSerializer):

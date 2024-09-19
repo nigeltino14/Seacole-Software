@@ -14,21 +14,27 @@ const Addform = () => {
     const user = useSelector((state) => state.auth.user)
     const selected_resident = useSelector((state) => state.resident.selectedResident)
     const residents = useSelector((state) => state.resident.residentList)
+    const staff_list = useSelector((state) => state.staff.staffList)
     const plans = useSelector((state) => state.plan.planList)
     const selected_plans_schedule = useSelector((state) => state.planscheduler.selectedPlanScheduler)
 
     const initialState = {
         title: '',
         category: 'Education',
+        approved_by: '',
+        cp_duration:'',
+        care_rating:'',
         issue: '',
         action_plan: '',
         by_who: '',
         created_by: '',
-        by_whom: '',
         by_when: '',
         goal: '',
         achievements: '',
-        
+        last_evaluated_date: '',
+        next_assement_date: '',
+        //evaluations: '',
+
 
     }
     const [state, setState] = useState(initialState)
@@ -73,6 +79,29 @@ const Addform = () => {
                 })
                 break;
 
+            case 'approved_by':
+                setState({
+                    ...state,
+                    approved_by: event.target.value
+                })
+                break;
+
+            case 'cp_duration':
+                setState({
+                    ...state,
+                    cp_duration: event.target.value
+                })
+                break;
+
+            case 'care_rating':
+                setState({
+                    ...state,
+                    care_rating: event.target.value
+                })
+                break;
+
+
+
             case 'issue':
                 setState({
                     ...state,
@@ -94,19 +123,6 @@ const Addform = () => {
                 })
                 break;
 
-            case 'by_whom':
-                setState({
-                    ...state,
-                    by_whom: event.target.value
-                })
-                break;
-
-            case 'goal':
-                setState({
-                    ...state,
-                   goal: event.target.value
-                })
-                break;
 
             case 'achievements':
                 setState({
@@ -128,6 +144,34 @@ const Addform = () => {
                     by_when: event.target.value
                 })
                 break;
+
+            case 'goal':
+                setState({
+                    ...state,
+                    goal: event.target.value
+                })
+                break;
+
+            case 'last_evaluated_date':
+                setState({
+                    ...state,
+                    last_evaluated_date: event.target.value
+                })
+                break;
+
+            case 'next_assement_date':
+                setState({
+                    ...state,
+                    next_assement_date: event.target.value
+                })
+                break;
+
+            /*case 'evaluations':
+                setState({
+                    ...state,
+                    evaluations: event.target.value
+                })
+                break;*/
             default:
         }
 
@@ -162,7 +206,7 @@ const Addform = () => {
         <div className="col-xl-12 col-md-12">
             <div className="ms-panel">
                 <div className="ms-panel-header ms-panel-custome">
-                    <h6>Add Support Plan</h6>
+                    <h6>Add A Support Plan</h6>
                     <ProtectedRoute perm="view_supportplan">
                         <Link to="/supportplan">Support Plans </Link>
                     </ProtectedRoute>
@@ -200,7 +244,6 @@ const Addform = () => {
                                         {/* <option value='Risk' >Risk</option> */}
                                         <option value='FinanceMoneyBenefitManagement' >Finance/Money/Benefit Management</option>
                                         <option value='RentArrearsServiceUsers' >Rent Arrears - Service Users</option>
-                                        <option value='RentArrearsServiceUsers' >Rent Arrears - Service Users</option>
                                         <option value='Education' >Education</option>
                                         <option value='Training' >Training</option>
                                         <option value='Employment' >Employment</option>
@@ -209,9 +252,73 @@ const Addform = () => {
                                         <option value='LeisureSocialNetwork' >LeisureSocialNetwork</option>
                                         <option value='MovingOn' >Moving On</option>
                                         <option value='FurtherConcernsNeeds' >Further Concerns/Needs -</option>
-                                        <option value='ServicesprovidedbyHousingorEstateManagementService' >Services provided by Housing or Estate Management Service</option>
-                                        <option value='ServicesprovidedbySupportWorker' >Services provided by Support Worker</option>
+                                        <option value='ServicesProvidedByHousingOrEstateManagementService' >Services provided by Housing or Estate Management Service</option>
+                                        <option value='ServicesProvidedBySupportWorker' >Services provided by Support Worker</option>
                                         <option value='SupportWorkersViewsofIssuesNeedsorActions' >Support Worker's Views of Issues, Needs or Actions</option>
+                                    </Form.Control>
+                                </InputGroup>
+                            </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom03">
+                            <Form.Label>Approved By</Form.Label>
+                                {errors.approved_by && errors.approved_by.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="approved_by"
+                                        value={state.approved_by}
+                                        as="textarea"
+                                        type="text"
+                                        onChange={handleChange}
+                                    >
+                                    </Form.Control>
+                                </InputGroup>
+                            </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom03">
+                            <Form.Label>
+                                Keyworker
+                            </Form.Label>
+                                {errors.staff && errors.staff.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control as="select" onChange={handleChange}
+                                                  name="staff">
+                                        {staff_list.map(staff =>  (
+                                            <option key={staff.id}  value={staff.id}>{staff.first_name}  {staff.last_name}
+
+                                            </option>
+                                        ))}
+
+                                    </Form.Control>
+                                </InputGroup>
+
+                            </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom03">
+                            <Form.Label>Care Plan Duration</Form.Label>
+                                {errors.cp_duration && errors.cp_duration.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="cp_duration"
+                                        value={state.cp_duration}
+                                        as="select"
+                                        onChange={handleChange}
+                                    >
+                                        <option value='Standard Care Plan'>Standard Care Plan</option>
+                                        <option value='ShortTerm'>Short term</option>
+                                        <option value='LongTerm'>Long term</option>
+                                    </Form.Control>
+                                </InputGroup>
+                            </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom02">
+                            <Form.Label> Care Rating </Form.Label>
+                                {errors.care_rating && errors.care_rating.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="care_rating"
+                                        value={state.care_rating}
+                                        onChange={handleChange}
+                                        as="select"
+                                    >
+                                        <option value='Low'>Low 🟢</option>
+                                        <option value='Medium'>Medium 🟡</option>
+                                        <option value='High'>High 🔴</option>
                                     </Form.Control>
                                 </InputGroup>
                             </Form.Group>
@@ -244,7 +351,7 @@ const Addform = () => {
                                     </Form.Control>
                                 </InputGroup>
                             </Form.Group>
-                            {/* <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom04">
+                            {<Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom04">
                                 <Form.Label>Resident</Form.Label>
                                 <InputGroup>
                                     <Form.Control as="select" onChange={handleChange}
@@ -257,22 +364,8 @@ const Addform = () => {
                                         ))}
                                     </Form.Control>
                                 </InputGroup>
-                            </Form.Group> */}
-                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
-                                <Form.Label>By Whom</Form.Label>
-                                {errors.by_whom && errors.by_whom.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
-                                <InputGroup>
-                                    <Form.Control
-                                        name="by_whom"
-                                        required
-                                        as="textarea"
-                                        type="text"
-                                        onChange={handleChange}
-                                        value={state.by_whom}
-                                        placeholder="By Whom"
-                                    />
-                                </InputGroup>
-                            </Form.Group>
+                            </Form.Group> }
+
                             <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
                                 <Form.Label>By Who</Form.Label>
                                 {errors.by_who && errors.by_who.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
@@ -303,21 +396,22 @@ const Addform = () => {
                                     />
                                 </InputGroup>
                             </Form.Group>
-                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
-                                <Form.Label>Goal</Form.Label>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom03">
+                                <Form.Label>Goal Targeted</Form.Label>
                                 {errors.goal && errors.goal.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
                                 <InputGroup>
                                     <Form.Control
                                         name="goal"
-                                        required
-                                        onChange={handleChange}
                                         value={state.goal}
-                                        type="text"
+                                        onChange={handleChange}
+                                        required
                                         as="textarea"
-                                        placeholder="Goal"
-                                    />
+                                        type="text"
+                                    >
+                                    </Form.Control>
                                 </InputGroup>
                             </Form.Group>
+
                             <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
                                 <Form.Label>Achievements</Form.Label>
                                 {errors.achievements && errors.achievements.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
@@ -363,7 +457,7 @@ const Addform = () => {
                             </Form.Group>
                             {!state.discontinue &&
                                 <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
-                                    <Form.Label>Next Evaluation Date</Form.Label>
+                                    <Form.Label>Next Evaluation Date/ Review Date</Form.Label>
                                     {errors.next_assement_date && errors.next_assement_date.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
                                     <InputGroup>
                                         <Form.Control
@@ -377,6 +471,20 @@ const Addform = () => {
                                     </InputGroup>
                                 </Form.Group>
                             }
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
+                                   <Form.Label>Last Evaluated</Form.Label>
+                                   {errors.last_evaluated_date && errors.last_evaluated_date.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                   <InputGroup>
+                                       <Form.Control
+                                           name="last_evaluated_date"
+                                           required
+                                           onChange={handleChange}
+                                           value={state.last_evaluated_date}
+                                           type="datetime-local"
+                                           placeholder="Last Evaluated On"
+                                       />
+                                   </InputGroup>
+                            </Form.Group>
                         </Form.Row>
                         <Button type="reset" variant="warning" className="mt-4 d-inline w-20 mr-2" onClick={handleReset}>Reset</Button>
                         <Button type="submit" className="mt-4 d-inline w-20">Save</Button>
@@ -386,5 +494,6 @@ const Addform = () => {
         </div>
     );
 }
+
 
 export default Addform;

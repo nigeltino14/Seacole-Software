@@ -2,8 +2,8 @@
 
 import datetime
 from django.db import migrations, models
-from django.utils.timezone import utc
-
+#from django.utils.timezone import utc
+from datetime import timezone as utc
 
 class Migration(migrations.Migration):
 
@@ -27,13 +27,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='reminder',
             name='end_date',
-            field=models.DateTimeField(default=datetime.datetime(2023, 1, 10, 18, 41, 47, 755475, tzinfo=utc)),
+            field=models.DateTimeField(default=datetime.datetime(2023, 1, 10, 18, 41, 47, 75547)),
             preserve_default=False,
         ),
         migrations.AddField(
             model_name='reminder',
             name='start_date',
-            field=models.DateTimeField(default=datetime.datetime(2023, 1, 10, 18, 41, 53, 591688, tzinfo=utc)),
+            field=models.DateTimeField(default=datetime.datetime(2023, 1, 10, 18, 41, 53, 591688)),
             preserve_default=False,
         ),
     ]

@@ -32,11 +32,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 # settings.py
 
-DEBUG = False
+DEBUG = True
 
 
-
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["*", "127.0.0.1", "localhost", "10.0"]
 
 
 # Application definition
@@ -62,7 +61,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.security.SecurityMiddleware",
+
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -102,7 +101,7 @@ if os.environ.get("DEBUG", "debug") == "debug":
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": 'seacole_staging',
+            "NAME": 'staging',
             "USER": 'doadmin',
             "PASSWORD": 'AVNS_P2v-z3kK_178BxBTvfO',
             "HOST": 'seacole-do-user-14823812-0.c.db.ondigitalocean.com',
@@ -196,9 +195,9 @@ CRF_TRUSTED_ORIGINS = [
 ]
 
 
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
 
 
 USE_SPACES = os.getenv("USE_SPACES") == "true"

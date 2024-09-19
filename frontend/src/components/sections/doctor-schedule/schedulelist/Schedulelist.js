@@ -12,10 +12,12 @@ import { careActions } from '../../../../store/care'
 import { afternoonRoutineActions } from '../../../../store/afternoonRoutine'
 import { morningRoutineActions } from '../../../../store/morningRoutine'
 import { incidentActions } from '../../../../store/incident'
+import { Modal } from 'react-bootstrap';
 import { getApi } from '../../../../api/api'
 import { selectedResident, selectedStaff, addEmojis } from '../../../utils/expand'
 import dateToYMD from '../../../utils/dates'
 import { homeActions } from '../../../../store/home'
+import PrintButton from '../../../utils/print'
 
 
 
@@ -46,11 +48,22 @@ const Schedulelist = () => {
 
     const dispatch = useDispatch();
     const [tableData, setTableData] = useState({ columns: [], data: [] });
-    const [present_care, setPresentCare] = useState();
+    const [present_care, setPresentCare] = useState(null);
     const [fromdate, setFromDate] = useState(Date.now());
     const [todate, setToDate] = useState(Date.now());
     const [selectedHome, setSelectedHome] = useState(null);
+	const [selectedRow, setSelectedRow] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+    const [showEdit, setshowEdit] = useState(false)
+    const handleCloseEdit = () => {
+        setshowEdit(false)
+    }
 
+    const handleRowClick = (row) => {
+        setSelectedRow(row);
+        console.log("Selected Care", selectedRow);
+        setShowModal(true);
+    };
 
     const handleHomeChange = (event) => {
         const selectedHomeId = event.target.value;
@@ -292,6 +305,7 @@ const Schedulelist = () => {
     ];
 
 
+
     useEffect(() => {
         getApi(response => { dispatch(residentActions.setResidents(response.data)) }, token, "/api/resident")
         getApi(response => { dispatch(bathActions.setBaths(response.data)) }, token, "/api/bath")
@@ -425,8 +439,11 @@ const Schedulelist = () => {
     }
 
     const handleCare = (event) => {
+		const careType = event.target.value;
+		setPresentCare(careType);
+		setShowModal(true);
 
-        switch (event.target.value) {
+        switch (careType) {
             case 'Fluid-Intake':
                 dispatch(careActions.setCare({
                     weight: false, bath: false,
@@ -434,7 +451,12 @@ const Schedulelist = () => {
                     fluidIntake: true, morningRoutine: false,
                     afternoonRoutine: false,
                     incident: false,
-                }))
+                }));
+				setTableData({
+                    columns: fluid_columns,
+                    data: selectedFluids,
+                });
+
                 break;
             case 'Weight':
                 dispatch(careActions.setCare({
@@ -444,7 +466,11 @@ const Schedulelist = () => {
                     weight: true, morningRoutine: false,
                     afternoonRoutine: false,
                     incident: false,
-                }))
+                }));
+                setTableData({
+                    columns: weight_columns,
+                    data: selectedWeights,
+                });
                 break;
             case 'Mood':
 
@@ -454,7 +480,11 @@ const Schedulelist = () => {
                     fluidIntake: false, morningRoutine: false,
                     afternoonRoutine: false,
                     incident: false,
-                }))
+                }));
+				setTableData({
+                    columns: mood_columns,
+                    data: selectedMoods,
+                });
                 break;
             case 'Sleep':
                 dispatch(careActions.setCare({
@@ -463,7 +493,11 @@ const Schedulelist = () => {
                     fluidIntake: false, morningRoutine: false,
                     afternoonRoutine: false,
                     incident: false,
-                }))
+                }));
+				setTableData({
+                    columns: sleep_columns,
+                    data: selectedSleeps,
+                });
                 break;
             case 'Morning-Routine':
 
@@ -473,7 +507,11 @@ const Schedulelist = () => {
                     fluidIntake: false, morningRoutine: true,
                     afternoonRoutine: false,
                     incident: false,
-                }))
+                }));
+				setTableData({
+                    columns: morningRoutine_columns,
+                    data: selectedMorningRoutines,
+                });
                 break;
             case 'Afternoon-Routine':
                 dispatch(careActions.setCare({
@@ -482,7 +520,11 @@ const Schedulelist = () => {
                     morningRoutine: false,
                     afternoonRoutine: true,
                     incident: false,
-                }))
+                }));
+				setTableData({
+                    columns: afternoonRoutine_columns,
+                    data: selectedAfternoonRoutines,
+                });
                 break;
             case 'Incident':
                 dispatch(careActions.setCare({
@@ -492,13 +534,59 @@ const Schedulelist = () => {
                     bath: true, morningRoutine: false,
                     afternoonRoutine: false,
                     incident: true,
-                }))
+                }));
+				setTableData({
+                    columns: incident_columns,
+                    data: selectedIncident,
+                });
                 break;
             default:
         }
     }
 
- 
+
+    //adding a test for displaying weight Modal
+    const SelectedRowModal = () => {
+		if (!selectedRow) {
+		   return null;
+		}
+
+	const onClose = () => {
+		setSelectedRow(null);
+		setshowEdit(false);
+	};
+
+         return (
+		    <Modal show={true} className="ms-modal-dialog-width ms-modal-content-width" onHide={onClose} centered>
+                <Modal.Header className="ms-modal-header-radius-0">
+                 <div>
+                    <h1 style={{ fontSize: '24px', marginBottom: '0' }}>Seacole Health</h1>
+                    <h4 className="modal-title text-white">Selected Note</h4>
+                    <p>Date recorded: {selectedWeights.created_on}</p>
+                 </div>
+                    <button type="button" className="close text-red w-20 mr-2" onClick={onClose}>x</button>
+                    <PrintButton />
+                </Modal.Header>
+                <Modal.Body style={{ padding: '20px', fontSize: '16px', lineHeight: '1.5' }}>
+                    <div>
+                        <h5>Subject: {selectedWeights}</h5>
+                        <p>Entry: {selectedWeights.resident_id}</p>
+                        <p>Type of note: {selectedWeights.weight}</p>
+                        <p>Staff responsible: {selectedWeights.staff_id}</p>
+                        <p>Type of note: {selectedWeights.emotion}</p>
+                        <p>Staff responsible: {selectedWeights.additional_info}</p>
+
+                        {/* Display other note details here */}
+                    </div>
+                </Modal.Body>
+            </Modal>
+         );
+    };
+
+
+//the function for displaying the note ends here
+
+
     return (
         <div className="ms-panel">
             <div className="ms-panel-header ms-panel-custome">
@@ -587,6 +675,7 @@ const Schedulelist = () => {
                         responsive={true}
                         noHeader
                         striped
+						onRowClicked={handleRowClick}
                     />
                 </div>
             </div>

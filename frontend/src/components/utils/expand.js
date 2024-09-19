@@ -48,10 +48,16 @@ export const selectedFamily = (family_id, family) => {
 
 
 export const addEmojis = (emotion) => {
-    let clean_emotion = "❓ Unknown"
+    let clean_emotion = "❓ Unknown Emotion"
     switch (emotion) {
         case 'unknown':
             clean_emotion = "❓ Unknown"
+            break;
+
+//adding the new emojis
+
+        case 'happy':
+            clean_emotion = "😃 Happy"
             break;
 
         case 'joyful':
@@ -60,6 +66,26 @@ export const addEmojis = (emotion) => {
 
         case 'sad':
             clean_emotion = "😔 Sad"
+            break;
+
+        case 'content':
+            clean_emotion = "🙂 Content"
+            break;
+
+        case 'worried':
+            clean_emotion = "😟 Worried"
+            break;
+
+        case 'fearful':
+            clean_emotion = "😨 Fearful"
+            break;
+
+        case 'sleepy':
+            clean_emotion = "🥱 Sleepy"
+            break;
+
+		case 'confused':
+            clean_emotion = "😕 Confused"
             break;
 
         case 'tearful':

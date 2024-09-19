@@ -78,14 +78,10 @@ const Patientlist = () => {
         setshowEdit(false)
     }
     const handleHomeChange = (event) => {
-        const value = event.target.value
-        if (value === "all") {
-            dispatch(homeActions.setSelectedHome({}))
-        } else {
-            const home_list = [...homes]
-            const selected = home_list.find(item => item.id === +value);
-            dispatch(homeActions.setSelectedHome(selected))
-        }
+        const value = event.target.value;
+        const home_list = [...homes];
+        const selected = home_list.find(item => item.id === +value);
+        dispatch(homeActions.setSelectedHome(selected));
     }
    
      
@@ -276,8 +272,7 @@ const Patientlist = () => {
                             <Form.Label>Home Filter</Form.Label>
                             <InputGroup>
                                 <Form.Control as="select" onChange={handleHomeChange}
-                                    name="home" value={JSON.stringify(selected_home) === '{}' ? 'all' : selected_home.id} >
-                                    <option key="all" value="all" > All </option>
+                                    name="home" value={selected_home.id} >
                                     {homes.map(home => (
                                         <option key={home.id} value={home.id}>{home.name} </option>
                                     ))}

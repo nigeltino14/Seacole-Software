@@ -5,7 +5,7 @@ from rest_framework.settings import api_settings
 from rest_framework.decorators import action
 from rest_framework.views import APIView
 from django.views.decorators.http import require_http_methods
-
+from django.contrib.auth import get_user_model
 from .models import *
 from .serializers import *
 from rest_framework import status
@@ -474,6 +474,46 @@ class SupportPlanViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
 
+
+from rest_framework import viewsets, permissions, status
+from rest_framework.response import Response
+from .models import PlanEvaluation
+from .serializers import PlanEvaluationSerializer
+from .models import SupportPlan
+
+class PlanEvaluationViewSet(viewsets.ModelViewSet):
+    queryset = PlanEvaluation.objects.all()
+    serializer_class = PlanEvaluationSerializer
+    permission_classes = [permissions.DjangoModelPermissions]
+
+    def get_queryset(self):
+        support_plan_id = self.kwargs.get('support_plan_id')
+        if support_plan_id:
+            return PlanEvaluation.objects.filter(support_plan_id=support_plan_id)
+        return super().get_queryset()
+
+    def perform_create(self, serializer):
+        support_plan_id = self.kwargs.get('support_plan_id')
+        if not support_plan_id:
+            return Response({"detail": "Support plan ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            support_plan = SupportPlan.objects.get(id=support_plan_id)
+        except SupportPlan.DoesNotExist:
+            return Response({"detail": "Support plan not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        staff = self.request.user
+        serializer.save(
+            support_plan=support_plan,
+            staff=staff,
+            resident=support_plan.resident,
+        )
+
+    def perform_update(self, serializer):
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class AppointmentViewSet(viewsets.ModelViewSet):
     queryset = Appointment.objects.all()
@@ -1005,6 +1045,7 @@ class SupportPlanViewset(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
 
 
+
 class RiskActionPlanViewset(viewsets.ModelViewSet):
     queryset = RiskActionPlan.objects.all()
     serializer_class = RiskActionPlanSerializer
@@ -1039,6 +1080,25 @@ class RiskActionPlanViewset(viewsets.ModelViewSet):
             )
             return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
+
+
+class AtRiskOptionViewSet(viewsets.ModelViewSet):
+    queryset = AtRiskOption.objects.all()
+    serializer_class = AtRiskOptionSerializer
+    permission_classes = [permissions.DjangoModelPermissions]
+
+    def perform_create(self, serializer):
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
+
+    def perform_update(self, serializer):
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
+
 
 
 class RiskSchedulerViewset(viewsets.ModelViewSet):

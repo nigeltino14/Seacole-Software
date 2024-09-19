@@ -245,12 +245,18 @@ const AddWeight = (props) => {
                                         value={state.emotion}
                                     >
                                         <option value="unknown">❓ Unknown</option>
-                                        <option value="joyful">😊  Joyful</option>
+                                        <option value="happy">😃 Happy</option>
+                                        <option value="joyful">😊 Joyful</option>
                                         <option value="sad">😔 Sad</option>
+                                        <option value="content">🙂 Content</option>
+                                        <option value="worried">😟 Worried</option>
+                                        <option value="fearful">😨 Fearful</option>
+                                        <option value="sleepy">🥱 Sleepy</option>
+                                        <option value="confused">😕 Confused</option>
                                         <option value="tearful">😢 Tearful</option>
                                         <option value="angry">😡 Angry</option>
                                         <option value="annoyed">🙄 Annoyed</option>
-                                        <option value="sleeping">😴 Sleeping</option>  
+                                        <option value="sleeping">😴 Sleeping</option>
                                     </Form.Control>
                                 </InputGroup>
                             </Form.Group>
