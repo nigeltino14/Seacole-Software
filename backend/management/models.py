@@ -97,6 +97,7 @@ REPEAT_CHOICES = (
     ("weekly", "Weekly"),
     ("monthly", "Monthly"),
     ("yearly", "Yearly"),
+    ("norecur", "NoRecur"),
 )
 
 TRANSACTION_TYPE = (
@@ -730,7 +731,7 @@ class Appointment(models.Model):
         related_name="appointment_created_by",
     )
     recur = models.CharField(
-        default=" ",
+        default="norecur",
         max_length=50,
         choices=REPEAT_CHOICES,
     )
@@ -1367,7 +1368,7 @@ def create_reminder_for_appointment(sender, instance, created, **kwargs):
                 print(e)
 
         match instance.recur:
-            case "no":
+            case "norecur":
                 create_reminder(start_date_time)
 
             case "daily":

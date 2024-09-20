@@ -521,34 +521,36 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.DjangoModelPermissions]
 
     def perform_create(self, serializer):
-        if serializer.is_valid():
-            instance = serializer.save()
+        # Set the created_by field to the current authenticated user
+        serializer.save(created_by=self.request.user)
 
-            name_first_name = instance.resident.first_name
-            name_last_name = instance.resident.last_name
+        # Access the newly created instance
+        instance = serializer.instance
+        name_first_name = instance.resident.first_name
+        name_last_name = instance.resident.last_name
 
-            UserHistory.objects.create(
-                user=self.request.user,
-                action='appointmentList',
-                details=f'Appointment for resident: {name_first_name} {name_last_name}',
-            )
-            return Response(status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
+        # Log the action in UserHistory
+        UserHistory.objects.create(
+            user=self.request.user,
+            action='appointmentList',
+            details=f'Appointment for resident: {name_first_name} {name_last_name}',
+        )
 
     def perform_update(self, serializer):
-        if serializer.is_valid():
-            instance = serializer.save()
+        # Save the instance and perform the update
+        serializer.save()
 
-            name_first_name = instance.resident.first_name
-            name_last_name = instance.resident.last_name
+        # Access the updated instance
+        instance = serializer.instance
+        name_first_name = instance.resident.first_name
+        name_last_name = instance.resident.last_name
 
-            UserHistory.objects.create(
-                user=self.request.user,
-                action='appointmentList',
-                details=f'Appointment for {name_first_name} {name_last_name}',
-            )
-            return Response(status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
+        # Log the update action in UserHistory
+        UserHistory.objects.create(
+            user=self.request.user,
+            action='appointmentList',
+            details=f'Appointment for {name_first_name} {name_last_name}',
+        )
 
 
 class TaskViewSet(viewsets.ModelViewSet):

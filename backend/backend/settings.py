@@ -16,7 +16,7 @@ from pathlib import Path
 import environ
 from decouple import config
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = "2Q8Td6DOmUDUSe1SvJDh7hQteFbc7N5v2DyDU0DSTvMIK62SIFVVYBqTFJtON8LqRpI"
 env = environ.Env()
 environ.Env.read_env()
 
@@ -32,10 +32,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 # settings.py
 
-DEBUG = True
+DEBUG = False
 
 
-ALLOWED_HOSTS = ["*", "127.0.0.1", "localhost", "10.0"]
+ALLOWED_HOSTS = ['seacolehealthsystems.co.uk', 'www.seacolehealthsystems.co.uk']
 
 
 # Application definition
@@ -61,7 +61,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
-
+    "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -101,7 +101,7 @@ if os.environ.get("DEBUG", "debug") == "debug":
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": 'staging',
+            "NAME": 'seacole_staging',
             "USER": 'doadmin',
             "PASSWORD": 'AVNS_P2v-z3kK_178BxBTvfO',
             "HOST": 'seacole-do-user-14823812-0.c.db.ondigitalocean.com',
@@ -195,9 +195,10 @@ CRF_TRUSTED_ORIGINS = [
 ]
 
 
-SECURE_SSL_REDIRECT = False
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 USE_SPACES = os.getenv("USE_SPACES") == "true"
