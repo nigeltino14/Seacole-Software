@@ -216,7 +216,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
- #   location = models.CharField(max_length=255, null=True, blank=True)
+    location = models.CharField(max_length=255, null=True, blank=True)
     home = models.ForeignKey(Home, on_delete=models.SET_NULL, null=True, blank=True)
     category = models.CharField(max_length= 30, null=True, blank=True)  #this is the position or rank in the addform
     dob = models.DateField(null=True, blank=True)
