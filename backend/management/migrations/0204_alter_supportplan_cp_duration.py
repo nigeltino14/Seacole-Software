@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='supportplan',
             name='cp_duration',
-            field=models.CharField(choices=[('Standard Care Plan', 'Standard Care Plan'), ('ShortTerm ', 'ShortTerm '), ('LongTerm', 'LongTerm')], max_length=40),
+            field=models.CharField(choices=[('Standard Care Plan', 'Standard Care Plan'), ('ShortTerm ', 'ShortTerm '), ('LongTerm', 'LongTerm')], max_length=40, null=True),
         ),
     ]
