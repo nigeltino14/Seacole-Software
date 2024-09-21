@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='supportplan',
             name='staff',
-            field=models.CharField(blank=True, null=True),
+            field=models.CharField(max_length=50, blank=True, null=True),
         ),
         migrations.AlterField(
             model_name='riskactionplan',
