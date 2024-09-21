@@ -643,7 +643,7 @@ class SupportPlan(models.Model):
     discontinue = models.BooleanField(_("Discontinue"), default=False)
     category = models.CharField(choices=CATEGORY_TYPE, max_length=100)
     last_evaluated_date = models.DateTimeField(auto_now=True, blank=True, null=True)
-    staff = models.CharField(blank=True, null=True)
+    staff = models.CharField(max_length=50, blank=True, null=True)
     is_deleted = models.BooleanField(default=False)
     deletion_reason = models.TextField(null=True, blank=True, default="Not deleted")
 
