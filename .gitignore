@@ -157,6 +157,12 @@ venv.bak/
 # sftp configuration file 
 sftp-config.json 
 
+/Seacole-Backup/
+/Seacole-Software.zip
+/Seacole-Software/
+/requirements.txt
+/shh
+
 # Package control specific files Package 
 Control.last-run 
 Control.ca-list 
