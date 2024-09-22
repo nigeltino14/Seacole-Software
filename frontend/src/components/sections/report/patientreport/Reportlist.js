@@ -197,7 +197,7 @@ const Reportlist = () => {
                     <div>
                         <h5>Subject: {selectedNote.subject}</h5>
                         <p>Entry: {selectedNote.entry}</p>
-                        <p>Resident: {selectedNote.resident}</p>
+                        <p>Resident: {`${selectedNote.name_first_name} ${selectedNote.name_last_name}`}</p>
                         <p>Type of note: {selectedNote.type_of_note}</p>
                         <p>Staff responsible: {selectedNote.staff}</p>
                         

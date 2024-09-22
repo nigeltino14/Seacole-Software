@@ -7,6 +7,7 @@ import { toastsuccess } from '../../../utils/notifications'
 import ProtectedRoute from '../../../protected/ProtectedRoute'
 import { staffActions } from '../../../../store/staff'
 import { riskActions } from '../../../../store/riskAssessment';
+import Select from 'react-select';
 
 
 const Addform = () => {
@@ -14,11 +15,19 @@ const Addform = () => {
     const [errors, setErrors] = useState(false);
     const token = useSelector((state) => state.auth.token).token
     const residents = useSelector((state) => state.resident.residentList)
+    const staff_list = useSelector((state) => state.staff.staffList)
     const user = useSelector((state) => state.auth.user)
     const selected_resident = useSelector((state) => state.resident.selectedResident)
     const selected_risk_schedule = useSelector((state) => state.riskschedulerscheduler.selectedriskScheduler)
     const risks = useSelector((state) => state.risk.riskList)
     const dispatch = useDispatch()
+
+    const options = [
+        { id: 1, value: 'Service User', label: 'Service User' },
+        { id: 2, value: 'Staff', label: 'Staff' },
+        { id: 3, value: 'Family Member', label: 'Family Member' },
+        { id: 4, value: 'Other', label: 'Other' }
+    ];
 
     const initialState = {
         title: '',
@@ -26,13 +35,20 @@ const Addform = () => {
         details: '',
         resident: '',
         created_by: '',
+        approved_by:'',
+        at_risk: [],
+        likelihood: '',
+        risk_level: '',
         information_sources_used: '',
         next_assement_date: '',
         is_further_information_needed: true,
         discontinue: false
+
     }
 
     const [state, setState] = useState(initialState)
+
+
 
     const handleReset = () => {
         setValidated(false);
@@ -45,10 +61,18 @@ const Addform = () => {
         if (form.checkValidity() === false) {
             event.stopPropagation();
         } else {
-            let data = { ...state }
+            const data = { ...state }
+
+            data.at_risk = state.at_risk.map(option =>  option.id);
+
+            console.log('Payload before submit:', data);
+
             if (data.discontinue) {
                 delete data["next_assement_date"]
             }
+
+            console.log('Payload before submit:', data);
+
             postApi(_ => {
                 toastsuccess("Risk Assessment added successfully");
                 handleReset();
@@ -57,75 +81,29 @@ const Addform = () => {
         setValidated(true);
     };
 
+
+    const handleSelectChange = (selectedOptions) => {
+    setState({
+        ...state,
+        at_risk: selectedOptions
+    });
+    console.log('Updated at_risk:', selectedOptions.map(option => ({ label: option.label, value: option.value })));
+};
     const handleChange = (event) => {
-        switch (event.target.name) {
+        const { name, value, type, checked } = event.target;
 
-            case 'title':
-                setState({
-                    ...state,
-                    title: event.target.value
-                })
-                break;
-
-            case 'category':
-                setState({
-                    ...state,
-                    category: event.target.value
-                })
-                break;
-
-            case 'identified_risk':
-                setState({
-                    ...state,
-                    identified_risk: event.target.value
-                })
-                break;
-
-            case 'details':
-                setState({
-                    ...state,
-                    details: event.target.value
-                })
-                break;
-
-            case 'resident':
-                setState({
-                    ...state,
-                    resident: event.target.value
-                })
-                break;
-
-            case 'information_sources_used':
-                setState({
-                    ...state,
-                    information_sources_used: event.target.value
-                })
-                break;
-
-            case 'next_assement_date':
-                setState({
-                    ...state,
-                    next_assement_date: event.target.value
-                })
-                break;
-
-            case 'is_further_information_needed':
-                setState({
-                    ...state,
-                    is_further_information_needed: event.target.checked
-                })
-                break;
-
-            case 'discontinue':
-                setState({
-                    ...state,
-                    discontinue: event.target.checked
-                })
-                break;
-
-            default:
+        if (type === 'checkbox') {
+            setState({
+                ...state,
+                [name]: checked
+            });
+        } else {
+            setState({
+                ...state,
+                [name]: value
+            });
         }
-    }
+    };
 
     useEffect(() => {
         setState(prevState => ({
@@ -147,6 +125,12 @@ const Addform = () => {
             setState(risk)
         }
     }, [selected_risk_schedule])
+
+    const riskOptions = risks.map(risk => ({
+        id: risk.id,
+        name: risk.label,
+        value: risk.value
+    }));
 
     return (
         <div className="col-xl-12 col-md-12">
@@ -174,6 +158,38 @@ const Addform = () => {
                                         rows={3} placeholder="Title"
                                     />
                                 </InputGroup>
+                            </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom03">
+                            <Form.Label>Approved By</Form.Label>
+                                {errors.approved_by && errors.approved_by.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="approved_by"
+                                        value={state.approved_by}
+                                        as="textarea"
+                                        type="text"
+                                        onChange={handleChange}
+                                    >
+                                    </Form.Control>
+                                </InputGroup>
+                            </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom03">
+                            <Form.Label>
+                                Keyworker
+                            </Form.Label>
+                                {errors.staff && errors.staff.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control as="select" onChange={handleChange}
+                                                  name="staff">
+                                        {staff_list.map(staff =>  (
+                                            <option key={staff.id}  value={staff.id}>{staff.first_name}  {staff.last_name}
+
+                                            </option>
+                                        ))}
+
+                                    </Form.Control>
+                                </InputGroup>
+
                             </Form.Group>
                             {/* <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom02">
                                 <Form.Label>Category</Form.Label>
@@ -273,6 +289,62 @@ const Addform = () => {
                                 </InputGroup>
                             </Form.Group>
                             <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
+                                <Form.Label>Who is at risk</Form.Label>
+                                {errors.at_risk && errors.at_risk.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Select
+                                        isMulti
+                                        name="at_risk"
+                                        options={options}
+                                        className="basic-multi-select"
+                                        classNamePrefix="select"
+                                        value={state.at_risk}
+                                        onChange={handleSelectChange}
+                                        placeholder="Select Risks"
+
+                                    />
+                                </InputGroup>
+                            </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
+                                <Form.Label>Likelihood</Form.Label>
+                                {errors.likelihood && errors.likelihood.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="likelihood"
+                                        required
+                                        as="select"
+                                        onChange={handleChange}
+                                        value={state.likelihood}
+                                        placeholder="Likelihood"
+                                    >
+                                        <option value='Likelihood' >========================</option>
+                                        <option value='Unlikely' >UNLIKELY</option>
+                                        <option value='May Happen' >MAY HAPPEN</option>
+                                        <option value='Likely' >LIKELY</option>
+                                    </Form.Control>
+                                </InputGroup>
+                            </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
+                                <Form.Label>Risk Level</Form.Label>
+                                {errors.risk_level && errors.risk_level.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="risk_level"
+                                        required
+                                        as="select"
+                                        onChange={handleChange}
+                                        value={state.risk_level}
+                                        placeholder="Levels of risk"
+                                    >
+                                        <option value='Risk Level' >========================</option>
+                                        <option value='Low'>🟢Low</option>
+                                        <option value='Medium'>🟡Medium</option>
+                                        <option value='High'>🔴High</option>
+
+                                    </Form.Control>
+                                </InputGroup>
+                            </Form.Group>
+                            {/* <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
                                 <Form.Label>Is Further Information Needed</Form.Label>
                                 {errors.is_further_information_needed && errors.is_further_information_needed.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
                                 <Form.Check
@@ -281,7 +353,7 @@ const Addform = () => {
                                     type="checkbox"
                                     onChange={handleChange}
                                 />
-                            </Form.Group>
+                            </Form.Group>//
                             <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
                                 <Form.Label>Discontinue Evaluation</Form.Label>
                                 {errors.discontinue && errors.discontinue.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
@@ -291,7 +363,7 @@ const Addform = () => {
                                     type="checkbox"
                                     onChange={handleChange}
                                 />
-                            </Form.Group>
+                            </Form.Group>*/}
                             {!state.discontinue &&
                                 <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
                                     <Form.Label>Next Evaluation Date</Form.Label>

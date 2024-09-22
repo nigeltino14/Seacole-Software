@@ -12,7 +12,7 @@ import Swal from 'sweetalert2'
 import { selectedStaff, selectedHome, selectedFamily } from '../../../utils/expand'
 import dateToYMD from '../../../utils/dates'
 import ProtectedRoute from '../../../protected/ProtectedRoute'
-
+import PrintButton from '../../../utils/print'
 const SuggestionList = () => {
     const [showEdit, setshowEdit] = useState(false)
     const [showDelete, setshowDelete] = useState("")
@@ -23,6 +23,7 @@ const SuggestionList = () => {
     const home_list = useSelector((state) => state.home.homeList)
     const family = useSelector((state) => state.family.familyList)
     const homes = [...home_list]
+    const [selectedSuggestion, setSelectedSuggestion] = useState(null);
     const handleShowEdit = (id) => {
         const suggestions_list = [...suggestions]
         const selected = suggestions_list.find(item => item.id === id);
@@ -32,6 +33,13 @@ const SuggestionList = () => {
     const handleCloseEdit = () => {
         setshowEdit(false)
     }
+
+//the below syntax added on 310524 to make accidents clickable.#
+
+    const handleRowClick = (row) => {
+        setSelectedSuggestion(row);
+    };
+
     const handleDelete = (id) => {
         const suggestions_list = [...suggestions]
         const selected = suggestions_list.find(item => item.id === id);
@@ -48,7 +56,7 @@ const SuggestionList = () => {
                 deleteApi(_ => {
                     Swal.fire('Deleted!', 'Suggestion has been deleted.', 'success');
                     setshowDelete(id)
-                }, token, '/api/suggestion/', selected.id)
+                }, token, `/api/suggestion/${selected.id}/`);
             }
         });
     }
@@ -102,6 +110,50 @@ const SuggestionList = () => {
             dispatch(suggestionActions.setSuggestions(response.data));
         }, token, "/api/suggestion")
     }, [dispatch, token, showDelete])
+
+
+
+    const SelectedSuggestionModal = () => {
+        if (!selectedSuggestion) {
+            return null;
+        }
+
+	const onClose = () => {
+        setSelectedSuggestion(null);
+        setshowEdit(false);
+    };
+
+	    return (
+            <Modal show={true} className="ms-modal-dialog-width ms-modal-content-width" onHide={onClose} centered>
+                <Modal.Header className="ms-modal-header-radius-0">
+                 <div>
+                    <h1 style={{ fontSize: '24px', marginBottom: '0' }}>Seacole Health</h1>
+                    <h4 className="modal-title text-white">Selected Accident</h4>
+                    <p>Date recorded: {selectedSuggestion.created_on}</p>
+                 </div>
+                    <button type="button" className="close text-red w-20 mr-2" onClick={onClose}>x</button>
+                    <PrintButton />
+                </Modal.Header>
+				<Modal.Body style={{ padding: '20px', fontSize: '16px', lineHeight: '1.5' }}>
+                    <div>
+                        <h5>Resident: {selectedSuggestion.resident}</h5>
+                        <p>Report type: {selectedSuggestion.report_type}</p>
+						<p>Date: {selectedSuggestion.date_occured}</p>
+						<p>Next Assessment: {selectedSuggestion.next_assement_date}</p>
+                        <p>Follow Up: {selectedSuggestion.follow_up_notes}</p>
+                        <p>Preventative Action: {selectedSuggestion.future_preventative_action}</p>
+                        <p>Action Taken: {selectedSuggestion.action_taken}</p>
+						<p>Incident: {selectedSuggestion.incident_details}</p>
+                        <p>Status: {selectedSuggestion.status}</p>
+
+                        {/* Display other note details here */}
+                    </div>
+                </Modal.Body>
+            </Modal>
+        );
+    };
+
+
     return (
         <div className="ms-panel">
             <div className="ms-panel-header ms-panel-custome">
@@ -120,9 +172,11 @@ const SuggestionList = () => {
                             responsive={true}
                             striped
                             noHeader
+							onRowClicked={handleRowClick}
                         />
                     </DataTableExtensions>
                 </div>
+                  <SelectedSuggestionModal onClose={ () => setshowEdit(false)} />
             </div>
             <Modal show={showEdit} className="ms-modal-dialog-width ms-modal-content-width" onHide={handleCloseEdit} centered>
                 <Modal.Header className="ms-modal-header-radius-0">

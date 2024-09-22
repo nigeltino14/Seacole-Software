@@ -43,7 +43,7 @@ router.register(
 )
 router.register(r"question", views.QuestionViewSet, "Question")
 router.register(r"assessment", views.AssessmentViewSet, "Assessment")
-router.register(r"evaluation", views.EvaluationViewSet, "Evaluation")
+router.register(r"review", views.EvaluationViewSet, "Review")
 router.register(r"choice", views.ChoiceViewSet, "Choice")
 router.register(
     r"posible-answear", views.PosibleAnswerViewSet, "PosibleAnswe  b    r"
@@ -51,8 +51,9 @@ router.register(
 router.register(
     r"assign-home-user", views.AssignHomeUserViewset, "PosibleAnswear"
 )
-router.register(r"plan", views.SupportPlanViewset, "SupportPlan")
+router.register(r"plan", views.SupportPlanViewset, "SupportPlans")
 router.register(r"risk", views.RiskActionPlanViewset, "RiskActionPlan")
+router.register(r"body-map", views.BodyMapViewSet, "BodyMap")
 router.register(r"risk-scheduler", views.RiskSchedulerViewset, "RiskScheduler")
 router.register(r"plan-scheduler", views.PlanSchedulerViewset, "PlanScheduler")
 router.register(r"evaluation-scheduler", views.EvaluationSchedulerViewset, "EvaluationScheduler")
@@ -68,6 +69,10 @@ router.register(r"house-overview", views.HouseAssetsViewSet, "HouseOverview")
 router.register(r"repair-record", views.RepairRecordViewSet, "RepairRecord")
 router.register(r"record-delete", views.DeletionRecordViewSet, "DeleteRecord")
 router.register(r"confidential-info", views.ConfidentialRecordViewSet, "ConfidentialRecord")
+
+router.register(r'support-plan/(?P<support_plan_id>\d+)/evaluations', views.PlanEvaluationViewSet, basename='evaluations')
+router.register(r'evaluations', views.PlanEvaluationViewSet, basename='PlanEvaluations')
+router.register(r'risk-options', views.AtRiskOptionViewSet, basename='AtRiskOptions')
 
 
 urlpatterns = [
@@ -112,6 +117,9 @@ urlpatterns = [
          views.HouseStockViewSet.as_view({"get": "list", "post": "create", "delete": "archive"}), name="house-stock"),
     path("house-overview/", views.HouseAssetsViewSet.as_view({"get": "list", "post": "create"}), name="house-overview"),
     path("repair-record", views.RepairRecordViewSet.as_view({"get": "list", "post": "create"}), name="repair-record"),
+    path("evaluations/", views.PlanEvaluationViewSet.as_view({"get": "list", "post": "create"}), name="evaluations"),
+    path("risk-options/", views.AtRiskOptionViewSet.as_view({"get": "list", "post": ""}), name="risk-options"),
+
 
 
 

@@ -14,6 +14,7 @@ import { stockActions } from './store/stock'
 import { repairActions } from './store/repairs'
 import { confidentialActions } from './store/confidential'
 import { noteActions } from './store/note'
+import { planActions} from './store/supportPlans'
 
 import { getApi } from './api/api'
 import { useDispatch, useSelector } from 'react-redux'
@@ -51,6 +52,7 @@ const RiskList = React.lazy(() => import("./components/pages/human-resource/Risk
 const Notifications = React.lazy(() => import("./components/pages/human-resource/Notifications"));
 const AddRisk = React.lazy(() => import("./components/pages/payment/AddRisk"));
 const AddPlan = React.lazy(() => import("./components/pages/payment/AddPlan"));
+const AddPlanEvaluation = React.lazy(() => import("./components/sections/payment/addpayment/AddPlanEvaluation"));
 
 // notice
 const Addnotice = React.lazy(() => import("./components/pages/notice/Addnotice"));
@@ -87,7 +89,7 @@ const UserHistory = React.lazy (() => import("./components/modals/UserHistory"))
 const DeleteUser = React.lazy (() => import("./components/modals/DeleteUser"));
 const AddAssets = React.lazy (() => import("./components/modals/AddAssets"));
 const AddStock = React.lazy (() => import("./components/modals/AddStock"));
-const AssetList = React.lazy (() => import("./components/pages/assets_stock/AssetList"));
+const AssetList = React.lazy (() => import("./components/pages/assets_stock/Assetlist"));
 const HouseOverview = React.lazy (() => import("./components/pages/house/house-overview"));
 
 const StockList = React.lazy (() => import("./components/pages/assets_stock/StockList"));
@@ -169,6 +171,7 @@ const App = () => {
                         <Route path="/supportplan/detail" component={SupportPlan} />
                         <Route exact path="/supportplan" component={SupportPlan} />
                         <Route path="/supportplan/add-supportplan" component={AddPlan} />
+                        <Route path="/supportplan/evaluations" component={AddPlanEvaluation} />
                         {/* Risk Assessment */}
                         <Route path="/riskassessment/detail" component={Employeelist} />
                         <Route exact path="/riskassessment" component={RiskList} />

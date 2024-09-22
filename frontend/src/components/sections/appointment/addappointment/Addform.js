@@ -198,13 +198,17 @@ const Addform = () => {
                                 <InputGroup>
                                     <Form.Control as="select" onChange={handleChange}
                                         name="resident">
+                                        required
+                                        value={state.resident}
+                                    >
+                                        <option key="2a" > ------------- </option>
                                         {residents.map(resident => (
                                             <option key={resident.national_id} value={resident.national_id}>{resident.first_name}  {resident.last_name}</option>
                                         ))}
                                     </Form.Control>
                                 </InputGroup>
                             </Form.Group>
-                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
+                            {/*<Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
                                 <Form.Label>Home</Form.Label>
                                 {errors.home && errors.home.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
                                 <InputGroup>
@@ -216,7 +220,7 @@ const Addform = () => {
                                         ))}
                                     </Form.Control>
                                 </InputGroup>
-                            </Form.Group>
+                            </Form.Group>*/}
                             <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom10">
                                 <Form.Label>Start On</Form.Label>
                                 {errors.start_time && errors.start_time.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
@@ -256,6 +260,7 @@ const Addform = () => {
                                         <option value="weekly" > Weekly </option>
                                         <option value="monthly" > Monthly </option>
                                         <option value="yearly" > Yearly </option>
+                                        <option value="norecur" > NoRecur </option>
                                     </Form.Control>
                                 </InputGroup>
                             </Form.Group>

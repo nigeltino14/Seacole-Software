@@ -11,21 +11,61 @@ const EditQuestion = (props) => {
     const residents = useSelector((state) => state.resident.residentList)
     const selected_plan = useSelector((state) => state.plan.selectedPlan)
     const dispatch = useDispatch()
-    const handleSubmit = (event) => {
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        if (isNaN(date)) return '';
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+    const handleSubmit = async (event) => {
         event.preventDefault();
         const form = event.currentTarget;
         if (form.checkValidity() === false) {
             event.stopPropagation();
         } else {
-            postApi(_ => { props.handleClose() }, token, `/api/plan/`, selected_plan)
+
+            let updatedPlan = {
+                ...selected_plan,
+                last_evaluated_date: new Date(),
+
+            };
+            try {
+                const response = await fetch(`http://localhost:8000/api/plan/${selected_plan.id}/`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Token ${token}`
+                    },
+                    body: JSON.stringify(updatedPlan)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`Error: ${errorData}`);
+                }
+
+                const data = await response.json();
+                console.log('Success:', data);
+                props.handleClose();
+            } catch (error) {
+                console.error('Error:', error);
+            }
         }
+
 
         setValidated(true);
     };
 
 
+
     const handleChange = (event) => {
-        switch (event.target.name) {
+
+        const { name, value } = event.target;
+        switch (name) {
+
 
             case 'title':
                 dispatch(planActions.setSelectedPlans({
@@ -41,19 +81,10 @@ const EditQuestion = (props) => {
                 }))
                 break;
 
-            case 'identified_risk':
+            case 'issue':
                 dispatch(planActions.setSelectedPlans({
-
                     ...selected_plan,
-                    identified_risk: event.target.value
-                }))
-                break;
-
-            case 'details':
-                dispatch(planActions.setSelectedPlans({
-
-                    ...selected_plan,
-                    details: event.target.value
+                    issue: event.target.value
                 }))
                 break;
 
@@ -65,36 +96,56 @@ const EditQuestion = (props) => {
                 }))
                 break;
 
-
-            case 'information_sources_used':
+            case 'goal':
                 dispatch(planActions.setSelectedPlans({
-
                     ...selected_plan,
-                    information_sources_used: event.target.value
+                    goal: event.target.value
                 }))
                 break;
 
-            case 'assesment_date':
+            case 'action_plan':
                 dispatch(planActions.setSelectedPlans({
-
                     ...selected_plan,
-                    assesment_date: event.target.value
+                    action_plan: event.target.value
                 }))
                 break;
 
-            case 'is_further_information_needed':
+            case 'care_rating':
                 dispatch(planActions.setSelectedPlans({
-
                     ...selected_plan,
-                    is_further_information_needed: event.target.value
+                    care_rating: event.target.value
                 }))
                 break;
 
-            case 'yes_no':
+            case 'by_who':
+                dispatch(planActions.setSelectedPlans({
+                    ...selected_plan,
+                    by_who: event.target.value
+                }))
+                break;
+
+            case 'next_assement_date':
+                const isoDate = new Date(value).toISOString();
+                dispatch(planActions.setSelectedPlans({
+                    ...selected_plan,
+                   next_assement_date: isoDate
+
+                }))
+                break;
+
+            case 'achievements':
                 dispatch(planActions.setSelectedPlans({
 
                     ...selected_plan,
-                    yes_no: event.target.value
+                    achievements: event.target.value
+                }))
+                break;
+
+            case 'by_when':
+                dispatch(planActions.setSelectedPlans({
+
+                    ...selected_plan,
+                    by_when: event.target.value
                 }))
                 break;
 
@@ -106,10 +157,12 @@ const EditQuestion = (props) => {
     }
 
 
+
     return (
         <div className="col-xl-12 col-md-12">
             <div className="ms-panel ms-panel-bshadow-none">
                 <div className="ms-panel-header">
+
 
                 </div>
                 <div className="ms-panel-body">
@@ -159,7 +212,7 @@ const EditQuestion = (props) => {
                                 </InputGroup>
                             </Form.Group>
                             <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom03">
-                                <Form.Label>Issue</Form.Label>
+                                <Form.Label>Issues</Form.Label>
                                 <InputGroup>
                                     <Form.Control
                                         name="issue"
@@ -172,7 +225,7 @@ const EditQuestion = (props) => {
                                 </InputGroup>
                             </Form.Group>
                             <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom04">
-                                <Form.Label>Action Plan</Form.Label>
+                                <Form.Label>Action Plan/s</Form.Label>
                                 <InputGroup>
                                     <Form.Control
                                         as="textarea"
@@ -200,16 +253,16 @@ const EditQuestion = (props) => {
                                 </InputGroup>
                             </Form.Group>
                             <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
-                                <Form.Label>By Whom</Form.Label>
+                                <Form.Label>Care Rating</Form.Label>
                                 <InputGroup>
                                     <Form.Control
-                                        name="by_whom"
+                                        name="care_rating"
                                         required
                                         as="textarea"
                                         type="text"
                                         onChange={handleChange}
-                                        value={selected_plan.by_whom}
-                                        placeholder="By Whom"
+                                        value={selected_plan.care_rating}
+                                        placeholder="Rating"
                                     />
                                 </InputGroup>
                             </Form.Group>
@@ -256,7 +309,7 @@ const EditQuestion = (props) => {
                                 </InputGroup>
                             </Form.Group>
                             <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
-                                <Form.Label>Goal</Form.Label>
+                                <Form.Label>Achievements</Form.Label>
                                 <InputGroup>
                                     <Form.Control
                                         name="achievements"
@@ -266,6 +319,18 @@ const EditQuestion = (props) => {
                                         type="text"
                                         as="textarea"
                                         placeholder="Achievements"
+                                    />
+                                </InputGroup>
+                            </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
+                                <Form.Label>Evaluation Date</Form.Label>
+                                <InputGroup>
+                                    <Form.Control
+                                        name="next_assement_date"
+                                        required
+                                        onChange={handleChange}
+                                        value={selected_plan.next_assement_date ? new Date(selected_plan.next_assement_date).toISOString().slice(0, 16) : ""}
+                                        type="datetime-local"
                                     />
                                 </InputGroup>
                             </Form.Group>

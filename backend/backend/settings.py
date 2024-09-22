@@ -36,6 +36,7 @@ DEBUG = False
 
 
 
+
 ALLOWED_HOSTS = ['seacolehealthsystems.co.uk', 'www.seacolehealthsystems.co.uk']
 
 
@@ -200,7 +201,10 @@ SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+<<<<<<< HEAD
 
+=======
+>>>>>>> 434f88765e8bb32036277c9bc55ee2d8282d2042
 
 
 USE_SPACES = os.getenv("USE_SPACES") == "true"

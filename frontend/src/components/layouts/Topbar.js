@@ -87,7 +87,7 @@ const Topbar = () => {
                         <span className="ms-toggler-bar bg-black" />
                         <span className="ms-toggler-bar bg-black" />
                     </div>
-                    <div className="logo-sn logo-sm"> Clinix (Seacole Health Systems)
+                    <div className="logo-sn logo-sm"> SEACOLE HEALTHCARE
                         <Link className="pl-0 ml-0 text-center navbar-brand mr-0" to="/">
                             <img src={logo} alt="logo" />
                         </Link>
