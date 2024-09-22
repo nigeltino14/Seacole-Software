@@ -16,7 +16,7 @@ from pathlib import Path
 import environ
 from decouple import config
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = "2Q8Td6DOmUDUSe1SvJDh7hQteFbc7N5v2DyDU0DSTvMIK62SIFVVYBqTFJtON8LqRpI"
 env = environ.Env()
 environ.Env.read_env()
 
@@ -36,7 +36,7 @@ DEBUG = False
 
 
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['seacolehealthsystems.co.uk', 'www.seacolehealthsystems.co.uk']
 
 
 # Application definition
@@ -158,10 +158,10 @@ USE_TZ = True
 
 
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = (BASE_DIR / "static",)
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
-MEDIA_URL = "/media/"
+
+MEDIA_URL = "/mediafiles/"
 MEDIA_ROOT = BASE_DIR / "mediafiles"
 
 # Default primary key field type
@@ -180,25 +180,27 @@ REST_FRAMEWORK = {
 CORS_ALLOWED_ORIGINS = [
     "https://seacolehealthsystems.co.uk",
     "http://localhost:3000",
-    "https://staging.seacolehealthsystems.co.uk",
+    "https://www.seacolehealthsystems.co.uk",
 ]
 
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
     "https://seacolehealthsystems.co.uk",
-    "https://staging.seacolehealthsystems.co.uk",
+    "https://www.seacolehealthsystems.co.uk",
 ]
 
 CRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "https://seacolehealthsystems.co.uk",
-    "https://staging.seacolehealthsystems.co.uk",
+    "https://www.seacolehealthsystems.co.uk",
 ]
 
 
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 
 
 USE_SPACES = os.getenv("USE_SPACES") == "true"
@@ -222,7 +224,7 @@ if USE_SPACES:
     DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 else:
     STATIC_URL = "/static/"
-    STATIC_ROOT = BASE_DIR / "staticfiles"
+    STATIC_ROOT = BASE_DIR / "/root/Production/Seacole-Software/backend/static/"
 
 if DEBUG == True:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
