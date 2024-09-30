@@ -14,30 +14,33 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build Docker image
-        run: docker build -t seacole-image:latest .
+        run: docker compose -f docker-compose.dev.yml build
 
-      - name: Save Docker image as tar file
-        run: docker save -o seacole-image.tar seacole-image:latest
+      - name: Save Backend Docker image as tar file
+        run: docker save -o backend.tar seacole-software-backend:latest
+
+      - name: Save Frontend Docker image as tar file
+        run: docker save -o frontend.tar seacole-software-frontend:latest
 
       - name: Transfer Docker image to remote server
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          scp -o StrictHostKeyChecking=no seacole-image.tar ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.WORK_DIR }}
+          scp -o StrictHostKeyChecking=no *.tar ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.WORK_DIR }}
 
       - name: Load Docker image on remote server
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'ENDSSH'
-          docker load -i ${{ secrets.WORK_DIR }}/seacole-image.tar
+          docker load -i ${{ secrets.WORK_DIR }}/*.tar
           ENDSSH
 
       - name: Transfer Docker Compose file to remote server
         run: |
-          scp -o StrictHostKeyChecking=no docker-compose.yaml ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.WORK_DIR }}
+          scp -o StrictHostKeyChecking=no docker-compose.dev.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.WORK_DIR }}
 
       - name: Deploy Docker containers using Docker Compose on remote server
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'ENDSSH'
-          docker compose -f ${{ secrets.WORK_DIR }}/docker-compose.yml up -d
+          docker compose -f ${{ secrets.WORK_DIR }}/docker-compose.dev.yml up -d
           ENDSSH
