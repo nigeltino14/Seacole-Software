@@ -22,18 +22,31 @@ jobs:
       - name: Save Frontend Docker image as tar file
         run: docker save -o frontend.tar seacole-software-frontend:latest
 
-      - name: Transfer Docker image to remote server
+      - name: Transfer Frontend Docker image to remote server
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          scp -o StrictHostKeyChecking=no *.tar ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.WORK_DIR }}
+          scp -o StrictHostKeyChecking=no frontend.tar ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.WORK_DIR }}
 
-      - name: Load Docker image on remote server
+      - name: Transfer Backend Docker image to remote server
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          scp -o StrictHostKeyChecking=no backend.tar ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.WORK_DIR }}
+
+      - name: Load Frontend Docker image on remote server
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'ENDSSH'
-          docker load -i ${{ secrets.WORK_DIR }}/*.tar
+          docker load -i ${{ secrets.WORK_DIR }}/frontend.tar
           ENDSSH
+
+      - name: Load Backend Docker image on remote server
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'ENDSSH'
+          docker load -i ${{ secrets.WORK_DIR }}/backend.tar
+          ENDSSH          
 
       - name: Transfer Docker Compose file to remote server
         run: |
