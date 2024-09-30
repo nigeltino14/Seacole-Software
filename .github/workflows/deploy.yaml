@@ -1,16 +1,49 @@
-name: remote ssh command
-on: [push]
-jobs:
+name: 'main'
+on:
+  push:
+    branches: [main]
+    paths:
+      - '*'
 
-  build:
-    name: Build
+jobs:
+  deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: executing remote ssh commands using password
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          port: ${{ secrets.SSH_PORT }}
-          script: whoami
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build Docker image
+        run: docker compose -f docker-compose.dev.yml build
+
+      - name: Save Backend Docker image as tar file
+        run: docker save -o backend.tar seacole-software-backend:latest
+
+      - name: Save Frontend Docker image as tar file
+        run: docker save -o frontend.tar seacole-software-frontend:latest
+
+      - name: Transfer Docker images to remote server
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          scp -o StrictHostKeyChecking=no frontend.tar ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.WORK_DIR }}
+          scp -o StrictHostKeyChecking=no backend.tar ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.WORK_DIR }}
+
+      - name: Load Docker images on remote server
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'ENDSSH'
+          docker load -i ${{ secrets.WORK_DIR }}/frontend.tar
+          docker load -i ${{ secrets.WORK_DIR }}/backend.tar
+          ENDSSH
+
+
+      - name: Transfer Docker Compose file to remote server
+        run: |
+          scp -o StrictHostKeyChecking=no docker-compose.dev.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.WORK_DIR }}
+
+      - name: Deploy Docker containers using Docker Compose on remote server
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'ENDSSH'
+          docker compose -f ${{ secrets.WORK_DIR }}/docker-compose.dev.yml up -d
+          ENDSSH
