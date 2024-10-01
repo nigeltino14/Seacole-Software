@@ -22,42 +22,42 @@ jobs:
       - name: Save Frontend Docker image as tar file
         run: docker save -o frontend.tar seacole-software-frontend:latest
 
-      - name: Configure SSH
+      - name: Set up SSH key
         run: |
-          mkdir -p ~/.ssh/
-          echo "$SSH_KEY" > ~/.ssh/staging.key
-          chmod 600 ~/.ssh/staging.key
-          cat >>~/.ssh/config <<END
-          Host staging
-            HostName $SSH_HOST
-            User $SSH_USER
-            IdentityFile ~/.ssh/staging.key
-            StrictHostKeyChecking no
-          END
-        env:
-          SSH_USER: ${{ secrets.SSH_USERNAME }}
-          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
+          env
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p 22 ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+          sudo apt-get install sshpass
 
       - name: Transfer Docker images to remote server
+        env:
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
         run: |
-          scp -o StrictHostKeyChecking=no frontend.tar ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.WORK_DIR }}
-          scp -o StrictHostKeyChecking=no backend.tar ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.WORK_DIR }}
+          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no frontend.tar ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.WORK_DIR }}
+          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no backend.tar ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.WORK_DIR }}
 
       - name: Load Docker images on remote server
+        env:
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'ENDSSH'
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'ENDSSH'
           docker load -i ${{ secrets.WORK_DIR }}/frontend.tar
           docker load -i ${{ secrets.WORK_DIR }}/backend.tar
           ENDSSH
 
 
       - name: Transfer Docker Compose file to remote server
+        env:
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
         run: |
-          scp -o StrictHostKeyChecking=no docker-compose.dev.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.WORK_DIR }}
+          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no docker-compose.dev.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.WORK_DIR }}
 
       - name: Deploy Docker containers using Docker Compose on remote server
+        env:
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'ENDSSH'
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'ENDSSH'
           docker compose -f ${{ secrets.WORK_DIR }}/docker-compose.dev.yml up -d
           ENDSSH
