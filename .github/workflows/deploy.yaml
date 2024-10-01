@@ -54,12 +54,20 @@ jobs:
         run: |
           sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no docker-compose.dev.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.WORK_DIR }}
 
+      - name: Remove running Docker containers
+        env:
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        run: |
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'ENDSSH'
+          docker rm -f backend frontend
+          ENDSSH
+
+
       - name: Deploy Docker containers using Docker Compose on remote server
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
         run: |
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'ENDSSH'
-          docker rm -f backend frontend 
           docker run -d -p 3000:3000 --restart=always --name frontend seacole-software-frontend:latest
           docker run -d -p 8000:8000 --restart=always --name backend seacole-software-backend:latest
           ENDSSH
