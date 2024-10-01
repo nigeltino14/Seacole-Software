@@ -59,6 +59,7 @@ jobs:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
         run: |
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'ENDSSH'
-          docker run -d --restart=always --name seacole-software-frontend:latest  -p 3000:3000
-          sudo docker run -d --restart=always --name seacole-software-backend:latest -p 8000:8000
+          docker rm -f backend frontend 
+          docker run -d -p 3000:3000 --restart=always --name frontend seacole-software-frontend:latest
+          docker run -d -p 8000:8000 --restart=always --name backend seacole-software-backend:latest
           ENDSSH
