@@ -9,7 +9,7 @@ services:
     volumes:
       - './backend:/usr/src/app'
     ports:
-      - 8000:8000
+      - "8000:8000"
     depends_on:
       - db
     environment:
@@ -40,4 +40,4 @@ services:
       DEBUG: debug
 
     ports:
-      - 3000:3000
+      - "3000:3000"
