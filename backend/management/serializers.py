@@ -31,19 +31,16 @@ class UserSerializer(serializers.ModelSerializer):
     user_permissions = PermissionnsSerializer(many=True, read_only=True)
 
     def create(self, validated_data):
-        group_id = self.initial_data.pop("groups")
+        groups_data = validated_data.pop("groups", [])  # Get groups data if available
         user = User.objects.create(**validated_data)
-        if group_id[0]:
-            gr = Group.objects.get(id=int(group_id[0]))
-            user.groups.add(gr)
+        user.groups.set(groups_data)  # Set the user's groups
         return user
 
     def update(self, instance, validated_data):
-        group_id = self.initial_data.pop("groups")
-        if group_id[0]:
-            gr = Group.objects.get(id=int(group_id[0]))
-            instance.groups.add(gr)
-        return instance
+        groups_data = validated_data.pop("groups", [])  # Get groups data if available
+        for group in groups_data:
+            instance.groups.add(group)  # Add each group to the user
+        return super().update(instance, validated_data)
 
     class Meta:
         model = get_user_model()
@@ -93,9 +90,21 @@ class ReminderSerializer(serializers.ModelSerializer):
 
 
 class ResidentDischargeSerializer(serializers.ModelSerializer):
+    discharged_by_first_name = serializers.CharField(source='discharged_by.first_name', read_only=True)
+    discharged_by_last_name = serializers.CharField(source='discharged_by.last_name', read_only=True)
+    name_first_name = serializers.CharField(source='resident.first_name', read_only=True)
+    name_last_name = serializers.CharField(source='resident.last_name', read_only=True)
+
     class Meta:
         model = ResidentDischarge
         fields = "__all__"
+
+    def get_created_by(self, obj):
+        return {
+                 'username': obj.discharged_by.username,
+                 'name': obj.first_name,
+              }
+
 
 
 class DailyCareSerializer(serializers.ModelSerializer):
@@ -108,7 +117,6 @@ class AttachmentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Attachments
         fields = "__all__"
-
 
 
 class BodyMapSerializer(serializers.ModelSerializer):
@@ -160,6 +168,9 @@ class SupportPlanSerializer(serializers.ModelSerializer):
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
+    name_first_name = serializers.CharField(source='resident.first_name', read_only=True)
+    name_last_name = serializers.CharField(source='resident.last_name', read_only=True)
+
     class Meta:
         model = Appointment
         fields = "__all__"
@@ -178,6 +189,11 @@ class HomeSerializer(serializers.ModelSerializer):
 
 
 class NoteSerializer(serializers.ModelSerializer):
+    name_first_name = serializers.CharField(source='resident.first_name', read_only=True)
+    name_last_name = serializers.CharField(source='resident.last_name', read_only=True)
+    created_by_first_name = serializers.CharField(source='staff.first_name', read_only=True)
+    created_by_last_name = serializers.CharField(source='staff.last_name', read_only=True)
+
     class Meta:
         model = Note
         fields = "__all__"
@@ -255,9 +271,9 @@ class ChoiceSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class PosibleAnswearSerializer(serializers.ModelSerializer):
+class PosibleAnswerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PosibleAnswear
+        model = PosibleAnswer
         fields = "__all__"
 
 
@@ -278,22 +294,145 @@ class RiskActionPlanSerializer(serializers.ModelSerializer):
         model = RiskActionPlan
         fields = "__all__"
 
+
 class RiskSchedulerSerializer(serializers.ModelSerializer):
     class Meta:
         model = RiskScheduler
         fields = "__all__"
+
 
 class SupportPlanSchedulerSerializer(serializers.ModelSerializer):
     class Meta:
         model = SupportScheduler
         fields = "__all__"
 
+
 class AccidentPlanSchedulerSerializer(serializers.ModelSerializer):
     class Meta:
         model = SuggestionComplainsScheduler
         fields = "__all__"
 
+
 class EvaluationPlanSchedulerSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReminderEvaluationScheduler
         fields = "__all__"
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = "__all__"
+
+
+class InventoryItemSerializer(serializers.ModelSerializer):
+    created_by_first_name = serializers.CharField(source='created_by.first_name', read_only=True)
+    created_by_last_name = serializers.CharField(source='created_by.last_name', read_only=True)
+
+    class Meta:
+        model = InventoryItem
+        fields = "__all__"
+
+    def get_queryset(self):
+        selected_resident = self.context['request'].query_params.get('resident')
+        queryset = super().get_queryset().filter(resident__national_id=selected_resident)
+        return queryset
+
+    def create(self, validated_data):
+        created_by = self.context['request'].user
+        validated_data['created_by'] = created_by
+        return super().create(validated_data)
+
+    def get_created_by(self, obj):
+        return obj.created_by.username if obj.created_by else None
+
+
+class InventoryItemDeleteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InventoryItem
+        fields = '__all__'
+
+
+class UserHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserHistory
+        fields = "__all__"
+
+    def get_user(self, obj):
+        return {
+            'username': obj.user.username,
+            'id': obj.user.id,
+        }
+
+
+def get_recorded_by(obj):
+    return obj.recorded_by.username if obj.recorded_by else None
+
+
+class HouseAssetsSerializer(serializers.ModelSerializer):
+    recorded_by_first_name = serializers.CharField(source='recorded_by.first_name', read_only=True)
+    recorded_by_last_name = serializers.CharField(source='recorded_by.last_name', read_only=True)
+    house_name = serializers.CharField(source='location.name', read_only=True)
+
+    class Meta:
+        model = HouseAssets
+        fields = "__all__"
+
+    def get_created_by(self, obj):
+        return obj.recorded_by.username if obj.recorded_by else None
+
+
+class HouseStockSerializer(serializers.ModelSerializer):
+    recorded_by_first_name = serializers.CharField(source='recorded_by.first_name', read_only=True)
+    recorded_by_last_name = serializers.CharField(source='recorded_by.last_name', read_only=True)
+    house_name = serializers.CharField(source='house.name', read_only=True)
+
+    class Meta:
+        model = HouseStock
+        fields = "__all__"
+
+    def get_created_by(self, obj):
+        return obj.recorded_by.username if obj.recorded_by else None
+
+
+class RepairRecordSerializer(serializers.ModelSerializer):
+    recorded_by_first_name = serializers.CharField(source='recorded_by.first_name', read_only=True)
+    recorded_by_last_name = serializers.CharField(source='recorded_by.last_name', read_only=True)
+    house_name = serializers.CharField(source='house.name', read_only=True)
+
+    class Meta:
+        model = RepairRecord
+        fields = '__all__'
+
+    def get_created_by(self, obj):
+        return obj.recorded_by.username if obj.recorded_by else None
+
+
+class DeletionRecordSerializer(serializers.ModelSerializer):
+    deleted_by_first_name = serializers.CharField(source='deleted_by.first_name', read_only=True)
+    deleted_by_last_name = serializers.CharField(source='deleted_by.last_name', read_only=True)
+
+    class Meta:
+        model = DeletionRecords
+        fields = '__all__'
+
+    def get_deleted_by(self, obj):
+        return obj.deleted_by.username if obj.deleted_by else None
+
+
+class ConfidentialRecordSerializer(serializers.ModelSerializer):
+    created_by_first_name = serializers.CharField(source='created_by.first_name', read_only=True)
+    created_by_last_name = serializers.CharField(source='created_by.last_name', read_only=True)
+    name_first_name = serializers.CharField(source='resident.first_name', read_only=True)
+    name_last_name = serializers.CharField(source='resident.last_name', read_only=True)
+
+    class Meta:
+        model = ConfidentialRecord
+        fields = '__all__'
+
+
+class AllowedLocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AllowedLocations
+        fields = '__all__'
+

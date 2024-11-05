@@ -5,6 +5,8 @@ from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
     PermissionsMixin,
+    Permission,
+    Group,
 )
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
@@ -14,6 +16,9 @@ from django_rest_passwordreset.signals import reset_password_token_created
 
 from django.core.mail import send_mail
 from django.utils import timezone
+from datetime import datetime
+from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
 
 
 STOOL_TYPE = (
@@ -77,6 +82,7 @@ CATEGORY_TYPE = (
 )
 
 REPEAT_CHOICES = (
+    ("no", "No"),
     ("daily", "Daily"),
     ("weekly", "Weekly"),
     ("monthly", "Monthly"),
@@ -195,9 +201,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     location = models.CharField(max_length=255, null=True, blank=True)
+    home = models.ForeignKey(Home, on_delete=models.SET_NULL, null=True, blank=True)
+    category = models.CharField(max_length= 30, null=True, blank=True)  #this is the position or rank in the addform
     dob = models.DateField(null=True, blank=True)
     training = models.TextField(null=True, blank=True)
-    NHS_number = models.CharField(max_length=255, null=True, blank=True)
+
     marital_status = models.CharField(max_length=255, null=True, blank=True)
     nationality = models.CharField(max_length=255, null=True, blank=True)
     religion = models.CharField(max_length=30, null=True, blank=True)
@@ -211,8 +219,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_archived = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    job_title = models.CharField(max_length=30, null=True, blank=True)
-    job_status = models.CharField(max_length=30, null=True, blank=True)
+
     department = models.CharField(max_length=30, null=True, blank=True)
     start_date = models.DateField(null=True, blank=True)
     leave_date = models.DateField(null=True, blank=True)
@@ -221,14 +228,15 @@ class User(AbstractBaseUser, PermissionsMixin):
         "self", on_delete=models.SET_NULL, null=True
     )
     NI_number = models.CharField(max_length=30, null=True, blank=True)
-    pova_checked = models.BooleanField(null=True, blank=True)
-    Trur = models.BooleanField(null=True, blank=True)
-    smoker = models.BooleanField(null=True, blank=True)
+
     full_driving_license = models.BooleanField(null=True, blank=True)
-    weekly_contracted_hour = models.BooleanField(null=True, blank=True)
+
     profile_pic = models.ImageField(
         upload_to="profiles/", null=True, blank=True
     )
+    deletion_reason = models.TextField(null=True, blank=True, default="Not deleted")
+    enable_reason = models.TextField(null=True, blank=True, default="Enabled")
+    locations = models.ManyToManyField("AllowedLocations", blank=True)
     USERNAME_FIELD = "email"
     objects = UserManager()
 
@@ -266,13 +274,13 @@ class Note(models.Model):
 
     id = models.AutoField(primary_key=True)
     subject = models.CharField(max_length=50)
-    description = models.TextField()
+    entry = models.TextField()
     type_of_note = models.CharField(
         default="day",
         max_length=50,
         choices=(("day", "day"), ("night", "night")),
     )
-    created_on = models.DateTimeField(_("Created On"), auto_now_add=True)
+    created_on = models.DateField(_("Created On"), auto_now_add=True)
     staff = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_("Created By"),
@@ -282,6 +290,8 @@ class Note(models.Model):
     emotion = models.CharField(
         _("Emotion"), choices=EMOTION_CHOICES, max_length=10, default="unknown"
     )
+    is_deleted = models.BooleanField(default=False)
+    deletion_reason = models.TextField(null=True, blank=True, default="Not deleted")
 
     class Meta:
         ordering = ["-created_on"]
@@ -291,9 +301,9 @@ class Note(models.Model):
 
 
 class ResidentDischarge(models.Model):
-    """Manages  Resdident Discharge"""
-
+    """Manages  Resident Discharge"""
     id = models.AutoField(primary_key=True)
+    is_discharged_status = models.BooleanField(default=False)
     discharged_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_("Staff"),
@@ -362,7 +372,7 @@ class DailyCare(models.Model):
     def __str__(self):
         return self.staff + " --> " + self.resident
 
-    created_on = models.DateTimeField(_("Created On"), auto_now_add=True)
+    created_on = models.DateField(_("Created On"), auto_now_add=True)
 
 
 class Attachments(models.Model):
@@ -399,7 +409,7 @@ class BodyMap(models.Model):
         on_delete=models.CASCADE,
     )
     treatment_plan = models.CharField(max_length=30, blank=True, null=True)
-    condition = models.CharField(max_length=30, default="Bruise")
+
     created_on = models.DateTimeField(_("Created On"), auto_now_add=True)
     comment = models.TextField(blank=True, null=True)
     wound_lenght = models.IntegerField()
@@ -422,6 +432,8 @@ class Resident(models.Model):
     last_name = models.CharField(max_length=30)
     gender = models.CharField(max_length=30, choices=GENDER_CHIOCES)
     date_of_birth = models.DateField()
+    next_of_kin = models.CharField(max_length=30, null=True, blank=False)
+    relative = models.CharField(max_length=40, null=True,blank=False)
     is_archived = models.BooleanField(
         default=False
     )  # we must be able to achieve a resident
@@ -442,12 +454,14 @@ class Resident(models.Model):
     phone = models.CharField(_("Contact"), max_length=12)
     email = models.EmailField(max_length=255, unique=False)
     address = models.TextField()
+    created_by = models.ForeignKey('User', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f"{self.first_name } {self.last_name } {self.national_id}"
 
     class Meta:
         ordering = ["-is_archived"]
+
 
 class HandoverPayment(models.Model):
     """HandoverPayment"""
@@ -516,7 +530,7 @@ class Finance(models.Model):
         verbose_name="Staff",
         on_delete=models.CASCADE,
     )
-    created_on = models.DateTimeField(_("Created On"), auto_now_add=True)
+    created_on = models.DateField(_("Created On"), auto_now_add=True)
 
     def __str__(self):
         return self.description
@@ -534,7 +548,7 @@ class SuggestionComplains(models.Model):
     follow_up_notes = models.TextField()
     future_preventative_action = models.TextField()
     action_taken = models.TextField()
-    inident_details = models.TextField()
+    incident_details = models.TextField()
     location = models.TextField()
     date_occured = models.DateTimeField()
     status = models.CharField(choices=SUGGESTION_STATUS, max_length=20)
@@ -587,7 +601,7 @@ class Rota(models.Model):
 
 class SupportPlan(models.Model):
     title = models.CharField(max_length=30, null=True, blank=True)
-    created_on = models.DateTimeField(_("Created On"), auto_now_add=True)
+    created_on = models.DateField(_("Created On"), auto_now_add=True)
     issue = models.CharField(max_length=30, null=True, blank=True)
     action_plan = models.CharField(max_length=30, null=True, blank=True)
     by_whom = models.CharField(max_length=30, null=True, blank=True)
@@ -604,7 +618,7 @@ class SupportPlan(models.Model):
     next_assement_date = models.DateTimeField(
         _("Asssment date"), default=timezone.now
     )
-    discontinue = models.BooleanField(_("Discontibnue"), default=False)
+    discontinue = models.BooleanField(_("Discontinue"), default=False)
     category = models.CharField(choices=CATEGORY_TYPE, max_length=100)
 
     def __str__(self):
@@ -613,7 +627,7 @@ class SupportPlan(models.Model):
 
 class RiskActionPlan(models.Model):
     title = models.CharField(max_length=30, null=True, blank=True)
-    created_on = models.DateTimeField(_("Created On"), auto_now_add=True)
+    created_on = models.DateField(_("Created On"), auto_now_add=True)
     identified_risk = models.CharField(max_length=30, null=True, blank=True)
     details = models.TextField(null=True)
     triggers = models.TextField(null=True)
@@ -668,10 +682,12 @@ class Appointment(models.Model):
         related_name="appointment_created_by",
     )
     recur = models.CharField(
-        default="no",
+        default=" ",
         max_length=50,
         choices=REPEAT_CHOICES,
     )
+    is_deleted = models.BooleanField(default=False)
+    deletion_reason = models.TextField(null=True, blank=True, default="Not deleted")
 
     class Meta:
         ordering = ["-created_on"]
@@ -897,6 +913,28 @@ class AfternoonRoutine(models.Model):
     def __str__(self):
         return f" {self.id}"
 
+# I have added the models below in order to be able to update an inventory list
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
+
+class InventoryItem(models.Model):
+    item_name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    category = models.CharField(max_length=50, null=False, blank=True)
+    quantity = models.IntegerField( null=True, blank=True)
+    resident = models.ForeignKey('Resident', on_delete=models.CASCADE)
+    created_at = models.DateTimeField( null=True, blank=True, auto_now_add=True)
+    created_by = models.ForeignKey('User', on_delete=models.CASCADE,null=True, blank=True)
+    is_deleted = models.BooleanField(default=False)
+    def __str__(self):
+        return self.created_by.id
 
 
 class Question(models.Model):
@@ -948,7 +986,7 @@ class Choice(models.Model):
     id = models.AutoField(primary_key=True)
     evaluation = models.CharField("Evaluation", max_length=20)
     question = models.ForeignKey("Question", on_delete=models.CASCADE)
-    answer = models.ForeignKey("PosibleAnswear", on_delete=models.CASCADE)
+    answer = models.ForeignKey("PosibleAnswer", on_delete=models.CASCADE)
     comment = models.CharField(max_length=50)
 
     def __str__(self):
@@ -958,7 +996,7 @@ class Choice(models.Model):
         unique_together = ("question", "evaluation")
 
 
-class PosibleAnswear(models.Model):
+class PosibleAnswer(models.Model):
     id = models.AutoField(primary_key=True)
     answear = models.CharField(max_length=20)
     question = models.ForeignKey("Question", on_delete=models.CASCADE)
@@ -982,7 +1020,7 @@ class AssignHomeUser(models.Model):
 class AssignHomeStaff(models.Model):
     staff = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Stafdf"),
+        verbose_name=_("Staff"),
         on_delete=models.CASCADE,
     )    
     assigned_by = models.ForeignKey(
@@ -1153,6 +1191,110 @@ class RiskScheduler(models.Model):
     def __str__(self):
         return f" {self.id}"
 
+
+class UserHistory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    action = models.CharField(max_length=200)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    details = models.TextField(blank=True)
+    # Add any additional fields you need to store
+
+    def __str__(self):
+        return f"{self.user.username} - {self.action} - {self.timestamp}"
+
+
+class HouseAssets(models.Model):
+    name = models.CharField(max_length=255)
+    serial_number = models.CharField(max_length=50, unique=True)
+    date_of_acquisition = models.DateField()
+    condition = models.CharField(max_length=100)
+    location = models.ForeignKey("Home", on_delete=models.SET_NULL, null=True)
+    recorded_by = models.ForeignKey("User", on_delete=models.SET_NULL, null=True)  # Link to User model
+    recorded_on = models.DateTimeField(auto_now_add=True)
+    category = models.CharField(max_length=50, null=False, blank=True)
+    value = models.CharField(max_length=50, null=True, blank=False)
+    is_deleted = models.BooleanField(default=False)
+    deletion_reason = models.TextField(null=True, blank=True, default="Not deleted")
+
+    def __str__(self):
+        return self.recorded_by.id
+
+    class Meta:
+        ordering = ['-recorded_on']
+
+
+class HouseStock(models.Model):
+    name = models.CharField(max_length=255, null=False, blank=True)
+    quantity = models.CharField(max_length=30, null=False, blank=True)
+    description = models.CharField(max_length=255, null=True, blank=True)
+    date_of_acquisition = models.DateField(null=True)
+    recorded_by = models.ForeignKey("User", on_delete=models.SET_NULL, blank=False, null=True)
+    created_on = models.DateTimeField(auto_now_add=True, null=True)
+    expiry_date = models.DateField(null=True)
+    house = models.ForeignKey("Home", on_delete=models.SET_NULL, blank=False, null=True)
+    if_perishable = models.CharField(max_length=50, null=True, blank=False)
+    is_deleted = models.BooleanField(default=False)
+    deletion_reason = models.TextField(null=True, blank=True, default="Not deleted")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['-name']
+
+
+class RepairRecord(models.Model):
+    asset_type = models.CharField(max_length=50, blank=False, null=False)
+    asset_name = models.CharField(max_length=200)
+    date_reported = models.DateField()
+    reminder_date = models.DateField(null=True, blank=True)
+    status = models.CharField(max_length=30, choices=[("Pending", "Pending"), ("In Progress", "In Progress"), ("Completed", "Completed")])
+    priority_level = models.CharField(max_length=50, blank=True, null=False)
+    house = models.ForeignKey(Home, on_delete=models.SET_NULL, blank=False, null=True)
+    photos = models.ImageField(upload_to='repair_photos/', null=True, blank=True)
+    attachments = models.FileField(upload_to='repair_attachments/', null=True, blank=True)
+    description = models.TextField()
+    recorded_by = models.ForeignKey("User", on_delete=models.SET_NULL, blank=False, null=True)
+    is_deleted = models.BooleanField(default=False)
+    deletion_reason = models.TextField(null=True, blank=True, default="Not deleted")
+
+    def __str__(self):
+        return f"{self.asset_name} - {self.status}"
+
+
+class DeletionRecords(models.Model):
+    stock_item = models.ForeignKey("HouseStock", on_delete=models.CASCADE, null=True)
+    reason = models.TextField(null=True)
+    date_deleted = models.DateTimeField(auto_now_add=True)
+    deleted_by = models.ForeignKey("User", on_delete=models.SET_NULL, blank=False, null=True )
+
+    def __str__(self):
+        return f"{self.deleted_by.username}"
+
+
+class ConfidentialRecord(models.Model):
+    information = models.TextField()
+    resident = models.ForeignKey("Resident", on_delete=models.CASCADE)
+    added_on = models.DateField(auto_now_add=True)
+    created_by = models.ForeignKey("User", on_delete=models.SET_NULL, null=True)
+    is_deleted = models.BooleanField(default=False)
+    deletion_reason = models.TextField(default="Not deleted")
+
+
+class AllowedLocations(models.Model):
+    name = models.CharField(max_length=255)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    radius = models.FloatField()
+    allowed_groups = models.ManyToManyField("AllowedUserGroup")
+
+
+class AllowedUserGroup(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Link the AllowedUserGroup to a User
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)  # Link the AllowedUserGroup to a Group
+
+    def __str__(self):
+        return f"{self.user.first_name} - {self.group.name}"
 
 @receiver(pre_delete, sender=Appointment)
 def delete_reminder_for_appointment(sender, instance, **kwargs):
@@ -1574,7 +1716,7 @@ def password_reset_token_created(
         reset_password_token.key,
     )
     send_mail(
-        "Password Reset for {title}".format(title="Clinix Healthy Systems"),
+        "Password Reset for {title}".format(title="Clinix Health Systems"),
         email_plaintext_message,
         settings.EMAIL_HOST_USER,
         [reset_password_token.user.email],
@@ -1615,3 +1757,5 @@ def send_password_reset_token_2(sender, instance, created, *args, **kwargs):
             [token.user.email],
             fail_silently=False,
         )
+
+
