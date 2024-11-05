@@ -14,7 +14,6 @@ import os
 
 from pathlib import Path
 import environ
-from decouple import config
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "2Q8Td6DOmUDUSe1SvJDh7hQteFbc7N5v2DyDU0DSTvMIK62SIFVVYBqTFJtON8LqRpI"
@@ -258,3 +257,12 @@ BACKEND_HOST = os.environ.get("BACKEND_HOST", default="http://localhost:8000")
 #         },
 #     },
 # }
+
+# HOST_SCHEME = "http://"
+# SECURE_PROXY_SSL_HEADER = None
+# SECURE_SSL_REDIRECT = False
+# SESSION_COOKIE_SECURE = False
+# CSRF_COOKIE_SECURE = False
+# SECURE_HSTS_SECONDS = None
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+# SECURE_FRAME_DENY = False
