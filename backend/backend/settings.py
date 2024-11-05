@@ -15,6 +15,7 @@ import os
 from pathlib import Path
 import environ
 from decouple import config
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "2Q8Td6DOmUDUSe1SvJDh7hQteFbc7N5v2DyDU0DSTvMIK62SIFVVYBqTFJtON8LqRpI"
 env = environ.Env()
@@ -28,16 +29,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 
-
 # SECURITY WARNING: don't run with debug turned on in production!
 # settings.py
 
 DEBUG = False
 
 
-
-
-ALLOWED_HOSTS = ['seacolehealthsystems.co.uk', 'www.seacolehealthsystems.co.uk']
+ALLOWED_HOSTS = ["seacolehealthsystems.co.uk", "www.seacolehealthsystems.co.uk"]
 
 
 # Application definition
@@ -70,7 +68,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-
 ]
 
 ROOT_URLCONF = "backend.urls"
@@ -103,11 +100,11 @@ if os.environ.get("DEBUG", "debug") == "debug":
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": 'seacole_staging',
-            "USER": 'doadmin',
-            "PASSWORD": 'AVNS_P2v-z3kK_178BxBTvfO',
-            "HOST": 'seacole-do-user-14823812-0.c.db.ondigitalocean.com',
-            "PORT": '25060',
+            "NAME": "seacole_staging",
+            "USER": "doadmin",
+            "PASSWORD": "AVNS_P2v-z3kK_178BxBTvfO",
+            "HOST": "seacole-do-user-14823812-0.c.db.ondigitalocean.com",
+            "PORT": "25060",
         }
     }
 else:
@@ -174,7 +171,6 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.TokenAuthentication",
     ),
-
 }
 
 
@@ -200,7 +196,7 @@ CRF_TRUSTED_ORIGINS = [
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 USE_SPACES = os.getenv("USE_SPACES") == "true"
 if USE_SPACES:
@@ -209,9 +205,7 @@ if USE_SPACES:
     AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
     AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
     AWS_DEFAULT_ACL = "public-read"
-    AWS_S3_ENDPOINT_URL = (
-        "https://seacolesoftwaresolutions.ams3.digitaloceanspaces.com"
-    )
+    AWS_S3_ENDPOINT_URL = "https://seacolesoftwaresolutions.ams3.digitaloceanspaces.com"
     AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
     # static settings
     AWS_LOCATION = "static"
@@ -233,15 +227,13 @@ else:
 EMAIL_HOST = os.environ.get("EMAIL_HOST", default="mail.privateemail.com")
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
-EMAIL_HOST_USER = 'nigeltino98@gmail.com'
-EMAIL_HOST_PASSWORD = 'opsalygeebnzkffb'
+EMAIL_HOST_USER = "nigeltino98@gmail.com"
+EMAIL_HOST_PASSWORD = "opsalygeebnzkffb"
 SERVER_EMAIL = EMAIL_HOST_USER
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
-FRONTEND_HOST = os.environ.get(
-    "FRONTEND_HOST", default="http://localhost:3000"
-)
+FRONTEND_HOST = os.environ.get("FRONTEND_HOST", default="http://localhost:3000")
 BACKEND_HOST = os.environ.get("BACKEND_HOST", default="http://localhost:8000")
 
 # LOGGING = {
