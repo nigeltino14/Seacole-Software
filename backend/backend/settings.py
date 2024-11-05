@@ -32,10 +32,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 # settings.py
 
-DEBUG = False
+DEBUG = True
 
 
-ALLOWED_HOSTS = ["seacolehealthsystems.co.uk", "www.seacolehealthsystems.co.uk"]
+ALLOWED_HOSTS = [
+    "seacolehealthsystems.co.uk",
+    "www.seacolehealthsystems.co.uk",
+    "localhost",
+]
 
 
 # Application definition
