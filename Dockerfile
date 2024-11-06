@@ -1,14 +1,11 @@
-# pull official base image
-FROM node:18.17.1-alpine
-
+# Use Node.js with Alpine for smaller image size
+FROM node:16.0.0-alpine 
 WORKDIR /app/
 
 COPY package*.json ./
 
-RUN npm install --force or --legacy-peer-deps
+RUN npm install --save --legacy-peer-deps
+COPY .  .
 
-# add app
-COPY . ./
 
-# start app
-CMD ["npm", "start"]
+CMD ["npm", "run", "start"]
