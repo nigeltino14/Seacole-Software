@@ -1,13 +1,12 @@
-version: '3.8'
+version: "3.8"
 
 services:
-
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     volumes:
-      - './backend:/usr/src/app'
+      - "./backend:/usr/src/app"
     ports:
       - "8000:8000"
     depends_on:
@@ -19,8 +18,7 @@ services:
       POSTGRES_PORT: 5432
       POSTGRES_HOST: db
       DEBUG: debug
-      USE_SPACES: false
-      
+
   db:
     image: postgres
     restart: always
@@ -28,7 +26,7 @@ services:
       POSTGRES_PASSWORD: clinx
       POSTGRES_USER: clinx
       POSTGRES_DB: clinx
-  
+
   frontend:
     build:
       context: ./frontend
