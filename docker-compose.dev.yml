@@ -9,8 +9,6 @@ services:
       - "./backend:/usr/src/app"
     ports:
       - "8000:8000"
-    depends_on:
-      - db
     environment:
       POSTGRES_PASSWORD: clinx
       POSTGRES_USER: clinx
@@ -18,14 +16,6 @@ services:
       POSTGRES_PORT: 5432
       POSTGRES_HOST: db
       DEBUG: debug
-
-  db:
-    image: postgres
-    restart: always
-    environment:
-      POSTGRES_PASSWORD: clinx
-      POSTGRES_USER: clinx
-      POSTGRES_DB: clinx
 
   frontend:
     build:
