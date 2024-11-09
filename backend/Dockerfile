@@ -1,24 +1,24 @@
+# Use Python 3.11 slim image
 FROM python:3.11-slim
 
+# Environment settings
 ENV PYTHONUNBUFFERED 1
 ENV DJANGO_ENV dev
 
-# install dependencies
-RUN apt-get update --fix-missing
-RUN apt-get -y upgrade 
+# Install dependencies
+RUN apt-get update --fix-missing && \
+    apt-get -y upgrade && \
+    apt-get install -y --no-install-recommends \
+    # Add any additional system dependencies here, if needed \
+    && rm -rf /var/lib/apt/lists/*
 
+# Install Python dependencies
 COPY ./requirements.txt /requirements.txt
-RUN pip install -r /requirements.txt
+RUN pip install --no-cache-dir -r /requirements.txt
 
-# Setup directory structure
-RUN mkdir -p /usr/src/app
+# Set up directory structure
 WORKDIR /usr/src/app
-
-# add entrypoint.sh
-COPY ./entrypoint.sh /usr/src/app/entrypoint.sh
-ENTRYPOINT ["sh", "/usr/src/app/entrypoint.sh"]
-
 COPY . /usr/src/app
 
-# run server
-CMD ["/usr/src/app/entrypoint.sh"]
+# Run migrations and start the Django development server
+CMD ["sh", "-c", "python manage.py makemigrations --no-input && python manage.py migrate --no-input && python manage.py runserver 0.0.0.0:8000"]
