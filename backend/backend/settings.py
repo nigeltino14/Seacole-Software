@@ -36,8 +36,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "seacolehealthsystems.co.uk",
-    "www.seacolehealthsystems.co.uk",
     "localhost",
+    "165.227.229.113",
 ]
 
 
