@@ -1,10 +1,11 @@
-FROM python:3.11-slim
-ENV PYTHONUNBUFFERED 1
-ENV DJANGO_ENV dev
-RUN apt-get update --fix-missing
-RUN apt-get -y upgrade 
-WORKDIR /srv/backend
-COPY ./backend /srv/backend
-RUN pip install -r /srv/backend/requirements.txt
+# Use Node.js with Alpine for smaller image size
+FROM node:16.0.0-alpine 
+WORKDIR /app/
 
-ENTRYPOINT ["/usr/bin/supervisord", "-c", "/srv/backend/supervisor.conf"]
+COPY package*.json ./
+
+RUN npm install --save --legacy-peer-deps
+COPY .  .
+
+
+CMD ["npm", "run", "start"]

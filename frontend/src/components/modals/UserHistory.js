@@ -36,11 +36,11 @@ const UserHistoryList = () => {
       <div className="col-xl-12 col-md-12">
         <div className="ms-panel ms-panel-fh">
           <div className="ms-panel-body">
-            <h1 className="section-title">User History</h1>
+            <h1 className="section-title">User History Recorded</h1>
             <table className="table-container">
               <thead>
                 <tr className="table-heading">
-                  <th className="table-cell">Action</th>
+                  <th className="table-cell">Actions</th>
                   <th className="table-cell">Date and Time</th>
                   <th className="table-cell">Details</th>
                   {/* Add more columns as needed */}

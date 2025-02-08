@@ -262,14 +262,14 @@ const Patientlist = () => {
                     <i className='fa fa-print ms-text-info  mr-4' />
                 </Link>
                 <ProtectedRoute perm="add_resident">
-                    <Link to="/resdient/add-resdient">Add Resident</Link>
+                    <Link to="/resdient/add-resdient">Add Residents To House</Link>
                 </ProtectedRoute>
             </div>
             <div className="ms-panel-header ms-panel-custome">
                 <Form>
                     <Form.Row>
                         <Form.Group as={Col} md="12" className="mb-12" controlId="validationCustom01">
-                            <Form.Label>Home Filter</Form.Label>
+                            <Form.Label>Home Filters</Form.Label>
                             <InputGroup>
                                 <Form.Control as="select" onChange={handleHomeChange}
                                     name="home" value={selected_home.id} >
@@ -286,7 +286,7 @@ const Patientlist = () => {
                 <div className="thead-primary datatables">
                     <DataTable
                         columns={columns}
-                        data={residents_to_display}
+                        data={residents}
                         pagination
                         responsive={true}
                         striped

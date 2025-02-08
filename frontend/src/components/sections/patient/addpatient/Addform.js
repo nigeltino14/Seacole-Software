@@ -201,7 +201,7 @@ const Addform = () => {
                                 </InputGroup>
                             </Form.Group>
                             <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom02">
-                                <Form.Label>Last Name</Form.Label>
+                                <Form.Label>Surname</Form.Label>
                                 {errors.last_name && errors.last_name.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
                                 <InputGroup>
                                     <Form.Control

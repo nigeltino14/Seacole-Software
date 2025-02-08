@@ -1,0 +1,71 @@
+import django
+from management.models import Resident
+from django.conf import settings
+
+# Set up Django environment
+import os
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+django.setup()
+
+def add_resident():
+    # Define the details of the new resident
+    resident_data = {
+	     national_id': 'JM182170C'
+        'first_name': 'Chris',
+        'last_name': 'Taylor',
+        'gender': 'Male',
+		'date_of_birth': '1991-12-15',
+		'room': '2',
+		'phone_number': '07886187186',
+		'email': 'christaylorpixel@outlook.com',
+        'address': '31 High Street Horsell Woking Surrey',
+        'home': 'Elcauma',
+		'height': '1.62,
+		'NHS_number': '6063817778',
+		'next_of_kin': 'Sarah Holden',
+        
+        # Add more fields as needed
+    }
+
+    # Create the new resident
+    resident = Resident.objects.create(**resident_data)
+    print('Resident added successfully.')
+
+if __name__ == '__main__':
+    add_resident()
+import django
+from management.models import Resident
+from django.conf import settings
+
+# Set up Django environment
+import os
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+django.setup()
+
+def add_resident():
+    # Define the details of the new resident
+    resident_data = {
+	     national_id': 'JM182170C'
+        'first_name': 'Chris',
+        'last_name': 'Taylor',
+        'gender': 'Male',
+		'date_of_birth': '1991-12-15',
+		'room': '2',
+		'phone_number': '07886187186',
+		'email': 'christaylorpixel@outlook.com',
+        'address': '31 High Street Horsell Woking Surrey',
+        'home': 'Elcauma',
+		'height': '1.62,
+		'NHS_number': '6063817778',
+		'next_of_kin': 'Sarah Holden',
+        
+        # Add more fields as needed
+    }
+
+    # Create the new resident
+    resident = Resident.objects.create(**resident_data)
+    print('Resident added successfully.')
+
+if __name__ == '__main__':
+    add_resident()
+
