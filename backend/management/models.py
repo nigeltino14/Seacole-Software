@@ -622,12 +622,12 @@ class SupportPlan(models.Model):
     care_rating = models.CharField(_("Care Rating"), choices=RATING_CHOICES, max_length=40, null=True, blank=True)
     approved_by = models.CharField(max_length=100, null=True, blank=True)
     cp_duration = models.CharField(choices=DURATION_CHOICES, max_length=40, null=True, blank=True)
-    issue = models.CharField(max_length=9000, null=True, blank=True)
-    action_plan = models.CharField(max_length=9000, null=True, blank=True)
+    issue = models.CharField(max_length=9999, null=True, blank=True)
+    action_plan = models.CharField(max_length=9999, null=True, blank=True)
     by_who = models.CharField(max_length=500, null=True, blank=True)
     by_when = models.CharField(max_length=100, null=True, blank=True)
-    goal = models.CharField(max_length=9000, null=True, blank=True)
-    achievements = models.CharField(max_length=9000, null=True, blank=True)
+    goal = models.CharField(max_length=9999, null=True, blank=True)
+    achievements = models.CharField(max_length=9999, null=True, blank=True)
     created_by = models.ForeignKey(
         "User", verbose_name=_(""), on_delete=models.CASCADE
     )
@@ -640,7 +640,7 @@ class SupportPlan(models.Model):
     next_eval_date = models.DateTimeField(
         _("Evaluation Date"), default=timezone.now
     )
-    evaluations = models.CharField(max_length=5000, null=True, blank=True)
+    evaluations = models.CharField(max_length=9999, null=True, blank=True)
     discontinue = models.BooleanField(_("Discontinue"), default=False)
     category = models.CharField(choices=CATEGORY_TYPE, max_length=100)
     last_evaluated_date = models.DateTimeField(auto_now=True, blank=True, null=True)
@@ -1322,6 +1322,7 @@ class DeletionRecords(models.Model):
     def __str__(self):
         return f"{self.deleted_by.username}"
 
+
 class GP(models.Model):
     resident = models.OneToOneField(Resident, on_delete=models.CASCADE, related_name="gp")
     gp_name = models.CharField(max_length=100)
@@ -1330,6 +1331,7 @@ class GP(models.Model):
 
     def __str__(self):
         return f"GP: {self.name} for {self.resident.first_name}"
+
 
 class SocialWorker(models.Model):
     resident = models.OneToOneField(Resident, on_delete=models.CASCADE, related_name="social_worker")
@@ -1340,6 +1342,7 @@ class SocialWorker(models.Model):
     def __str__(self):
         return f"Social Worker: {self.name} for {self.resident.first_name}"
 
+
 class Pharmacist(models.Model):
     resident = models.OneToOneField(Resident, on_delete=models.CASCADE, related_name="pharmacist")
     pharma_name = models.CharField(max_length=100)
@@ -1349,6 +1352,7 @@ class Pharmacist(models.Model):
     def __str__(self):
         return f"Pharmacist: {self.name} for {self.resident.first_name}"
 
+
 class Dentist(models.Model):
     resident = models.OneToOneField(Resident, on_delete=models.CASCADE, related_name="dentist")
     dentist_name = models.CharField(max_length=100)
@@ -1357,6 +1361,7 @@ class Dentist(models.Model):
 
     def __str__(self):
         return f"Dentist: {self.name} for {self.resident.first_name}"
+
 
 class ConfidentialRecord(models.Model):
     information = models.TextField()

@@ -31,11 +31,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 # settings.py
 
-DEBUG = True
+DEBUG = False
 
 
 ALLOWED_HOSTS = [
-    "seacolehealthsystems.co.uk",
+    "seacolehealthsystems.co.uk", "www.seacolehealthsystems.co.uk",
     "localhost",
     "165.227.229.113",
 ]
