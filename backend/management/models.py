@@ -216,12 +216,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    location = models.CharField(max_length=255, null=True, blank=True)
     home = models.ForeignKey(Home, on_delete=models.SET_NULL, null=True, blank=True)
-    category = models.CharField(max_length= 30, null=True, blank=True)  #this is the position or rank in the addform
+    category = models.CharField(max_length=50, null=True, blank=True)  #this is the position or rank in the addform
     dob = models.DateField(null=True, blank=True)
     training = models.TextField(null=True, blank=True)
-
     marital_status = models.CharField(max_length=255, null=True, blank=True)
     nationality = models.CharField(max_length=255, null=True, blank=True)
     religion = models.CharField(max_length=30, null=True, blank=True)
@@ -471,6 +469,9 @@ class Resident(models.Model):
     email = models.EmailField(max_length=255, unique=False)
     address = models.TextField()
     created_by = models.ForeignKey('User', on_delete=models.CASCADE, null=True, blank=True)
+    clinical_diagnosis = models.CharField(max_length=1000, null=True, blank=True)
+    allergies = models.CharField(max_length=1000, blank=True, null=True)
+    risk = models.CharField(max_length=1000, blank=True, null=True)
 
     def __str__(self):
         return f"{self.first_name } {self.last_name } {self.national_id}"
@@ -616,17 +617,17 @@ class Rota(models.Model):
 
 
 class SupportPlan(models.Model):
-    title = models.CharField(max_length=30, null=True, blank=True)
+    title = models.CharField(max_length=100, null=True, blank=True)
     created_on = models.DateTimeField(_("Created On"), auto_now_add=True)
     care_rating = models.CharField(_("Care Rating"), choices=RATING_CHOICES, max_length=40, null=True, blank=True)
-    approved_by = models.CharField(max_length=40, null=True, blank=True)
+    approved_by = models.CharField(max_length=100, null=True, blank=True)
     cp_duration = models.CharField(choices=DURATION_CHOICES, max_length=40, null=True, blank=True)
-    issue = models.CharField(max_length=500, null=True, blank=True)
-    action_plan = models.CharField(max_length=500, null=True, blank=True)
-    by_who = models.CharField(max_length=100, null=True, blank=True)
+    issue = models.CharField(max_length=9000, null=True, blank=True)
+    action_plan = models.CharField(max_length=9000, null=True, blank=True)
+    by_who = models.CharField(max_length=500, null=True, blank=True)
     by_when = models.CharField(max_length=100, null=True, blank=True)
-    goal = models.CharField(max_length=500, null=True, blank=True)
-    achievements = models.CharField(max_length=100, null=True, blank=True)
+    goal = models.CharField(max_length=9000, null=True, blank=True)
+    achievements = models.CharField(max_length=9000, null=True, blank=True)
     created_by = models.ForeignKey(
         "User", verbose_name=_(""), on_delete=models.CASCADE
     )
@@ -639,11 +640,11 @@ class SupportPlan(models.Model):
     next_eval_date = models.DateTimeField(
         _("Evaluation Date"), default=timezone.now
     )
-    evaluations = models.CharField(max_length=200, null=True, blank=True)
+    evaluations = models.CharField(max_length=5000, null=True, blank=True)
     discontinue = models.BooleanField(_("Discontinue"), default=False)
     category = models.CharField(choices=CATEGORY_TYPE, max_length=100)
     last_evaluated_date = models.DateTimeField(auto_now=True, blank=True, null=True)
-    staff = models.CharField(max_length=50, blank=True, null=True)
+    staff = models.CharField(max_length=100, blank=True, null=True)
     is_deleted = models.BooleanField(default=False)
     deletion_reason = models.TextField(null=True, blank=True, default="Not deleted")
 
@@ -901,6 +902,7 @@ class Bath(models.Model):
 
     def __str__(self):
         return f" {self.id}"
+
 
 class MorningRoutine(models.Model):
     id = models.AutoField(primary_key=True)
@@ -1320,6 +1322,41 @@ class DeletionRecords(models.Model):
     def __str__(self):
         return f"{self.deleted_by.username}"
 
+class GP(models.Model):
+    resident = models.OneToOneField(Resident, on_delete=models.CASCADE, related_name="gp")
+    gp_name = models.CharField(max_length=100)
+    gp_phone = models.CharField(max_length=15, blank=True, null=True)
+    gp_email = models.EmailField(blank=True, null=True)
+
+    def __str__(self):
+        return f"GP: {self.name} for {self.resident.first_name}"
+
+class SocialWorker(models.Model):
+    resident = models.OneToOneField(Resident, on_delete=models.CASCADE, related_name="social_worker")
+    sw_name = models.CharField(max_length=100)
+    sw_phone = models.CharField(max_length=15, blank=True, null=True)
+    sw_email = models.EmailField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Social Worker: {self.name} for {self.resident.first_name}"
+
+class Pharmacist(models.Model):
+    resident = models.OneToOneField(Resident, on_delete=models.CASCADE, related_name="pharmacist")
+    pharma_name = models.CharField(max_length=100)
+    pharma_phone = models.CharField(max_length=15, blank=True, null=True)
+    pharma_email = models.EmailField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Pharmacist: {self.name} for {self.resident.first_name}"
+
+class Dentist(models.Model):
+    resident = models.OneToOneField(Resident, on_delete=models.CASCADE, related_name="dentist")
+    dentist_name = models.CharField(max_length=100)
+    dentist_phone = models.CharField(max_length=15, blank=True, null=True)
+    dentist_email = models.EmailField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Dentist: {self.name} for {self.resident.first_name}"
 
 class ConfidentialRecord(models.Model):
     information = models.TextField()
