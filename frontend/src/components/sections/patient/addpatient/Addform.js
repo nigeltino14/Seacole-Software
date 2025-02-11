@@ -22,6 +22,19 @@ const initialState = {
     address: '',
     height: '',
     next_of_kin: '',
+    dentist_name: '',
+    dentist_phone: '',
+    dentist_address: '',
+    gp_name: '',
+    gp_phone: '',
+    gp_address: '',
+    sw_name: '',
+    sw_phone: '',
+    sw_address: '',
+    pharma_name: '',
+    pharma_phone: '',
+    pharma_address: '',
+
 
 }
 const Addform = () => {
@@ -53,6 +66,19 @@ const Addform = () => {
         formData.append('address', state.address);
         formData.append('height', state.height);
         formData.append('next_of_kin', state.next_of_kin);
+        formData.append('dentist_name', state.dentist_name);
+        formData.append('dentist_phone', state.dentist_phone);
+        formData.append('dentist_address', state.dentist_address);
+        formData.append('gp_name', state.gp_name);
+        formData.append('gp_phone', state.gp_phone);
+        formData.append('gp_address', state.gp_address);
+        formData.append('sw_name', state.sw_name);
+        formData.append('sw_phone', state.sw_phone);
+        formData.append('sw_address', state.sw_address);
+        formData.append('pharma_name', state.pharma_name);
+        formData.append('pharma_phone', state.pharma_phone);
+        formData.append('pharma_address', state.pharma_address);
+
 
         event.preventDefault();
         if (form.checkValidity() === false) {
@@ -162,12 +188,95 @@ const Addform = () => {
                 break;
 
             case 'next_of_kin':
-		setState({
-		   ...state,
-		   next_of_kin: event.target.value
-                   
-		})
-		break;
+		        setState({
+		            ...state,
+                    next_of_kin: event.target.value
+		        })
+                break;
+
+            case 'dentist_name':
+		        setState({
+		            ...state,
+                    dentist_name: event.target.value
+		        })
+                break;
+
+            case 'dentist_phone':
+		        setState({
+		            ...state,
+                    dentist_phone: event.target.value
+                })
+                break;
+
+            case 'dentist_address':
+		        setState({
+		            ...state,
+                    dentist_address: event.target.value
+		        })
+		        break;
+
+            case 'gp_name':
+		        setState({
+		            ...state,
+                    gp_name: event.target.value
+		        })
+                break;
+
+            case 'gp_phone':
+		        setState({
+		            ...state,
+                    gp_phone: event.target.value
+                })
+                break;
+
+            case 'gp_address':
+		        setState({
+		            ...state,
+                    gp_address: event.target.value
+		        })
+		        break;
+
+            case 'sw_name':
+		        setState({
+		            ...state,
+                    sw_name: event.target.value
+		        })
+                break;
+
+            case 'sw_phone':
+		        setState({
+		            ...state,
+                    sw_phone: event.target.value
+                })
+                break;
+
+            case 'sw_address':
+		        setState({
+		            ...state,
+                    sw_address: event.target.value
+		        })
+		        break;
+
+            case 'pharma_name':
+		        setState({
+		            ...state,
+                    pharma_name: event.target.value
+		        })
+                break;
+
+            case 'pharma_phone':
+		        setState({
+		            ...state,
+                    pharma_phone: event.target.value
+                })
+                break;
+
+            case 'pharma_address':
+		        setState({
+		            ...state,
+                    pharma_address: event.target.value
+		        })
+		        break;
             default:
 
         }
@@ -385,6 +494,163 @@ const Addform = () => {
                                    />
                                </InputGroup>
                            </Form.Group>
+                           <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom13">
+                                <Form.Label>Dentist Name</Form.Label>
+                                {errors.dentist_name && errors.dentist_name.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="dentist_name"
+                                        onChange={handleChange}
+                                        value={state.dentist_name}
+                                        type="text"
+                                        placeholder="Dentist name"
+                                    />
+                                </InputGroup>
+                            </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom14">
+                                <Form.Label>Dentist Phone number</Form.Label>
+                                {errors.dentist_phone && errors.dentist_phone.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="dentist_phone"
+                                        onChange={handleChange}
+                                        value={state.dentist_phone}
+                                        type="text"
+                                        placeholder="Dentist Phone Number"
+                                   />
+                               </InputGroup>
+                           </Form.Group>
+                           <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom15">
+                                <Form.Label>Dentist Address</Form.Label>
+                                {errors.dentist_address && errors.dentist_address.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="dentist_address"
+                                        onChange={handleChange}
+                                        value={state.dentist_address}
+                                        type="text"
+                                        placeholder="Dentist Address"
+                                    />
+                                </InputGroup>
+                            </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom16">
+                                <Form.Label>General Practitioner</Form.Label>
+                                {errors.gp_name && errors.gp_name.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="gp_name"
+                                        onChange={handleChange}
+                                        value={state.gp_name}
+                                        type="text"
+                                        placeholder="General Practitioner"
+                                    />
+                                </InputGroup>
+                            </Form.Group>
+
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom17">
+                                <Form.Label>GP Phone number</Form.Label>
+                                {errors.gp_phone && errors.gp_phone.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="gp_phone"
+                                        onChange={handleChange}
+                                        value={state.gp_phone}
+                                        type="text"
+                                        placeholder="GP Phone Number"
+                                   />
+                               </InputGroup>
+                           </Form.Group>
+                           <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom18">
+                                <Form.Label>GP Address</Form.Label>
+                                {errors.gp_address && errors.gp_address.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="gp_address"
+                                        onChange={handleChange}
+                                        value={state.gp_address}
+                                        type="text"
+                                        placeholder="GP Address"
+                                    />
+                                </InputGroup>
+                            </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom19">
+                                <Form.Label>Social Worker Name</Form.Label>
+                                {errors.sw_name && errors.sw_name.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="sw_name"
+                                        onChange={handleChange}
+                                        value={state.sw_name}
+                                        type="text"
+                                        placeholder="Social Worker"
+                                   />
+                               </InputGroup>
+                           </Form.Group>
+                           <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom20">
+                                <Form.Label>Social Worker Phone</Form.Label>
+                                {errors.sw_phone && errors.sw_phone.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="sw_phone"
+                                        onChange={handleChange}
+                                        value={state.sw_phone}
+                                        type="text"
+                                        placeholder="Social Worker Phone number"
+                                    />
+                                </InputGroup>
+                            </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom21">
+                                <Form.Label>Social Worker Address</Form.Label>
+                                {errors.sw_address && errors.sw_address.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="sw_address"
+                                        onChange={handleChange}
+                                        value={state.sw_address}
+                                        type="text"
+                                        placeholder="Social Worker Address"
+                                   />
+                               </InputGroup>
+                           </Form.Group>
+                           <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom22">
+                                <Form.Label>Pharmacist's Name</Form.Label>
+                                {errors.pharma_name && errors.pharma_name.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="pharma_name"
+                                        onChange={handleChange}
+                                        value={state.pharma_name}
+                                        type="text"
+                                        placeholder="Pharmacist Name"
+                                    />
+                                </InputGroup>
+                            </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom23">
+                                <Form.Label>Pharmacist Phone number</Form.Label>
+                                {errors.pharma_phone && errors.pharma_phone.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="pharma_phone"
+                                        onChange={handleChange}
+                                        value={state.pharma_phone}
+                                        type="text"
+                                        placeholder="Pharmacist Phone Number"
+                                   />
+                               </InputGroup>
+                           </Form.Group>
+                           <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom24">
+                                <Form.Label>Pharmacist Address</Form.Label>
+                                {errors.pharma_address && errors.pharma_address.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="pharma_address"
+                                        onChange={handleChange}
+                                        value={state.pharma_address}
+                                        type="text"
+                                        placeholder="Pharmacist Address"
+                                    />
+                                </InputGroup>
+                            </Form.Group>
 
 
                         </Form.Row>
