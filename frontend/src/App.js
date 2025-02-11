@@ -18,6 +18,7 @@ import { planActions} from './store/supportPlans'
 
 import { getApi } from './api/api'
 import { useDispatch, useSelector } from 'react-redux'
+import WelcomePage from './components/pages/WelcomePage';
 // Preloader
 const Preloader = React.lazy(() => import("./components/layouts/Preloader"));
 // Pages
@@ -141,7 +142,8 @@ const App = () => {
 
                 {isLoggedIn ?
                     <Switch>
-                        <Route exact path="/" component={Home} />
+                        <Route exact path="/" component={WelcomePage} />
+                        <Route exact path="/home" component={Home} />
                         <Route exact path="/rota" component={Rota} />
                         {/* appointment */}
                         <Route path="/appointment/add-appointment" component={Addappointment} />
