@@ -89,6 +89,7 @@ CATEGORY_TYPE = (
         "SupportWorkersViewsofIssuesNeedsorActions",
         "Support Worker's Views of Issues, Needs or Actions",
     ),
+    ("PhysicalHealth", "Physical Health "),
 )
 
 REPEAT_CHOICES = (
@@ -130,6 +131,7 @@ EMOTION_CHOICES = (
     ("angry", "Angry"),
     ("annoyed", "Annoyed"),
     ("sleeping", "Sleeping"),
+    ("tearful", "Tearful"),
 )
 MOOD = (
     ("moody", "moody"),

@@ -34,12 +34,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = False
 
 
-ALLOWED_HOSTS = [
-    "seacolehealthsystems.co.uk", "www.seacolehealthsystems.co.uk",
-    "localhost",
-    "165.227.229.113",
-]
-
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 

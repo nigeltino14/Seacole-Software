@@ -12,6 +12,9 @@ const EditQuestion = (props) => {
     const selected_plan = useSelector((state) => state.plan.selectedPlan)
     const dispatch = useDispatch()
 
+    const API_URL = process.env.NODE_ENV === 'production'
+        ? 'https://seacolehealthsystems.co.uk'
+        : 'http://localhost:8000';
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         if (isNaN(date)) return '';
@@ -32,8 +35,12 @@ const EditQuestion = (props) => {
                 last_evaluated_date: new Date(),
 
             };
+
+            const API_URL = process.env.REACT_APP_API_URL;
+            console.log("API_URL:", API_URL);
+
             try {
-                const response = await fetch(`http://localhost:8000/api/plan/${selected_plan.id}/`, {
+                const response = await fetch(`${API_URL}/api/plan/${selected_plan.id}/`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',

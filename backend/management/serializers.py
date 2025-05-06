@@ -107,7 +107,6 @@ class ResidentDischargeSerializer(serializers.ModelSerializer):
               }
 
 
-
 class DailyCareSerializer(serializers.ModelSerializer):
     class Meta:
         model = DailyCare

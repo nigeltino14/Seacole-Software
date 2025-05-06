@@ -1,5 +1,6 @@
 import axios from "axios";
 import { toastdanger, } from '../components/utils/notifications'
+import { toastloading, } from '../components/utils/notifications'
 import Config from "../config.json";
 
 const baseURl = Config.BACKEND_HOST
@@ -35,7 +36,7 @@ const errorHandler = (error, ...args) => {
     } else if (status === 404) {
         toastdanger("Page not found")
     } else {
-        toastdanger("Server Error Contact Admin.")
+        toastdanger("Loading.... Please wait.")
     }
 }
 export const getToken = (handler, url, body) => {

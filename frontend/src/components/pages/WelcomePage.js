@@ -4,7 +4,9 @@ import { useHistory } from 'react-router-dom';
 import { setSelectedHome } from '../../store/house'; // Import your Redux action for house selection
 import { houseActions } from '../../store/house'; // Make sure you have axios for API calls
 import { getApi } from '../../api/api';
+import BackgroundImage from '../../assets/img/backgroundAI.png'
 
+import logo from '../../assets/img/Seacole logo.png';
 const WelcomePage = () => {
     const dispatch = useDispatch();
     const history = useHistory();
@@ -48,15 +50,61 @@ const WelcomePage = () => {
     };
 
     return (
-        <div className="welcome-container" style={{ textAlign: 'center', marginTop: '50px' }}>
-            <h1>Welcome to 'CLINIX', Seacole Healthcare Information Management System!</h1>
-            <p> Please select the house/home you'd like to access:</p>
+        <div
+            className="welcome-container"
+            style={{
+                backgroundImage: `url(${BackgroundImage})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                minHeight: '100vh',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '20px',
+                backgroundColor: 'rgba(130,215,120, 0.4)', // Soft fade overlay
+                backgroundBlendMode: 'overlay'
+            }}
+        >
+           {/* Top White Strip */}
+            <div style={{
+                backgroundColor: 'white',
+                width: '100%',
+                padding: '10px 0',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}>
+                <img src={logo} alt="Seacole Logo" style={{ width: '120px' }} />
+            </div>
+
+            {/* Middle Content */}
+            <div style={{
+                flexGrow: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '20px',
+                textAlign: 'center',
+            }}>
+                <h1 style={{ fontWeight: 'bold', fontSize: '32px', marginBottom: '10px', color: 'white', textShadow: '1px 1px 2px black' }}>
+                    Welcome to CLINIX, Seacole Healthcare Information System
+                </h1>
 
             <select
                 value={selectedHome || ''}
                 onChange={handleHouseChange}
                 className="form-select"
-                style={{ padding: '10px', fontSize: '16px', marginBottom: '20px' }}
+                style={{
+                    padding: '10px',
+                    fontSize: '16px',
+                    marginBottom: '20px',
+                    width: '300px',
+                    borderRadius: '5px'
+                }}
             >
                 <option value="">Select a House</option>
                 {homes.map(home => (
@@ -66,16 +114,30 @@ const WelcomePage = () => {
                 ))}
             </select>
 
-            <div>
-                <button
-                    className="btn btn-primary"
-                    style={{ padding: '10px 20px', fontSize: '16px' }}
-                    onClick={handleProceed}
-                >
-                    Proceed to Homepage
-                </button>
+            <button
+                className="btn btn-primary"
+                style={{ padding: '10px 20px', fontSize: '16px' }}
+                onClick={handleProceed}
+            >
+                Proceed to Homepage
+            </button>
+        </div>
+
+         {/* Bottom Colored Strip */}
+            <div style={{
+                backgroundColor: 'rgb(130,215,120)',
+                width: '100%',
+                padding: '15px 0',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}>
+                <h3 style={{ margin: 0, color: 'white', fontWeight: 'bold' }}>
+                    Gateway to Community Integration
+                </h3>
             </div>
         </div>
+
     );
 };
 

@@ -28,3 +28,8 @@ export const toastdanger = (text) => {
     toastr.error(text);
 }
 
+export const toastloading = (text) => {
+    toastr.options.positionClass = "toast-top-left";
+    toastr.loading(text);
+}
+

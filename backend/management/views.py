@@ -19,6 +19,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 # API view for django.contrib.auth.models.User
 from django.views.decorators.cache import cache_control
 from django.db import models
+from .pagination import NotePagination
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -603,12 +604,15 @@ class HomeViewSet(viewsets.ModelViewSet):
 
 
 class NoteViewSet(viewsets.ModelViewSet):
-    queryset = Note.objects.all()
     serializer_class = NoteSerializer
     permission_classes = [permissions.DjangoModelPermissions]
+    pagination_class = NotePagination
 
     def get_queryset(self):
-        queryset = Note.objects.all()
+        queryset = Note.objects.all().order_by('-created_on')
+        resident_id = self.request.query_params.get('resident', None)
+        if resident_id is not None:
+            queryset = queryset.filter(resident__national_id=resident_id)
         return queryset
 
     def perform_create(self, serializer):
