@@ -116,7 +116,7 @@ const Content = () => {
                     <div
                         className="ms-auth-container"
                         style={{
-                            backgroundColor: "rgb(159,222,149, 0.7)",
+                            backgroundColor: "rgb(159,222,149, 0.7pytrhon)",
                             padding: "30px 40px",
                             borderRadius: "8px",
                             maxWidth: "900px", // Increased width
