@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 import { setSelectedHome } from '../../store/house'; // Import your Redux action for house selection
 import { houseActions } from '../../store/house'; // Make sure you have axios for API calls
 import { getApi } from '../../api/api';
-import BackgroundImage from '../../assets/img/backgroundAI.png'
+//import BackgroundImage from '../../assets/img/backgroundAI.png'
 
 import logo from '../../assets/img/Seacole logo.png';
 const WelcomePage = () => {
@@ -53,7 +53,7 @@ const WelcomePage = () => {
         <div
             className="welcome-container"
             style={{
-                backgroundImage: `url(${BackgroundImage})`,
+                backgroundImage: `url('/images/backgroundAI.png')`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
