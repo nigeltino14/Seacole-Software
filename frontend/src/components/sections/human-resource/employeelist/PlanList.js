@@ -497,19 +497,20 @@ const Addform = () => {
 
             <Modal.Body>
                  {selectedPlan && (
-                     <>
-
-                         <div className="flex justify-end mt-6">
-                             <button className="btn btn-outline-secondary mt-3"
-                                     onClick={saveAsPDF}>
-
-                                📄 Save as PDF
-                             </button>
-                         </div>
-                     </>
-
-
-                 )}
+                    <>
+                      {user &&
+                        user.groups &&
+                        user.groups.some(group =>
+                          ['Senior Management', 'Management', 'Senior Support Worker'].includes(group.name)
+                        ) && (
+                          <div className="flex justify-end mt-6">
+                            <button className="btn btn-outline-secondary mt-3" onClick={saveAsPDF}>
+                              📄 Save as PDF
+                            </button>
+                          </div>
+                      )}
+                    </>
+                  )}
             </Modal.Body>
             <Modal.Body style={{padding: '20px', fontSize: '16px', lineHeight: '1.5'}}>
                 <table className="plan-table">

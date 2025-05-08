@@ -31,6 +31,14 @@ const Reportlist = () => {
   const [loading, setLoading] = useState(true);
 
   const rowsPerPage = 10;
+  const ALLOWED_GROUPS = ["Senior Management", "Management", "Senior Support Workers"];
+
+  const canExportPDF = () => {
+  if (!user || !user.groups) return false;
+  return user.groups.some(group => ALLOWED_GROUPS.includes(group.name));
+};
+
+
 
   const getStaffName = (staffId) => {
       const staff = staff_list.find((s) => s.id === staffId);
@@ -145,86 +153,90 @@ const Reportlist = () => {
                 }}>Resident: {selectedNote.name_first_name} {selectedNote.name_last_name}</h2>
 
               </div>
+              {canExportPDF() && (
+                <button
+                    onClick={() => {
+                      const doc = new jsPDF();
 
-              <button
-                  onClick={() => {
-                    const doc = new jsPDF();
+
 
                     // Header logo
-                    const pageWidth = doc.internal.pageSize.getWidth();
-                    const pageHeight = doc.internal.pageSize.getHeight();
+                      const pageWidth = doc.internal.pageSize.getWidth();
+                      const pageHeight = doc.internal.pageSize.getHeight();
 
-                    const brandColor = [152, 220, 141]; // Seacole theme green
-                    const headerTextColor = [255, 255, 255];
-
-
-
-
-                    doc.setFillColor(...brandColor);
-                    doc.rect(0, 20, pageWidth, 15, 'F');
-                    doc.setFontSize(16);
-                    doc.setTextColor(...headerTextColor);
-                    doc.text("Seacole Healthcare", pageWidth / 2, 33, { align: 'center' });
-
-                    doc.setFontSize(12);
-                    doc.setTextColor(0, 0, 0);
-                    doc.text('Note Details', pageWidth / 2, 43, { align: 'center' });
+                      const brandColor = [152, 220, 141]; // Seacole theme green
+                      const headerTextColor = [255, 255, 255];
 
 
 
 
-                    // Line Separator
-                    doc.setLineWidth(0.5);
-                    doc.setDrawColor(...brandColor);
-                    doc.line(15, 50, pageWidth - 15, 50);
+                      doc.setFillColor(...brandColor);
+                      doc.rect(0, 20, pageWidth, 15, 'F');
+                      doc.setFontSize(16);
+                      doc.setTextColor(...headerTextColor);
+                      doc.text("Seacole Healthcare", pageWidth / 2, 33, { align: 'center' });
 
-                    const boxTop = 58;
-                    const boxHeight = 200;
-                    doc.setDrawColor(...brandColor);
-                    doc.rect(14, boxTop, pageWidth - 28, boxHeight);
+                      doc.setFontSize(12);
+                      doc.setTextColor(0, 0, 0);
+                      doc.text('Note Details', pageWidth / 2, 43, { align: 'center' });
 
-                    let y = boxTop + 10;
-                    const lineHeight = 10;
-                    const marginLeft = 18;
-                    const maxTextWidth = pageWidth - marginLeft * 2;
 
-                    doc.setFontSize(11);
-                    doc.setTextColor(40, 40, 40);
 
-                    doc.text(`Resident Name: ${selectedNote.name_first_name} ${selectedNote.name_last_name}`, marginLeft, y); y += lineHeight;
-                    doc.text(`Subject: ${selectedNote.subject}`, marginLeft, y); y += lineHeight;
-                    doc.text(`Note Type: ${selectedNote.type_of_note}`, marginLeft, y); y += lineHeight;
-                    doc.text(`Staff: ${getStaffName(selectedNote.staff)}`, marginLeft, y); y += lineHeight;
 
-                    doc.setFont(undefined, 'bold');
-                    doc.text("Entry:", marginLeft, y); y += lineHeight;
-                    doc.setFont(undefined, 'normal');
+                      // Line Separator
+                      doc.setLineWidth(0.5);
+                      doc.setDrawColor(...brandColor);
+                      doc.line(15, 50, pageWidth - 15, 50);
 
-                    const wrappedEntry = doc.splitTextToSize(selectedNote.entry || '', maxTextWidth);
-                    doc.text(wrappedEntry, marginLeft, y);
-                    y += wrappedEntry.length * (lineHeight - 2); // adjust Y based on number of lines
-                    // Footer
-                    const footerLine1 = "Seacole Healthcare • Gateway to Community Integration";
-                    const footerLine2 = `Generated on: ${new Date().toLocaleString()}`;
+                      const boxTop = 58;
+                      const boxHeight = 200;
+                      doc.setDrawColor(...brandColor);
+                      doc.rect(14, boxTop, pageWidth - 28, boxHeight);
 
-                    doc.setFontSize(10);
-                    doc.setTextColor(0, 0, 0);
-                    doc.text(footerLine1, pageWidth / 2, pageHeight - 15, { align: 'center' });
+                      let y = boxTop + 10;
+                      const lineHeight = 10;
+                      const marginLeft = 18;
+                      const maxTextWidth = pageWidth - marginLeft * 2;
 
-                    doc.setFontSize(9);
-                    doc.setTextColor(100, 100, 100);
-                    doc.text(footerLine2, pageWidth / 2, pageHeight - 8, { align: 'center' });
+                      doc.setFontSize(11);
+                      doc.setTextColor(40, 40, 40);
 
-                    doc.setFontSize(9);
-                    doc.setTextColor(0, 0, 0);
-                    doc.text("Page 1", pageWidth - 20, pageHeight - 10);
+                      doc.text(`Resident Name: ${selectedNote.name_first_name} ${selectedNote.name_last_name}`, marginLeft, y); y += lineHeight;
+                      doc.text(`Subject: ${selectedNote.subject}`, marginLeft, y); y += lineHeight;
+                      doc.text(`Note Type: ${selectedNote.type_of_note}`, marginLeft, y); y += lineHeight;
+                      doc.text(`Staff: ${getStaffName(selectedNote.staff)}`, marginLeft, y); y += lineHeight;
 
-                    doc.save(`note_${selectedNote.name_first_name} ${selectedNote.name_last_name}.pdf`);
-                  }}
-                  className="btn btn-sm btn-info ml-2"
-              >
-                Save as PDF
-              </button>
+                      doc.setFont(undefined, 'bold');
+                      doc.text("Entry:", marginLeft, y); y += lineHeight;
+                      doc.setFont(undefined, 'normal');
+
+                      const wrappedEntry = doc.splitTextToSize(selectedNote.entry || '', maxTextWidth);
+                      doc.text(wrappedEntry, marginLeft, y);
+                      y += wrappedEntry.length * (lineHeight - 2); // adjust Y based on number of lines
+                      // Footer
+                      const footerLine1 = "Seacole Healthcare • Gateway to Community Integration";
+                      const footerLine2 = `Generated on: ${new Date().toLocaleString()}`;
+
+                      doc.setFontSize(10);
+                      doc.setTextColor(0, 0, 0);
+                      doc.text(footerLine1, pageWidth / 2, pageHeight - 15, { align: 'center' });
+
+                      doc.setFontSize(9);
+                      doc.setTextColor(100, 100, 100);
+                      doc.text(footerLine2, pageWidth / 2, pageHeight - 8, { align: 'center' });
+
+                      doc.setFontSize(9);
+                      doc.setTextColor(0, 0, 0);
+                      doc.text("Page 1", pageWidth - 20, pageHeight - 10);
+
+                      doc.save(`note_${selectedNote.name_first_name} ${selectedNote.name_last_name}.pdf`);
+                    }}
+                    className="btn btn-sm btn-info ml-2"
+                >
+                    Save as PDF
+                 </button>
+
+                )}
             </Modal.Header>
             <p> Subject: {selectedNote.subject}</p>
             <p>Entry: {selectedNote.entry}</p>

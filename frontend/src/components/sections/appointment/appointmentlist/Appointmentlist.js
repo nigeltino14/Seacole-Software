@@ -308,13 +308,17 @@ const Appointmentlist = () => {
                             <p><strong>Start:</strong> {dateToYMD(selectedAppointment.start_time)}</p>
                             <p><strong>End:</strong> {dateToYMD(selectedAppointment.due_time)}</p>
 
-                            <div className="text-right mt-3">
+                            {user?.groups?.some(group =>
+                              ["Senior Management", "Management", "Senior Support Worker"].includes(group.name)
+                            ) && (
+                              <div className="text-right mt-3">
                                 <button className="btn btn-outline-secondary mt-3"
-                                        style={{float: 'right'}}
+                                        style={{ float: 'right' }}
                                         onClick={generatePDF}>
-                                    📄 Save as PDF
+                                  📄 Save as PDF
                                 </button>
-                            </div>
+                              </div>
+                            )}
                         </>
                     )}
                 </Modal.Body>
