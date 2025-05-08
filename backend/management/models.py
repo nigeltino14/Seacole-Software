@@ -163,7 +163,20 @@ INFO_SRC_CHOICES = (
     ("REFERRER", "REFERRER"),
     ("OTHER AGENCIES", "OTHER AGENCIES"),
 )
+ETHNIC_CHOICES = (
+    ("ASIAN", "ASIAN"),
+    ("BLACK", "BLACK"),
+    ("MIDDLE-EASTERN", "MIDDLE-EASTERN"),
+    ("WHITE", "WHITE"),
+    ("OTHER", "OTHER"),
+)
+MARITAL_CHOICES = (
+    ("SINGLE", "SINGLE"),
+    ("MARRIED", "MARRIED"),
+    ("DIVORCED", "DIVORCED"),
+    ("SEPARATED","SEPARATED")
 
+)
 
 class Home(models.Model):
     id = models.AutoField(primary_key=True)
@@ -442,7 +455,7 @@ class BodyMap(models.Model):
 class Resident(models.Model):
     """Resident"""
 
-    # make sure a discharged resident doesent show up @ queries
+    # make sure a discharged resident doesnt show up @ queries
     national_id = models.CharField(max_length=25, primary_key=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
@@ -471,9 +484,13 @@ class Resident(models.Model):
     email = models.EmailField(max_length=255, unique=False)
     address = models.TextField()
     created_by = models.ForeignKey('User', on_delete=models.CASCADE, null=True, blank=True)
-    clinical_diagnosis = models.CharField(max_length=1000, null=True, blank=True)
-    allergies = models.CharField(max_length=1000, blank=True, null=True)
-    risk = models.CharField(max_length=1000, blank=True, null=True)
+    clinical_diagnosis = models.TextField(null=True, blank=True)
+    medical_condition = models.TextField(null=True, blank=True)
+    allergies = models.CharField(blank=True, null=True)
+    risk = models.CharField(blank=True, null=True)
+    date_of_admission = models.DateField(),
+    ethnic_origin = models.CharField(default= 'Unknown', max_length=30, choices=ETHNIC_CHOICES)
+    marital_status = models.CharField(default='NonApplicable', choices=MARITAL_CHOICES)
 
     def __str__(self):
         return f"{self.first_name } {self.last_name } {self.national_id}"

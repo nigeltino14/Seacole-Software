@@ -98,7 +98,7 @@ if os.environ.get("DEBUG", "debug") == "debug":
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": "seacole_staging",
+            "NAME": "staging",
             "USER": "doadmin",
             "PASSWORD": "AVNS_P2v-z3kK_178BxBTvfO",
             "HOST": "seacole-do-user-14823812-0.c.db.ondigitalocean.com",

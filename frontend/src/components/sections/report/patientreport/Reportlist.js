@@ -30,7 +30,7 @@ const Reportlist = () => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
 
-  const rowsPerPage = 10;
+  const rowsPerPage = 20;
   const ALLOWED_GROUPS = ["Senior Management", "Management", "Senior Support Workers"];
 
   const canExportPDF = () => {
