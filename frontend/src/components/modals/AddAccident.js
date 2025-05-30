@@ -23,7 +23,7 @@ const AddWeight = (props) => {
         action_taken: '',
         incident_details: '',
         date_occured: '',
-        status: 'low',
+        status: '',
         location: '',
         resident: '',
         staff: '',
@@ -109,7 +109,7 @@ const AddWeight = (props) => {
             case 'status':
                 setState({
                     ...state,
-                    location: event.target.value
+                    status: event.target.value
                 })
                 break;
 
@@ -269,9 +269,10 @@ const AddWeight = (props) => {
                                 {errors.status && errors.status.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
                                 <InputGroup>
                                     <Form.Control as="select" onChange={handleChange}
-                                        name="status"
-                                        value={state.status}
+                                                  name="status"
+                                                  value={state.status}
                                     >
+                                        <option value=""></option>
                                         <option value="low">Low</option>
                                         <option value="medium">Medium</option>
                                         <option value="high">High</option>

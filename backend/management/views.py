@@ -20,6 +20,13 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.views.decorators.cache import cache_control
 from django.db import models
 from .pagination import NotePagination
+from rest_framework.parsers import MultiPartParser, FormParser
+
+from rest_framework import viewsets, permissions, status
+from rest_framework.response import Response
+from .models import PlanEvaluation
+from .serializers import PlanEvaluationSerializer
+from .models import SupportPlan
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -448,10 +455,19 @@ class SupportPlanViewSet(viewsets.ModelViewSet):
     queryset = SupportPlan.objects.all()
     serializer_class = SupportPlanSerializer
     permission_classes = [permissions.DjangoModelPermissions]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs['context'] = self.get_serializer_context()
+        return super().get_serializer(*args, **kwargs)
 
     def perform_create(self, serializer):
         if serializer.is_valid():
             instance = serializer.save()
+
+            files = self.request.FILES.getlist('files')
+            for f in files:
+                SupportPlanFile.objects.create(support_plan=instance, file=f)
 
             UserHistory.objects.create(
                 user=self.request.user,
@@ -466,6 +482,10 @@ class SupportPlanViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             instance = serializer.save()
 
+            files = self.request.FILES.getlist('files')
+            for f in files:
+                SupportPlanFile.objects.create(support_plan=instance, file=f)
+
             UserHistory.objects.create(
                 user=self.request.user,
                 action='Accident/Incidents',
@@ -475,12 +495,6 @@ class SupportPlanViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
 
-
-from rest_framework import viewsets, permissions, status
-from rest_framework.response import Response
-from .models import PlanEvaluation
-from .serializers import PlanEvaluationSerializer
-from .models import SupportPlan
 
 class PlanEvaluationViewSet(viewsets.ModelViewSet):
     queryset = PlanEvaluation.objects.all()
@@ -515,6 +529,7 @@ class PlanEvaluationViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class AppointmentViewSet(viewsets.ModelViewSet):
     queryset = Appointment.objects.all()

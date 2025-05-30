@@ -33,6 +33,7 @@ const Addform = () => {
     const [selectedPlan, setSelectedPlan] = useState(null);
     const user = useSelector((state) => state.auth.user);
     const [selectedEvaluations, setSelectedEvaluations] = useState([]);
+    const BASE_BACKEND_URL = "http://127.0.0.1:8000";
 
     //const contentRef = useRef();
 
@@ -200,6 +201,22 @@ const Addform = () => {
 
         //{ name: "CP Duration", selector: "cp_duration", sortable: true},
         { name: "Care Rating", selector: "care_rating", sortable: true},
+        {
+                name: "Attachment",
+                cell: row =>
+                row.attachment ? (
+                    <a
+                        href={row.attachment}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        View File
+                    </a>
+                ) : (
+                    "No File"
+                ),
+            sortable: true
+        },
         //{ name: "By Who", selector: "by_who", sortable: true },
         //{ name: "By When", selector: "by_when", sortable: true },
         //{ name: "Goal", selector: "goal", sortable: true },
@@ -228,6 +245,7 @@ const Addform = () => {
                     {dateToYMD(row.last_evaluated_date)}
                 </div>, sortable: true
         },
+
         {
             name: "Date of Next Evaluation", cell: row =>
                 <div style={{ color: getEvaluationColor(row.next_assement_date) }}>

@@ -1,7 +1,8 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
-
+from django.conf import settings
+from django.conf.urls.static import static
 
 from rest_framework_simplejwt import views as jwt_views
 
@@ -124,3 +125,7 @@ urlpatterns = [
 
 
 ]
+
+# Serve media files only in development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

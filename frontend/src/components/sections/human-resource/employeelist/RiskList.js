@@ -83,11 +83,14 @@ const Addform = () => {
     });
   };
 
-  useEffect(() => {
+  const fetchRisks = () => {
     getApi((response) => {
       dispatch(riskActions.setRisk(response.data));
     }, token, '/api/risk');
+  };
 
+  useEffect(() => {
+    fetchRisks();  // ⬅️ use function here
     getApi((response) => {
       setAtRiskOptions(response.data);
     }, token, '/api/risk-options');
@@ -115,7 +118,7 @@ const Addform = () => {
       sortable: true,
       cell: (row) => <span>{getAtRiskNames(row.at_risk)}</span>,
     },
-    { name: 'Category', selector: 'category', sortable: true },
+    //{ name: 'Category', selector: 'category', sortable: true },
     { name: 'Details', selector: 'details', sortable: true },
     { name: 'Support Needs', selector: 'support_needs', sortable: true },
     { name: 'Info Sources', selector: 'information_sources_used', sortable: true },
@@ -193,7 +196,7 @@ const Addform = () => {
 
         const highlightFields = [];
         if (highlightFields.includes(field.label)) {
-          doc.setFillColor(204, 255, 204);
+          doc.setFillColor(...brandColor);
           doc.rect(margin, y - 5, pageWidth - 2 * margin, 10, 'F');
         }
 
@@ -219,13 +222,13 @@ const Addform = () => {
       >
         <Modal.Header className="ms-modal-header-radius-0">
           <div>
-            <h1 style={{ fontSize: '24px', marginBottom: '0' }}>Seacole Healthcare</h1>
-            <h4 className="modal-title text-white">Selected Risk</h4>
+            <h1 style={{ fontSize: '24px', marginBottom: '0' }}>Seacole Healthcare </h1>
+            <h4 className="modal-title text-white"></h4>
             <p>Date recorded: {dateToYMD(selectedrisk.created_on)}</p>
             <p>Created By: {selectedrisk.name_first} {selectedrisk.name_last}</p>
           </div>
           <button type="button" className="close text-red w-20 mr-2" onClick={onClose}>x</button>
-          <button className="btn btn-primary" onClick={saveAsPDF}>Download PDF</button>
+          <button className="btn btn-primary" onClick={saveAsPDF}>Download as PDF</button>
         </Modal.Header>
         <Modal.Body style={{ padding: '20px', fontSize: '16px', lineHeight: '1.5' }}>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -237,7 +240,7 @@ const Addform = () => {
                   key={index}
                   style={{
                     border: '1px solid black',
-                    background: isHighlighted ? 'lightgreen' : 'white',
+                    background: isHighlighted ? '' : 'white',
                     padding: '5px',
                     marginBottom: '5px',
                   }}
@@ -295,7 +298,7 @@ const Addform = () => {
           <button type="button" className="close text-white" onClick={handleCloseEdit}>x</button>
         </Modal.Header>
         <Modal.Body className="p-0 text-left">
-          <EditRisk handleClose={handleCloseEdit} />
+          <EditRisk handleClose={handleCloseEdit} refreshRisks={fetchRisks} />
         </Modal.Body>
       </Modal>
     </div>

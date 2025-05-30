@@ -35,8 +35,6 @@ const errorHandler = (error, ...args) => {
         toastdanger(JSON.parse(error.request.response).detail)
     } else if (status === 404) {
         toastdanger("Page not found")
-    } else {
-        toastdanger("Loading.... Please wait.")
     }
 }
 export const getToken = (handler, url, body) => {

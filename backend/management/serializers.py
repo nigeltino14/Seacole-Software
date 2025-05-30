@@ -161,6 +161,19 @@ class RotaSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class SupportPlanFileSerializer(serializers.ModelSerializer):
+    file_url = serializers.SerializerMethodField()
+    class Meta:
+        model = SupportPlanFile
+        fields = "__all__"
+
+    def get_file_url(self, obj):
+        request = self.context.get('request')
+        if request is not None:
+            return request.build_absolute_uri(obj.file.url)
+        return obj.file.url  # fallback relative URL
+
+
 class SupportPlanSerializer(serializers.ModelSerializer):
     name_first = serializers.CharField(source='created_by.first_name', read_only=True)
     name_last = serializers.CharField(source='created_by.last_name', read_only=True)
@@ -168,6 +181,7 @@ class SupportPlanSerializer(serializers.ModelSerializer):
     lastname = serializers.CharField(source='resident.last_name', read_only=True)
     next_assement_date = serializers.DateTimeField()
 
+    attachments = SupportPlanFileSerializer(source='supportplanfile_set', many=True, read_only=True)
 
     class Meta:
         model = SupportPlan

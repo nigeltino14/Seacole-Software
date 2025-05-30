@@ -3,6 +3,8 @@ import { Form, InputGroup, Button, Col } from 'react-bootstrap';
 import { putApi } from '../../api/api'
 import { useDispatch, useSelector } from 'react-redux'
 import { riskActions } from '../../store/riskAssessment'
+//import { toast } from 'react-toastify';
+import { toastsuccess } from '../utils/notifications'
 
 
 const EditQuestion = (props) => {
@@ -18,9 +20,12 @@ const EditQuestion = (props) => {
         if (form.checkValidity() === false) {
             event.stopPropagation();
         } else {
-            putApi(_ => { props.handleClose() }, token, `/api/risk/`, selected_risk, selected_risk.id)
+            putApi(_ => {
+                toastsuccess("Edit successfully done");
+                if (props.refreshRisks) props.refreshRisks();  // ✅ refresh list
+                props.handleClose();                           // ✅ close modal
+            }, token, `/api/risk/`, selected_risk, selected_risk.id)
         }
-
         setValidated(true);
     };
 
@@ -117,7 +122,7 @@ const EditQuestion = (props) => {
                                     />
                                 </InputGroup>
                             </Form.Group>
-                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom02">
+                            {/*<Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom02">
                                 <Form.Label>Category</Form.Label>
                                 <InputGroup>
                                     <Form.Control
@@ -145,7 +150,7 @@ const EditQuestion = (props) => {
                                         <option value='SupportWorkersViewsofIssuesNeedsorActions' >Support Worker's Views of Issues, Needs or Actions</option>
                                     </Form.Control>
                                 </InputGroup>
-                            </Form.Group>
+                            </Form.Group>*/}
                             <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom03">
                                 <Form.Label>Identified Risk</Form.Label>
                                 <InputGroup>

@@ -132,7 +132,7 @@ const Addform = () => {
             case 'status':
                 setState({
                     ...state,
-                    location: event.target.value
+                    status: event.target.value
                 })
                 break;
             case 'resident':
@@ -302,9 +302,10 @@ const Addform = () => {
                                 {errors.status && errors.status.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
                                 <InputGroup>
                                     <Form.Control as="select" onChange={handleChange}
-                                        name="status"
-                                        value={state.status}
+                                                  name="status"
+                                                  value={state.status}
                                     >
+                                        <option value=""></option>
                                         <option value="low">Low</option>
                                         <option value="medium">Medium</option>
                                         <option value="high">High</option>
