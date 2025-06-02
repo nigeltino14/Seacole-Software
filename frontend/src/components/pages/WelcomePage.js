@@ -77,7 +77,7 @@ const WelcomePage = () => {
                 alignItems: 'center',
                 boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
             }}>
-                <img src="/images/Seacole-logo.png" alt="Seacole Logo" style={{ width: '120px' }} />
+                <img src="/images/Seacole-logo.png" alt="Logo" style={{ width: '120px' }} />
             </div>
 
             {/* Middle Content */}
