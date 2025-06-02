@@ -6,7 +6,7 @@ import { houseActions } from '../../store/house'; // Make sure you have axios fo
 import { getApi } from '../../api/api';
 //import BackgroundImage from '../../assets/img/backgroundAI.png'
 
-//import logo from '../../assets/img/Seacole logo.png';
+
 const WelcomePage = () => {
     const dispatch = useDispatch();
     const history = useHistory();
