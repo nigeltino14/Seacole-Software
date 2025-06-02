@@ -6,7 +6,7 @@ import { houseActions } from '../../store/house'; // Make sure you have axios fo
 import { getApi } from '../../api/api';
 //import BackgroundImage from '../../assets/img/backgroundAI.png'
 
-import logo from '../../assets/img/Seacole logo.png';
+
 const WelcomePage = () => {
     const dispatch = useDispatch();
     const history = useHistory();
@@ -77,7 +77,7 @@ const WelcomePage = () => {
                 alignItems: 'center',
                 boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
             }}>
-                <img src={logo} alt="Seacole Logo" style={{ width: '120px' }} />
+                <img src="/images/Seacole-logo.png" alt="Logo" style={{ width: '120px' }} />
             </div>
 
             {/* Middle Content */}
