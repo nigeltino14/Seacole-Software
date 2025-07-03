@@ -486,11 +486,11 @@ class Resident(models.Model):
     created_by = models.ForeignKey('User', on_delete=models.CASCADE, null=True, blank=True)
     clinical_diagnosis = models.TextField(null=True, blank=True)
     medical_condition = models.TextField(null=True, blank=True)
-    allergies = models.CharField(blank=True, null=True)
-    risk = models.CharField(blank=True, null=True)
+    allergies = models.CharField(blank=True, null=True, max_length=9999)
+    risk = models.CharField(blank=True, null=True, max_length=9999)
     date_of_admission = models.DateField(blank=True, null=True)
     ethnic_origin = models.CharField(default= 'Unknown', max_length=30)
-    marital_status = models.CharField(default='NonApplicable')
+    marital_status = models.CharField(default='NonApplicable', max_length=9999)
 
 
     def __str__(self):
@@ -598,10 +598,8 @@ class SuggestionComplains(models.Model):
     resident = models.ForeignKey(
         Resident, verbose_name="Family", on_delete=models.CASCADE
     )
-    next_assement_date = models.DateTimeField(
-        _("Asssment date"), default=timezone.now
-    )
-    discontinue = models.BooleanField(_("Discontibnue"), default=False)
+    next_assement_date = models.DateTimeField()
+    discontinue = models.BooleanField(_("Discontinue"), default=False)
 
 
 class Rota(models.Model):
@@ -698,7 +696,7 @@ class RiskActionPlan(models.Model):
     identified_risk = models.TextField(null=True, blank=True)
     risk_level = models.CharField(_("Risk Levels"), choices=RISK_LEVELS, max_length=40, null=True, blank=True)
     at_risk = models.ManyToManyField( "AtRiskOption", choices= RISK_PERSONNEL)
-    likelihood = models.CharField(("Likelihood"), choices=LIKELIHOOD, null=True, blank=True)
+    likelihood = models.CharField(("Likelihood"), choices=LIKELIHOOD, null=True, blank=True, max_length=9999)
     severity = models.CharField(("Severity"), choices=SEVERITY, max_length=40, null=True, blank=True)
     approved_by = models.TextField(null=True, blank=True)
     details = models.TextField(null=True)
@@ -764,6 +762,7 @@ class Appointment(models.Model):
     )
     is_deleted = models.BooleanField(default=False)
     deletion_reason = models.TextField(null=True, blank=True, default="Not deleted")
+    notify_email = models.EmailField(null=True, blank=True)
 
     class Meta:
         ordering = ["-created_on"]

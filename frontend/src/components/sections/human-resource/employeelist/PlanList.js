@@ -268,7 +268,7 @@ const Addform = () => {
         {
             name: "", cell: row =>
                 <div data-tag="allowRowEvents">
-                    <ProtectedRoute perm="chnage_supportplan">
+                    <ProtectedRoute perm="change_supportplan">
                         <Link to='#' onClick={(event) => {
                             event.stopPropagation();
                             handleShowEdit(row.id);
@@ -627,15 +627,14 @@ const Addform = () => {
                 <SelectedSupportPlanModal onClose={() => setActiveModal(false)} />
 
             </div>
-            <Modal show={activeModal === "edit"} className="ms-modal-dialog-width ms-modal-content-width" onHide={() => setActiveModal(null)} centered>
-                <Modal.Header className="ms-modal-header-radius-0">
-                    <tr>
-                        <button type="button" className="close text-white" onClick={() => setActiveModal(null)}>Close</button>
-                    </tr>
-
+            <Modal show={activeModal === "edit"}  onHide={() => setActiveModal(null)} centered size="lg" scrollable>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Support Plan</Modal.Title>
                 </Modal.Header>
-                <Modal.Body className="p-0 text-left">
-                    <EditPlan handleClose={() => setActiveModal(null)}/>
+                <Modal.Body >
+                    <EditPlan
+                        plan={selectedPlan}
+                        handleClose={() => setActiveModal(null)}/>
                 </Modal.Body>
             </Modal>
 

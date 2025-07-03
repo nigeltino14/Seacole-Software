@@ -27,6 +27,7 @@ from rest_framework.response import Response
 from .models import PlanEvaluation
 from .serializers import PlanEvaluationSerializer
 from .models import SupportPlan
+from django.conf import settings
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -36,7 +37,7 @@ class CreateUserView(generics.CreateAPIView):
 
 
 class CreateTokenView(ObtainAuthToken):
-    """Create a nerw auth token"""
+    """Create a new auth token"""
 
     serializer_class = AuthTokenSerializer
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
@@ -463,7 +464,7 @@ class SupportPlanViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         if serializer.is_valid():
-            instance = serializer.save()
+            instance = serializer.save(created_by=self.request.user)
 
             files = self.request.FILES.getlist('files')
             for f in files:
@@ -539,11 +540,13 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         # Set the created_by field to the current authenticated user
         serializer.save(created_by=self.request.user)
+        appointment = serializer.save(created_by=self.request.user)
 
         # Access the newly created instance
         instance = serializer.instance
         name_first_name = instance.resident.first_name
         name_last_name = instance.resident.last_name
+
 
         # Log the action in UserHistory
         UserHistory.objects.create(
@@ -551,6 +554,29 @@ class AppointmentViewSet(viewsets.ModelViewSet):
             action='appointmentList',
             details=f'Appointment for resident: {name_first_name} {name_last_name}',
         )
+
+        recipient_email = appointment.notify_email
+        if recipient_email:
+            subject = 'New Appointment Notification'
+            message = f"""
+            A new appointment has been added, details are as below.
+            
+            📝 Title: {appointment.title}
+            📋 Description: {appointment.description}
+            ⏰ Start: {appointment.start_time}
+            ⏰ End: {appointment.due_time}
+            👤 Resident: {appointment.resident.first_name} {appointment.resident.last_name}
+            
+            Kind Regards,
+            IT Support 
+            """
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [recipient_email],
+                fail_silently=False,
+            )
 
     def perform_update(self, serializer):
         # Save the instance and perform the update
@@ -891,8 +917,6 @@ class AfternoonRoutineViewSet(viewsets.ModelViewSet):
             )
             return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
-
-
 
 
 class QuestionViewSet(viewsets.ModelViewSet):
