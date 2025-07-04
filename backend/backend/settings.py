@@ -31,7 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 # settings.py
 
-DEBUG = True
+# DEBUG = False
 
 
 ALLOWED_HOSTS = ['*']
@@ -98,7 +98,7 @@ if os.environ.get("DEBUG", "debug") == "debug":
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": "staging",
+            "NAME": "seacole_staging",
             "USER": "doadmin",
             "PASSWORD": "AVNS_P2v-z3kK_178BxBTvfO",
             "HOST": "seacole-do-user-14823812-0.c.db.ondigitalocean.com",
@@ -260,10 +260,10 @@ STATICFILES_DIRS = [
 ]
 
 HOST_SCHEME = "http://"
-SECURE_PROXY_SSL_HEADER = None
-SECURE_SSL_REDIRECT = False
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = None
 SECURE_HSTS_INCLUDE_SUBDOMAINS = False
 SECURE_FRAME_DENY = False
