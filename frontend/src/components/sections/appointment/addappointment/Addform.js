@@ -23,7 +23,8 @@ const Addform = () => {
         resident: '',
         start_time: '',
         due_time: '',
-        recur: ''
+        recur: '',
+        notify_email:''
     }
     const [state, setState] = useState(initialState)
     const homes = useSelector((state) => state.home.homeList)
@@ -113,6 +114,14 @@ const Addform = () => {
                     recur: event.target.value
                 })
                 break;
+
+            case 'notify_email':
+                setState({
+                    ...state,
+                    notify_email: event.target.value
+                })
+                break;
+
             default:
 
         }
@@ -166,6 +175,18 @@ const Addform = () => {
                                         as="textarea"
                                         rows={3}
                                         placeholder="Description"
+                                    />
+                                </InputGroup>
+                            </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationNotifyEmail">
+                                <Form.Label>Notify Email Address</Form.Label>
+                                <InputGroup>
+                                    <Form.Control
+                                        name="notify_email"
+                                        onChange={handleChange}
+                                        type="email"
+                                        placeholder="Enter email to notify"
+                                        value={state.notify_email}
                                     />
                                 </InputGroup>
                             </Form.Group>
@@ -265,7 +286,7 @@ const Addform = () => {
                                 </InputGroup>
                             </Form.Group>
                         </Form.Row>
-                        <Button type="reset" variant="warning" className="mt-4 d-inline w-20 mr-2" onClick={handleReset}>Reset</Button>
+                        <Button type="reset" variant="warning" className="mt-4 d-inline w-20 mr-2" onClick={handleReset}>Reset fields</Button>
                         <Button type="submit" className="mt-4 d-inline w-20">Create Appointment</Button>
                     </Form>
                 </div>

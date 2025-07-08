@@ -447,6 +447,7 @@ class BodyMap(models.Model):
     wound_depth = models.IntegerField()
     condition = models.CharField(max_length=150, blank=True, null=True)
     attachment = models.FileField(upload_to="attachments")
+
     next_assement_date = models.DateTimeField(
         _("Asssment date"), default=timezone.now
     )
@@ -598,10 +599,8 @@ class SuggestionComplains(models.Model):
     resident = models.ForeignKey(
         Resident, verbose_name="Family", on_delete=models.CASCADE
     )
-    next_assement_date = models.DateTimeField(
-        _("Asssment date"), default=timezone.now
-    )
-    discontinue = models.BooleanField(_("Discontibnue"), default=False)
+    next_assement_date = models.DateTimeField()
+    discontinue = models.BooleanField(_("Discontinue"), default=False)
 
 
 class Rota(models.Model):
@@ -628,6 +627,7 @@ class Rota(models.Model):
         null=True,
         related_name="RotaHome",
     )
+
     start_date = models.DateField()
     end_date = models.DateField()
     created_on = models.DateTimeField(_("Created On"), auto_now_add=True)
@@ -698,7 +698,7 @@ class RiskActionPlan(models.Model):
     identified_risk = models.TextField(null=True, blank=True)
     risk_level = models.CharField(_("Risk Levels"), choices=RISK_LEVELS, max_length=40, null=True, blank=True)
     at_risk = models.ManyToManyField( "AtRiskOption", choices= RISK_PERSONNEL)
-    likelihood = models.CharField(("Likelihood"), choices=LIKELIHOOD,max_length=100, null=True, blank=True)
+    likelihood = models.CharField(("Likelihood"), choices=LIKELIHOOD,max_length=1000, null=True, blank=True)
     severity = models.CharField(("Severity"), choices=SEVERITY, max_length=40, null=True, blank=True)
     approved_by = models.TextField(null=True, blank=True)
     details = models.TextField(null=True)
@@ -764,6 +764,7 @@ class Appointment(models.Model):
     )
     is_deleted = models.BooleanField(default=False)
     deletion_reason = models.TextField(null=True, blank=True, default="Not deleted")
+    notify_email = models.EmailField(null=True, blank=True)
 
     class Meta:
         ordering = ["-created_on"]

@@ -68,10 +68,10 @@ const SuggestionList = () => {
                 </div>, sortable: true
         },
         { name: "Subject", selector: "subject", sortable: true },
-        { name: "Follow Up Notes", selector: "follow_up_notes", sortable: true },
-        { name: "Future  Action", selector: "future_preventative_action", sortable: true },
+        //{ name: "Follow Up Notes", selector: "follow_up_notes", sortable: true },
+        //{ name: "Future  Action", selector: "future_preventative_action", sortable: true },
         { name: "Review Date", selector: "next_assement_date", sortable: true },
-        { name: "Action Taken", selector: "action_taken", sortable: true },
+        //{ name: "Action Taken", selector: "action_taken", sortable: true },
         {
             name: "Home", cell: row =>
                 <div >

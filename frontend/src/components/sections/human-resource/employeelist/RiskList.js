@@ -119,7 +119,7 @@ const Addform = () => {
       cell: (row) => <span>{getAtRiskNames(row.at_risk)}</span>,
     },
     //{ name: 'Category', selector: 'category', sortable: true },
-    { name: 'Details', selector: 'details', sortable: true },
+    //{ name: 'Details', selector: 'details', sortable: true },
     { name: 'Support Needs', selector: 'support_needs', sortable: true },
     { name: 'Info Sources', selector: 'information_sources_used', sortable: true },
     {

@@ -93,17 +93,17 @@ const SuggestionEdit = (props) => {
                 }))
                 break;
 
-            case 'review_date':
+            case 'next_assement_date':
                 dispatch(suggestionActions.setSelectedSuggestion({
                     ...selected_suggestion,
-                    review_date: event.target.value
+                    next_assement_datecd: event.target.value
                 }))
                 break;
 
             case 'status':
                 dispatch(suggestionActions.setSelectedSuggestion({
                     ...selected_suggestion,
-                    location: event.target.value
+                    status: event.target.value
                 }))
                 break;
             case 'resident':
@@ -122,7 +122,7 @@ const SuggestionEdit = (props) => {
         <div className="col-xl-12 col-md-12">
             <div className="ms-panel ms-panel-bshadow-none">
                 <div className="ms-panel-header">
-                    <h6>SuggestionEdit Information</h6>
+                    <h6>Accident/Incident Information</h6>
                 </div>
                 <div className="ms-panel-body">
                     <Form noValidate validated={validated} onSubmit={handleSubmit}>
@@ -202,7 +202,7 @@ const SuggestionEdit = (props) => {
                                 </InputGroup>
                             </Form.Group>
                             <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
-                                <Form.Label>Inident Details</Form.Label>
+                                <Form.Label>Incident Details</Form.Label>
                                 {errors.incident_details && errors.incident_details.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
                                 <InputGroup>
                                     <Form.Control
@@ -242,19 +242,19 @@ const SuggestionEdit = (props) => {
                                     />
                                 </InputGroup>
                             </Form.Group>
-                            {/* <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
+                             <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
                                 <Form.Label>Review Date</Form.Label>
-                                {errors.review_date && errors.review_date.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                {errors.next_assement_date && errors.next_assement_date.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
                                 <InputGroup>
                                     <Form.Control
-                                        name="review_date"
+                                        name="next_assement_date"
                                         required
                                         onChange={handleChange}
-                                        value={selected_suggestion.review_date}
+                                        value={selected_suggestion.next_assement_date}
                                         type="datetime-local"
                                     />
                                 </InputGroup>
-                            </Form.Group> */}
+                            </Form.Group>
                             <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
                                 <Form.Label>Status</Form.Label>
                                 {errors.status && errors.status.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}

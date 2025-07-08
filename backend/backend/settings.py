@@ -217,18 +217,20 @@ else:
     STATIC_URL = "/static/"
     STATIC_ROOT = BASE_DIR / "/root/Production/Seacole-Software/backend/static/"
 
-if DEBUG == True:
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-else:
-    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+#if DEBUG == True:
+#   EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+#else:
+#    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
-EMAIL_HOST = os.environ.get("EMAIL_HOST", default="mail.privateemail.com")
+EMAIL_HOST = "mail.privateemail.com"
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
-EMAIL_HOST_USER = "nigeltino98@gmail.com"
-EMAIL_HOST_PASSWORD = "opsalygeebnzkffb"
-SERVER_EMAIL = EMAIL_HOST_USER
+EMAIL_USE_TLS = False
+EMAIL_HOST_USER = "it.support@seacolehealthsystems.co.uk"
+EMAIL_HOST_PASSWORD = "MySTERious1550#"
+#SERVER_EMAIL = "it.support@seacolehealthsystems.co.uk"
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 
 FRONTEND_HOST = os.environ.get("FRONTEND_HOST", default="http://localhost:3000")
@@ -263,5 +265,5 @@ SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = None
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
 SECURE_FRAME_DENY = False

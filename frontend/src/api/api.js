@@ -38,6 +38,8 @@ const errorHandler = (error, ...args) => {
     }
 }
 export const getToken = (handler, url, body) => {
+    console.log("Sending login request to:", `${baseURl}${url}`);
+    console.log("With body:", body);
     axios.post(
         `${baseURl}${url}`,
         body,

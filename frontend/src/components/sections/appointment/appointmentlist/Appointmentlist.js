@@ -324,11 +324,10 @@ const Appointmentlist = () => {
                 </Modal.Body>
             </Modal>
 
-            <Modal show={showEdit} className="ms-modal-dialog-width ms-modal-content-width" onHide={handleCloseEdit}
+            <Modal show={showEdit}  onHide={handleCloseEdit}  size="lg" scrollable
                    centered>
-                <Modal.Header className="ms-modal-header-radius-0">
-                    <h4 className="modal-title text-white">Edit Appointment</h4>
-                    <button type="button" className="close text-white" onClick={handleCloseEdit}>x</button>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Appointment</Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="p-0 text-left">
                     <AppointmentEdit handleClose={handleCloseEdit} />
