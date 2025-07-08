@@ -31,7 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 # settings.py
 
-# DEBUG = False
+DEBUG = False
 
 
 ALLOWED_HOSTS = ['*']
