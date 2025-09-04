@@ -599,7 +599,7 @@ class SuggestionComplains(models.Model):
     resident = models.ForeignKey(
         Resident, verbose_name="Family", on_delete=models.CASCADE
     )
-    next_assement_date = models.DateTimeField()
+    next_assement_date = models.DateTimeField(blank=True, null=True)
     discontinue = models.BooleanField(_("Discontinue"), default=False)
 
 
