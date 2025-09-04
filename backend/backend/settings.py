@@ -33,7 +33,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 DEBUG = False
 
-
 ALLOWED_HOSTS = ['*']
 
 # Application definition
@@ -93,30 +92,20 @@ LOGIN_REDIRECT_URL = "management:mainmenu"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-if os.environ.get("DEBUG", "debug") == "debug":
+#if os.environ.get("DEBUG", "debug") == "debug":
 
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": "seacole_staging",
-            "USER": "doadmin",
-            "PASSWORD": "AVNS_P2v-z3kK_178BxBTvfO",
-            "HOST": "seacole-do-user-14823812-0.c.db.ondigitalocean.com",
-            "PORT": "25060",
-        }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "seacole_staging",
+        "USER": "doadmin",
+        "PASSWORD": "AVNS_P2v-z3kK_178BxBTvfO",
+        "HOST": "seacole-do-user-14823812-0.c.db.ondigitalocean.com",
+        "PORT": "25060",
+        "OPTIONS": {"sslmode": "require"},
     }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.environ.get("POSTGRES_DB"),
-            "USER": os.environ.get("POSTGRES_USER"),
-            "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
-            "HOST": os.environ.get("POSTGRES_HOST"),
-            "PORT": os.environ.get("POSTGRES_PORT"),
-            "OPTIONS": {"sslmode": "require"},
-        }
-    }
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -265,5 +254,5 @@ SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = None
-SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_FRAME_DENY = False

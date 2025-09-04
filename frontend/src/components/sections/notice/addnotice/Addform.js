@@ -27,7 +27,7 @@ const Addform = () => {
         action_taken: '',
         incident_details: '',
         date_occured: '',
-        review_date: '',
+        next_assement_date: '',
         status: 'low',
         location: '',
         resident: '',
@@ -122,10 +122,10 @@ const Addform = () => {
                 })
                 break;
 
-            case 'review_date':
+            case 'next_assement_date':
                 setState({
                     ...state,
-                    review_date: event.target.value
+                    next_assement_date: event.target.value
                 })
                 break;
 
@@ -170,7 +170,7 @@ const Addform = () => {
                     <Form noValidate validated={validated} onSubmit={handleSubmit}>
                         <Form.Row>
                             <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
-                                <Form.Label>Type</Form.Label>
+                                <Form.Label>Type of report</Form.Label>
                                 {errors.report_type && errors.report_type.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
                                 <InputGroup>
                                     <Form.Control as="select" onChange={handleChange}
@@ -286,13 +286,13 @@ const Addform = () => {
                             </Form.Group>
                             <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
                                 <Form.Label>Review Date</Form.Label>
-                                {errors.review_date && errors.review_date.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                {errors.next_assement_date && errors.next_assement_date.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
                                 <InputGroup>
                                     <Form.Control
-                                        name="review_date"
+                                        name="next_assement_date"
                                         required
                                         onChange={handleChange}
-                                        value={state.review_date}
+                                        value={state.next_assement_date}
                                         type="datetime-local"
                                     />
                                 </InputGroup>
