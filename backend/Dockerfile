@@ -21,4 +21,5 @@ WORKDIR /usr/src/app
 COPY . /usr/src/app
 
 # Run migrations and start the Django development server
-CMD ["sh", "-c", "python manage.py makemigrations --no-input && python manage.py migrate --no-input && python manage.py runserver 0.0.0.0:8000"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "backend.wsgi:application"]
+

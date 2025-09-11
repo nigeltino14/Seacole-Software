@@ -447,6 +447,7 @@ class BodyMap(models.Model):
     wound_depth = models.IntegerField()
     condition = models.CharField(max_length=150, blank=True, null=True)
     attachment = models.FileField(upload_to="attachments")
+
     next_assement_date = models.DateTimeField(
         _("Asssment date"), default=timezone.now
     )
@@ -486,11 +487,12 @@ class Resident(models.Model):
     created_by = models.ForeignKey('User', on_delete=models.CASCADE, null=True, blank=True)
     clinical_diagnosis = models.TextField(null=True, blank=True)
     medical_condition = models.TextField(null=True, blank=True)
-    allergies = models.CharField(blank=True, null=True, max_length=9999)
-    risk = models.CharField(blank=True, null=True, max_length=9999)
+    allergies = models.TextField(blank=True, null=True)
+    risk = models.CharField(max_length=9999,blank=True, null=True)
     date_of_admission = models.DateField(blank=True, null=True)
-    #ethnic_origin = models.CharField(default='Unknown', max_length=30)
-    marital_status = models.CharField(default='NonApplicable', max_length=9999)
+    ethnic_origin = models.CharField(default= 'Unknown', max_length=30)
+    marital_status = models.CharField(default='NonApplicable', max_length=100)
+
 
     def __str__(self):
         return f"{self.first_name } {self.last_name } {self.national_id}"
@@ -625,6 +627,7 @@ class Rota(models.Model):
         null=True,
         related_name="RotaHome",
     )
+
     start_date = models.DateField()
     end_date = models.DateField()
     created_on = models.DateTimeField(_("Created On"), auto_now_add=True)
@@ -695,7 +698,7 @@ class RiskActionPlan(models.Model):
     identified_risk = models.TextField(null=True, blank=True)
     risk_level = models.CharField(_("Risk Levels"), choices=RISK_LEVELS, max_length=40, null=True, blank=True)
     at_risk = models.ManyToManyField( "AtRiskOption", choices= RISK_PERSONNEL)
-    likelihood = models.CharField(("Likelihood"), choices=LIKELIHOOD, null=True, blank=True, max_length=9999)
+    likelihood = models.CharField(("Likelihood"), choices=LIKELIHOOD,max_length=1000, null=True, blank=True)
     severity = models.CharField(("Severity"), choices=SEVERITY, max_length=40, null=True, blank=True)
     approved_by = models.TextField(null=True, blank=True)
     details = models.TextField(null=True)
