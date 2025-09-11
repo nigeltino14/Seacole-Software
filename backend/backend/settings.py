@@ -143,12 +143,16 @@ USE_TZ = True
 
 
 STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Add any local static source folders here (do NOT include STATIC_ROOT)
+STATICFILES_DIRS = [
+    BASE_DIR / "backend/static",  # your source static files
+]
 
 
 MEDIA_URL = "/mediafiles/"
-MEDIA_ROOT = os.path.join(BASE_DIR / "mediafiles")
-
+MEDIA_ROOT = BASE_DIR / "mediafiles"  # maps to Docker volume media_volume
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
