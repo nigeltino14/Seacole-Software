@@ -143,7 +143,7 @@ USE_TZ = True
 
 
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = BASE_DIR / "static"
 
 # Add any local static source folders here (do NOT include STATIC_ROOT)
 STATICFILES_DIRS = [
@@ -206,9 +206,9 @@ if USE_SPACES:
     PUBLIC_MEDIA_LOCATION = "media"
     MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{PUBLIC_MEDIA_LOCATION}/"
     DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-else:
-    STATIC_URL = "/static/"
-    STATIC_ROOT = BASE_DIR / "/root/Production/Seacole-Software/backend/static/"
+#else:
+#    STATIC_URL = "/static/"
+#    STATIC_ROOT = BASE_DIR / "/root/Production/Seacole-Software/backend/static/"
 
 #if DEBUG == True:
 #   EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
