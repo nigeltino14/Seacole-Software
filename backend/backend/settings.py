@@ -147,7 +147,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Add any local static source folders here (do NOT include STATIC_ROOT)
 STATICFILES_DIRS = [
-    BASE_DIR / "backend/static",  # your source static files
+    BASE_DIR / "static",  # your source static files
 ]
 
 
