@@ -146,9 +146,7 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "static"
 
 # Add any local static source folders here (do NOT include STATIC_ROOT)
-STATICFILES_DIRS = [
-    BASE_DIR / "static",  # your source static files
-]
+STATICFILES_DIRS = []
 
 
 MEDIA_URL = "/mediafiles/"
