@@ -183,7 +183,10 @@ const Patientlist = () => {
                 </Link>
             </div>, sortable: true
         },
+
+        { name: "D.O.B", selector: "date_of_birth", sortable: true },
         { name: "Gender", selector: "gender", sortable: true },
+        { name: "Admission date", selector: "date_of_admission", sortable: true},
         {
             name: "Home", cell: row =>
                 <div>
@@ -191,10 +194,10 @@ const Patientlist = () => {
                 </div>
             , sortable: true
         },
-        { name: "Room", selector: "room", sortable: true },
-        { name: "D.O.B", selector: "date_of_birth", sortable: true },
-        { name: "Phone", selector: "phone", sortable: true },
-        { name: "Email", selector: "email", sortable: true },
+        //{ name: "Room", selector: "room", sortable: true },
+
+        { name: "Address", selector: "address", sortable: true },
+        //{ name: "Email", selector: "email", sortable: true },
 {/*
         {
             name: "Archived", cell: row =>
@@ -286,7 +289,7 @@ const Patientlist = () => {
                 <div className="thead-primary datatables">
                     <DataTable
                         columns={columns}
-                        data={residents}
+                        data={residents_to_display}
                         pagination
                         responsive={true}
                         striped

@@ -12,8 +12,8 @@ const SelectedRiskModal = ({ selectedrisk, show, onClose }) => {
         <Modal show={show} className="ms-modal-dialog-width ms-modal-content-width" onHide={onClose} centered>
             <Modal.Header className="ms-modal-header-radius-0">
                 <div>
-                    <h1 style={{ fontSize: '24px', marginBottom: '0' }}>Seacole Healthcare</h1>
-                    <h4 className="modal-title text-white">Selected Risk</h4>
+                    <h1 style={{ fontSize: '24px', marginBottom: '0' }}>Seacole Healthcare </h1>
+                    <h4 className="modal-title text-white">RISK</h4>
                     <p>Date recorded: {selectedrisk.created_on}</p>
                 </div>
                 <button type="button" className="close text-red w-20 mr-2" onClick={onClose}>x</button>

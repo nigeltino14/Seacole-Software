@@ -22,6 +22,13 @@ const initialState = {
     address: '',
     height: '',
     next_of_kin: '',
+    allergies: '',
+    clinical_diagnosis: '',
+    risk:'',
+    date_of_admission: '',
+    ethnic_origin: '',
+    medical_condition: '',
+    marital_status: '',
     dentist_name: '',
     dentist_phone: '',
     dentist_address: '',
@@ -48,6 +55,15 @@ const Addform = () => {
         setValidated(false);
         setState(initialState)
     }
+
+    const ethnicities = [
+        { value: 'Asian' , label:'Asian' },
+        { value: 'Black' , label:'Black' }, //these are the ethnicities of the staff
+        { value: 'Middle-Eastern' , label:'Middle-Eastern' },
+        { value: 'White' , label:'White' },
+        { value: 'Other' , label:'Other' },
+
+       ];
     const handleSubmit = (event) => {
         setValidated(true);
         const form = event.currentTarget;
@@ -66,6 +82,13 @@ const Addform = () => {
         formData.append('address', state.address);
         formData.append('height', state.height);
         formData.append('next_of_kin', state.next_of_kin);
+        formData.append('allergies', state.allergies);
+        formData.append('risk', state.risk);
+        formData.append('clinical_diagnosis', state.clinical_diagnosis);
+        formData.append('medical_condition', state.medical_condition);
+        formData.append('marital_status', state.marital_status);
+        formData.append('date_of_admission', state.date_of_admission);
+        formData.append('ethnic_origin', state.ethnic_origin);
         formData.append('dentist_name', state.dentist_name);
         formData.append('dentist_phone', state.dentist_phone);
         formData.append('dentist_address', state.dentist_address);
@@ -194,11 +217,60 @@ const Addform = () => {
 		        })
                 break;
 
+            case 'allergies':
+                setState({
+                    ...state,
+                    allergies: event.target.value
+                })
+                break;
+
+            case 'clinical_diagnosis' :
+                setState({
+                    ...state,
+                    clinical_diagnosis: event.target.value
+                })
+                break;
+
+            case 'medical_condition'  :
+                setState({
+                    ...state,
+                    medical_condition: event.target.value
+                })
+                break;
+
+            case 'ethnic_origin' :
+                setState({
+                    ...state,
+                    ethnic_origin: event.target.value
+                })
+                break;
+
+            case 'marital_status' :
+                setState({
+                    ...state,
+                    marital_status: event.target.value
+                })
+                break;
+
+            case 'risk' :
+                setState({
+                    ...state,
+                    risk: event.target.value
+                })
+                break;
+
             case 'dentist_name':
 		        setState({
 		            ...state,
                     dentist_name: event.target.value
 		        })
+                break;
+
+            case 'date_of_admission'   :
+                setState({
+                    ...state,
+                    date_of_admission: event.target.value
+                })
                 break;
 
             case 'dentist_phone':
@@ -351,13 +423,120 @@ const Addform = () => {
                                     />
                                 </InputGroup>
                             </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom10">
+                                <Form.Label>Date of Admission</Form.Label>
+                                {errors.date_of_admission && errors.date_of_admission.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="date_of_admission"
+                                        required
+                                        min={min_date()}
+                                        max={max_date()}
+                                        onChange={handleChange}
+                                        value={state.date_of_admission}
+                                        type="date"
+                                        placeholder="Admission Date"
+                                    />
+                                </InputGroup>
+                            </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom02">
+                                <Form.Label>Clinical Diagnosis</Form.Label>
+                                {errors.clinical_diagnosis && errors.clinical_diagnosis.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="clinical_diagnosis"
+                                        onChange={handleChange}
+                                        value={state.clinical_diagnosis}
+                                        type="text"
+                                        placeholder="Clinical Diagnosis"
+                                    />
+                                </InputGroup>
+                            </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom02">
+                                <Form.Label>Medical Condition</Form.Label>
+                                {errors.medical_condition && errors.medical_condition.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="medical_condition"
+                                        onChange={handleChange}
+                                        value={state.medical_condition}
+                                        type="text"
+                                        placeholder="Medical Condition"
+                                    />
+                                </InputGroup>
+                            </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom02">
+                                <Form.Label>Risk</Form.Label>
+                                {errors.risk && errors.risk.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="risk"
+                                        onChange={handleChange}
+                                        value={state.risk}
+                                        type="text"
+                                        placeholder="Risk associated with resident"
+                                    />
+                                </InputGroup>
+                            </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom02">
+                                <Form.Label>Allergies</Form.Label>
+                                {errors.allergies && errors.allergies.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        name="allergies"
+                                        onChange={handleChange}
+                                        value={state.allergies}
+                                        type="text"
+                                        placeholder="Allergies"
+                                    />
+                                </InputGroup>
+                            </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom02">
+                                <Form.Label>Ethnicity</Form.Label>
+                                {errors.ethnic_origin && errors.ethnic_origin.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        as="select"
+                                        name="ethnic_origin"
+                                        onChange={handleChange}
+                                        value={state.ethnic_origin}
+                                        type="text"
+                                        placeholder="Ethnicity"
+                                    >
+                                      <option value="">Select Ethnicity</option>
+                                         {ethnicities.map((ethnicity) => (
+                                           <option key={ethnicity.value} value={ethnicity.label}>
+                                             {ethnicity.label}
+                                           </option>
+                                         ))}
+                                    </Form.Control>
+                                </InputGroup>
+                            </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom02">
+                                <Form.Label>Marital Status</Form.Label>
+                                {errors.marital_status && errors.marital_status.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
+                                <InputGroup>
+                                    <Form.Control
+                                        as="select"
+                                        name="marital_status"
+                                        onChange={handleChange}
+                                        value={state.marital_status}
+                                        placeholder="Marital Status"
+
+                                    >flaticon-list mr-2
+                                        <option value="Single">Single</option>
+                                        <option value="Married">Married</option>
+                                        <option value="Divorced">Divorced</option>
+                                        <option value="Separated">Separated</option>
+                                    </Form.Control>
+                                </InputGroup>
+                            </Form.Group>
                             <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom04">
                                 <Form.Label>Phone No.</Form.Label>
                                 {errors.phone && errors.phone.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
                                 <InputGroup>
                                     <Form.Control
                                         name="phone"
-                                        required
                                         onChange={handleChange}
                                         value={state.phone}
                                         type="number"
@@ -371,7 +550,6 @@ const Addform = () => {
                                 <InputGroup>
                                     <Form.Control
                                         name="email"
-                                        required
                                         onChange={handleChange}
                                         value={state.email}
                                         type="email"
@@ -394,7 +572,7 @@ const Addform = () => {
                                     </Form.Control>
                                 </InputGroup>
                             </Form.Group>
-                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom08">
+                            {/*<Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom08">
                                 <Form.Label>Room</Form.Label>
                                 {errors.room && errors.room.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
                                 <InputGroup>
@@ -407,7 +585,7 @@ const Addform = () => {
                                         placeholder="Room Number"
                                     />
                                 </InputGroup>
-                            </Form.Group>
+                            </Form.Group>*/}
                             <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom09">
                                 <Form.Label>Profile Pic</Form.Label>
                                 {errors.profile_pic && errors.profile_pic.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}

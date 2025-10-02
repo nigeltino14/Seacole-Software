@@ -19,6 +19,15 @@ from django.contrib.auth.decorators import login_required, permission_required
 # API view for django.contrib.auth.models.User
 from django.views.decorators.cache import cache_control
 from django.db import models
+from .pagination import NotePagination
+from rest_framework.parsers import MultiPartParser, FormParser
+
+from rest_framework import viewsets, permissions, status
+from rest_framework.response import Response
+from .models import PlanEvaluation
+from .serializers import PlanEvaluationSerializer
+from .models import SupportPlan
+from django.conf import settings
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -28,7 +37,7 @@ class CreateUserView(generics.CreateAPIView):
 
 
 class CreateTokenView(ObtainAuthToken):
-    """Create a nerw auth token"""
+    """Create a new auth token"""
 
     serializer_class = AuthTokenSerializer
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
@@ -447,10 +456,19 @@ class SupportPlanViewSet(viewsets.ModelViewSet):
     queryset = SupportPlan.objects.all()
     serializer_class = SupportPlanSerializer
     permission_classes = [permissions.DjangoModelPermissions]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs['context'] = self.get_serializer_context()
+        return super().get_serializer(*args, **kwargs)
 
     def perform_create(self, serializer):
         if serializer.is_valid():
-            instance = serializer.save()
+            instance = serializer.save(created_by=self.request.user)
+
+            files = self.request.FILES.getlist('files')
+            for f in files:
+                SupportPlanFile.objects.create(support_plan=instance, file=f)
 
             UserHistory.objects.create(
                 user=self.request.user,
@@ -465,6 +483,10 @@ class SupportPlanViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             instance = serializer.save()
 
+            files = self.request.FILES.getlist('files')
+            for f in files:
+                SupportPlanFile.objects.create(support_plan=instance, file=f)
+
             UserHistory.objects.create(
                 user=self.request.user,
                 action='Accident/Incidents',
@@ -474,12 +496,6 @@ class SupportPlanViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
 
-
-from rest_framework import viewsets, permissions, status
-from rest_framework.response import Response
-from .models import PlanEvaluation
-from .serializers import PlanEvaluationSerializer
-from .models import SupportPlan
 
 class PlanEvaluationViewSet(viewsets.ModelViewSet):
     queryset = PlanEvaluation.objects.all()
@@ -515,6 +531,7 @@ class PlanEvaluationViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class AppointmentViewSet(viewsets.ModelViewSet):
     queryset = Appointment.objects.all()
     serializer_class = AppointmentSerializer
@@ -523,11 +540,13 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         # Set the created_by field to the current authenticated user
         serializer.save(created_by=self.request.user)
+        appointment = serializer.save(created_by=self.request.user)
 
         # Access the newly created instance
         instance = serializer.instance
         name_first_name = instance.resident.first_name
         name_last_name = instance.resident.last_name
+
 
         # Log the action in UserHistory
         UserHistory.objects.create(
@@ -535,6 +554,29 @@ class AppointmentViewSet(viewsets.ModelViewSet):
             action='appointmentList',
             details=f'Appointment for resident: {name_first_name} {name_last_name}',
         )
+
+        recipient_email = appointment.notify_email
+        if recipient_email:
+            subject = 'New Appointment Notification'
+            message = f"""
+            A new appointment has been added, details are as below.
+            
+            📝 Title: {appointment.title}
+            📋 Description: {appointment.description}
+            ⏰ Start: {appointment.start_time}
+            ⏰ End: {appointment.due_time}
+            👤 Resident: {appointment.resident.first_name} {appointment.resident.last_name}
+            
+            Kind Regards,
+            IT Support 
+            """
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [recipient_email],
+                fail_silently=False,
+            )
 
     def perform_update(self, serializer):
         # Save the instance and perform the update
@@ -603,12 +645,15 @@ class HomeViewSet(viewsets.ModelViewSet):
 
 
 class NoteViewSet(viewsets.ModelViewSet):
-    queryset = Note.objects.all()
     serializer_class = NoteSerializer
     permission_classes = [permissions.DjangoModelPermissions]
+    pagination_class = NotePagination
 
     def get_queryset(self):
-        queryset = Note.objects.all()
+        queryset = Note.objects.all().order_by('-created_on')
+        resident_id = self.request.query_params.get('resident', None)
+        if resident_id is not None:
+            queryset = queryset.filter(resident__national_id=resident_id)
         return queryset
 
     def perform_create(self, serializer):
@@ -872,8 +917,6 @@ class AfternoonRoutineViewSet(viewsets.ModelViewSet):
             )
             return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
-
-
 
 
 class QuestionViewSet(viewsets.ModelViewSet):

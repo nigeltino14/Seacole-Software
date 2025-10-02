@@ -34,10 +34,14 @@ const Addform = () => {
         last_evaluated_date: '',
         next_assement_date: '',
         //evaluations: '',
+        attachemnt: "",
 
 
     }
     const [state, setState] = useState(initialState)
+
+    //const [files, setFiles] = useState([]);
+
 
     const handleReset = () => {
         setValidated(false);
@@ -49,14 +53,19 @@ const Addform = () => {
         if (form.checkValidity() === false) {
             event.stopPropagation();
         } else {
-            let data = { ...state }
-            if (data.discontinue) {
-                delete data["next_assement_date"]
+        const formData = new FormData();
+        Object.entries(state).forEach(([key, value]) => {
+            if (value !== null && value !== undefined) {
+                formData.append(key, value);
             }
+        });
             postApi(_ => {
                 toastsuccess("Support Plan added successfully");
                 handleReset();
-            }, token, `/api/plan/`, data, errors_list => { setErrors(errors_list) })
+            }, token, `/api/plan/`, formData, errors_list => { setErrors(errors_list);
+            },
+            true
+          );
         }
         setValidated(true);
 
@@ -165,7 +174,12 @@ const Addform = () => {
                     next_assement_date: event.target.value
                 })
                 break;
-
+            case 'attachment':
+                setState({
+                    ...state,
+                    attachment: event.target.files[0]
+                });
+                break;
             /*case 'evaluations':
                 setState({
                     ...state,
@@ -177,13 +191,13 @@ const Addform = () => {
 
     }
 
-    useEffect(() => {
+    /*useEffect(() => {
         setState(prevState => ({
             ...prevState,
             staff: user.id,
             resident: JSON.stringify(selected_resident) !== '{}' ? selected_resident.national_id : ''
         }))
-    }, [user, selected_resident])
+    }, [user, selected_resident])*/
     useEffect(() => {
         setState(prevState => ({
             ...prevState,
@@ -255,6 +269,7 @@ const Addform = () => {
                                         <option value='ServicesProvidedByHousingOrEstateManagementService' >Services provided by Housing or Estate Management Service</option>
                                         <option value='ServicesProvidedBySupportWorker' >Services provided by Support Worker</option>
                                         <option value='SupportWorkersViewsofIssuesNeedsorActions' >Support Worker's Views of Issues, Needs or Actions</option>
+                                        <option value='PhysicalHealth' >Physical Health</option>
                                     </Form.Control>
                                 </InputGroup>
                             </Form.Group>
@@ -300,6 +315,7 @@ const Addform = () => {
                                         as="select"
                                         onChange={handleChange}
                                     >
+                                        <option value=''></option>
                                         <option value='Standard Care Plan'>Standard Care Plan</option>
                                         <option value='ShortTerm'>Short term</option>
                                         <option value='LongTerm'>Long term</option>
@@ -315,7 +331,9 @@ const Addform = () => {
                                         value={state.care_rating}
                                         onChange={handleChange}
                                         as="select"
+                                        placeholder="Care Rating"
                                     >
+                                        <option value=''></option>
                                         <option value='Low'>Low 🟢</option>
                                         <option value='Medium'>Medium 🟡</option>
                                         <option value='High'>High 🔴</option>
@@ -427,6 +445,20 @@ const Addform = () => {
                                     />
                                 </InputGroup>
                             </Form.Group>
+                            <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustomFile">
+                                <Form.Label>Attach File (optional)</Form.Label>
+                                {errors.attachment && errors.attachment.map(err => (
+                                    <p key={err} className='ms-text-danger'>{err}</p>
+                                ))}
+                                <InputGroup>
+                                    <Form.File
+                                        name="attachment"
+                                        type="file"
+                                        onChange={handleChange}
+                                    />
+                                </InputGroup>
+                            </Form.Group>
+
                             {JSON.stringify(selected_resident) === '{}' &&
                                 <Form.Group as={Col} md="6" className="mb-3" controlId="validationCustom07">
                                     <Form.Label>Resident</Form.Label>

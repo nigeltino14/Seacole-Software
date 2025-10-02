@@ -15,6 +15,9 @@ import dateToYMD from '../../../utils/dates'
 import { deleteApi, getApi, putApi } from '../../../../api/api'
 import ProtectedRoute from '../../../protected/ProtectedRoute'
 
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+
 const Appointmentlist = () => {
     const [showEdit, setshowEdit] = useState(false)
     const [showDelete, setshowDelete] = useState("false")
@@ -25,6 +28,7 @@ const Appointmentlist = () => {
     const residents = [...resident_list]
     const staff = [...staff_list]
     const user = useSelector((state) => state.auth.user);
+    const [selectedAppointment, setSelectedAppointment] = useState(null);
 
     const initialAppointments = appointments.map((appointment) => ({
       ...appointment,
@@ -34,6 +38,76 @@ const Appointmentlist = () => {
     console.log("Initial appointments:", initialAppointments);
 
     const [appointmentList, setAppointmentList] = useState(initialAppointments);
+
+    const generatePDF = () => {
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+
+      const brandColor = [152, 220, 141]; // Seacole theme green
+      const headerTextColor = [255, 255, 255];
+
+      // Header
+      doc.setFillColor(...brandColor);
+      doc.rect(0, 20, pageWidth, 20, 'F');
+      doc.setFontSize(16);
+      doc.setTextColor(...headerTextColor);
+      doc.text("Seacole Healthcare", pageWidth / 2, 33, { align: 'center' });
+
+      doc.setFontSize(12);
+      doc.setTextColor(...brandColor);
+      doc.text("Appointment Summary", pageWidth / 2, 45, { align: 'center' });
+
+      // Line Separator
+      doc.setLineWidth(0.5);
+      doc.setDrawColor(...brandColor);
+      doc.line(15, 50, pageWidth - 15, 50);
+
+      // Content Box
+      const boxTop = 58;
+      const boxHeight = 200;
+      doc.setDrawColor(...brandColor);
+      doc.rect(14, boxTop, pageWidth - 28, boxHeight);
+
+      let y = boxTop + 10;
+      const lineHeight = 10;
+      doc.setFontSize(11);
+      doc.setTextColor(40, 40, 40);
+
+      if (selectedAppointment) {
+
+        doc.text(`Resident: ${selectedResident(selectedAppointment.resident, residents)}`, 18, y); y += lineHeight;
+        doc.text(`Staff: ${selectedStaff(selectedAppointment.staff, staff)}`, 18, y); y += lineHeight;
+         doc.text(`Status: ${selectedAppointment.status}`, 18, y); y += lineHeight;
+        doc.text(`Start Time: ${dateToYMD(selectedAppointment.start_time)}`, 18, y); y += lineHeight;
+        doc.text(`End Time: ${dateToYMD(selectedAppointment.due_time)}`, 18, y); y += lineHeight;
+        // Handle long description with word wrap
+        const wrappedDescription = doc.splitTextToSize(
+          `Description: ${selectedAppointment.description}`,
+          pageWidth - 36 // padding from left and right
+        );
+        doc.text(wrappedDescription, 18, y);
+        y += wrappedDescription.length * lineHeight;
+
+
+
+      }
+
+      // Footer
+      doc.setFontSize(10);
+      doc.setTextColor(120);
+      doc.text("Seacole Healthcare • Gateway to Community Integration", pageWidth / 2, pageHeight - 20, { align: 'center' });
+
+      doc.setFontSize(9);
+      doc.text(`Generated on: ${new Date().toLocaleString()}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+
+      doc.text("Page 1", pageWidth - 20, pageHeight - 10);
+
+      doc.save('appointment_details.pdf');
+    };
+
+
+
 
     const handleShowEdit = (id) => {
         const appointment_list = [...appointments]
@@ -117,12 +191,12 @@ const Appointmentlist = () => {
                     {selectedResident(row.resident, residents)}
                 </div>, sortable: true
         },
-        {
+       /* {
             name: "Staff", cell: row =>
                 <div >
                     {selectedStaff(row.staff, staff)}
                 </div>, sortable: true
-        },
+        },*/
         { name: "Description", selector: "description", sortable: true,
           cell: (row) => (
             <div className={row.is_deleted ? 'deleted-appointment' : ''}>
@@ -130,7 +204,7 @@ const Appointmentlist = () => {
             </div>
           ),
         },
-        {
+        /*{
             name: "Start Time", cell: row =>
                 <div >
                     {dateToYMD(row.start_time)}
@@ -142,7 +216,7 @@ const Appointmentlist = () => {
                     {dateToYMD(row.due_time)}
                 </div>, sortable: true
         },
-        { name: "Status", selector: "status", sortable: true },
+        { name: "Status", selector: "status", sortable: true },*/
         {
             name: "Action", cell: (row) => 
                 <div data-tag="allowRowEvents" >
@@ -161,13 +235,19 @@ const Appointmentlist = () => {
                             <i className='far fa-trash-alt ms-text-danger  mr-4' />
                         </Link>
                     </ProtectedRoute>
+
+                    <Link to="#" onClick={() => setSelectedAppointment(row)}>
+                       <i className="fas fa-eye ms-text-info" /> View Details
+                    </Link>
+
                 </div>, sortable: true,
           
         },
     ];
  
     
-    
+
+
     
     const dispatch = useDispatch()
     useEffect(() => {
@@ -206,10 +286,48 @@ const Appointmentlist = () => {
                     </DataTableExtensions>
                 </div>
             </div>
-            <Modal show={showEdit} className="ms-modal-dialog-width ms-modal-content-width" onHide={handleCloseEdit} centered>
-                <Modal.Header className="ms-modal-header-radius-0">
-                    <h4 className="modal-title text-white">Edit Appointment</h4>
-                    <button type="button" className="close text-white" onClick={handleCloseEdit}>x</button>
+
+            <Modal show={selectedAppointment !== null} onHide={() => setSelectedAppointment(null)} centered>
+                <Modal.Header>
+                    <div>
+                        <h4 className="modal-title text-white">Appointment Details</h4>
+                        <p>Date: {selectedAppointment && dateToYMD(selectedAppointment.start_time)}</p>
+                    </div>
+                    <button type="button" className="close text-white" onClick={() => setSelectedAppointment(null)}>
+                        x
+                    </button>
+                </Modal.Header>
+                <Modal.Body>
+                    {selectedAppointment && (
+                        <>
+                            <p><strong>Description:</strong> {selectedAppointment.description}</p>
+                            <p><strong>Resident:</strong> {selectedResident(selectedAppointment.resident, residents)}
+                            </p>
+                            <p><strong>Staff:</strong> {selectedStaff(selectedAppointment.staff, staff)}</p>
+                            <p><strong>Status:</strong> {selectedAppointment.status}</p>
+                            <p><strong>Start:</strong> {dateToYMD(selectedAppointment.start_time)}</p>
+                            <p><strong>End:</strong> {dateToYMD(selectedAppointment.due_time)}</p>
+
+                            {user?.groups?.some(group =>
+                              ["Senior Management", "Management", "Senior Support Worker"].includes(group.name)
+                            ) && (
+                              <div className="text-right mt-3">
+                                <button className="btn btn-outline-secondary mt-3"
+                                        style={{ float: 'right' }}
+                                        onClick={generatePDF}>
+                                  📄 Save as PDF
+                                </button>
+                              </div>
+                            )}
+                        </>
+                    )}
+                </Modal.Body>
+            </Modal>
+
+            <Modal show={showEdit}  onHide={handleCloseEdit}  size="lg" scrollable
+                   centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Appointment</Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="p-0 text-left">
                     <AppointmentEdit handleClose={handleCloseEdit} />

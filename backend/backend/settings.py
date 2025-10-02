@@ -33,13 +33,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 DEBUG = False
 
-
-ALLOWED_HOSTS = [
-    "seacolehealthsystems.co.uk", "www.seacolehealthsystems.co.uk",
-    "localhost",
-    "165.227.229.113",
-]
-
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -98,30 +92,20 @@ LOGIN_REDIRECT_URL = "management:mainmenu"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-if os.environ.get("DEBUG", "debug") == "debug":
+#if os.environ.get("DEBUG", "debug") == "debug":
 
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": "seacole_staging",
-            "USER": "doadmin",
-            "PASSWORD": "AVNS_P2v-z3kK_178BxBTvfO",
-            "HOST": "seacole-do-user-14823812-0.c.db.ondigitalocean.com",
-            "PORT": "25060",
-        }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "seacole_staging",
+        "USER": "doadmin",
+        "PASSWORD": "AVNS_P2v-z3kK_178BxBTvfO",
+        "HOST": "seacole-do-user-14823812-0.c.db.ondigitalocean.com",
+        "PORT": "25060",
+        "OPTIONS": {"sslmode": "require"},
     }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.environ.get("POSTGRES_DB"),
-            "USER": os.environ.get("POSTGRES_USER"),
-            "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
-            "HOST": os.environ.get("POSTGRES_HOST"),
-            "PORT": os.environ.get("POSTGRES_PORT"),
-            "OPTIONS": {"sslmode": "require"},
-        }
-    }
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -159,12 +143,14 @@ USE_TZ = True
 
 
 STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+STATIC_ROOT = BASE_DIR / "static"
+
+# Add any local static source folders here (do NOT include STATIC_ROOT)
+STATICFILES_DIRS = []
 
 
 MEDIA_URL = "/mediafiles/"
-MEDIA_ROOT = BASE_DIR / "mediafiles"
-
+MEDIA_ROOT = BASE_DIR / "mediafiles"  # maps to Docker volume media_volume
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
@@ -218,22 +204,24 @@ if USE_SPACES:
     PUBLIC_MEDIA_LOCATION = "media"
     MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{PUBLIC_MEDIA_LOCATION}/"
     DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-else:
-    STATIC_URL = "/static/"
-    STATIC_ROOT = BASE_DIR / "/root/Production/Seacole-Software/backend/static/"
+#else:
+#    STATIC_URL = "/static/"
+#    STATIC_ROOT = BASE_DIR / "/root/Production/Seacole-Software/backend/static/"
 
-if DEBUG == True:
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-else:
-    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+#if DEBUG == True:
+#   EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+#else:
+#    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
-EMAIL_HOST = os.environ.get("EMAIL_HOST", default="mail.privateemail.com")
+EMAIL_HOST = "mail.privateemail.com"
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
-EMAIL_HOST_USER = "nigeltino98@gmail.com"
-EMAIL_HOST_PASSWORD = "opsalygeebnzkffb"
-SERVER_EMAIL = EMAIL_HOST_USER
+EMAIL_USE_TLS = False
+EMAIL_HOST_USER = "it.support@seacolehealthsystems.co.uk"
+EMAIL_HOST_PASSWORD = "MySTERious1550#"
+#SERVER_EMAIL = "it.support@seacolehealthsystems.co.uk"
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 
 FRONTEND_HOST = os.environ.get("FRONTEND_HOST", default="http://localhost:3000")
@@ -258,11 +246,15 @@ BACKEND_HOST = os.environ.get("BACKEND_HOST", default="http://localhost:8000")
 #     },
 # }
 
+#STATICFILES_DIRS = [
+#    os.path.join(BASE_DIR, 'static'),
+#]
+
 HOST_SCHEME = "http://"
-SECURE_PROXY_SSL_HEADER = None
-SECURE_SSL_REDIRECT = False
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = None
-SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_FRAME_DENY = False

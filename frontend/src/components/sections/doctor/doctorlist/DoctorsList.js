@@ -155,71 +155,40 @@ const Doctorlist = () => {
         };
 
         return (
-            <Modal show={true} className="ms-modal-dialog-width ms-modal-content-width" onHide={onClose}  style={{display:'flex', position:'fixed', background:'whitesmoke', }}>
-                <Modal.Header className="ms-modal-header-radius-0" style={{background:'lightgreen', color:'antiquewhite', justifyContent:'space-between',}} >
-                    <div>
-                        <h1 className="modal-title" style={{fontSize: '24px', marginBottom: '0'}}>Seacole
-                            Healthcare</h1>
-                        <h4 className="modal-title text-white">Staff Details</h4>
-                        <button onClick={saveAsPDF}>Save as PDF</button>
+            <Modal show={true} onHide={onClose} centered>
+              <Modal.Header closeButton className="bg-white border-bottom">
+                <div>
+                  <h5 className="modal-title fw-semibold mb-0">Seacole Healthcare</h5>
+                  <small className="text-muted">Staff Details</small>
+                </div>
+                <button onClick={saveAsPDF} className="btn btn-outline-dark ms-3">📄 Save as PDF</button>
+              </Modal.Header>
 
-
-                    </div>
-                    <button type="button" className="close text-red w-20 mr-2" onClick={onClose}>x</button>
-                </Modal.Header>
-                <Modal.Body style={{ background: 'white', padding: '5px', fontSize: '24px', lineHeight: '2.5' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        {staff.map((staff, index) => (
-                            <div key={staff.id} style={{ background:  'black', padding: '5px', border: '1px solid black'}}>
-                                <Modal.Body style={{ padding: '5px', fontSize: '24px', lineHeight: '2.0' }}>
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <div style={{ border: '1px solid black', background: 'lightgreen', padding: '5px', marginBottom: '5px' }}>
-            <p style={{ margin: '0' }}>First Name: {selectedStaff.first_name}</p>
-        </div>
-        <div style={{ border: '1px solid black', background: 'white', padding: '5px', marginBottom: '5px' }}>
-            <p style={{ margin: '0' }}>Last Name: {selectedStaff.last_name}</p>
-        </div>
-        <div style={{ border: '1px solid black', background: 'lightgreen', padding: '5px', marginBottom: '5px' }}>
-            <p style={{ margin: '0' }}>Email: {selectedStaff.email}</p>
-        </div>
-        <div style={{ border: '1px solid black', background: 'white', padding: '5px', marginBottom: '5px' }}>
-            <p style={{ margin: '0' }}>Gender: {selectedStaff.gender}</p>
-        </div>
-        <div style={{ border: '1px solid black', background: 'lightgreen', padding: '5px', marginBottom: '5px' }}>
-            <p style={{ margin: '0' }}>Address: {selectedStaff.address}</p>
-        </div>
-        <div style={{ border: '1px solid black', background: 'white', padding: '5px', marginBottom: '5px' }}>
-            <p style={{ margin: '0' }}>Nationality: {selectedStaff.nationality}</p>
-        </div>
-        <div style={{ border: '1px solid black', background: 'lightgreen', padding: '5px', marginBottom: '5px' }}>
-            <p style={{ margin: '0' }}>Category: {selectedStaff.category}</p>
-        </div>
-        <div style={{ border: '1px solid black', background: 'white', padding: '5px', marginBottom: '5px' }}>
-            <p style={{ margin: '0' }}>NI Number: {selectedStaff.NI_number}</p>
-        </div>
-        <div style={{ border: '1px solid black', background: 'lightgreen', padding: '5px', marginBottom: '5px' }}>
-            <p style={{ margin: '0' }}>Mobile: {selectedStaff.mobile}</p>
-        </div>
-        <div style={{ border: '1px solid black', background: 'white', padding: '5px', marginBottom: '5px' }}>
-            <p style={{ margin: '0' }}>Start Date: {selectedStaff.start_date}</p>
-        </div>
-        <div style={{ border: '1px solid black', background: 'lightgreen', padding: '5px', marginBottom: '5px' }}>
-            <p style={{ margin: '0' }}>Location: {selectedStaff.location}</p>
-        </div>
-        <div style={{ border: '1px solid black', background: 'white', padding: '5px', marginBottom: '5px' }}>
-            <p style={{ margin: '0' }}>Ethnic Origin: {selectedStaff.ethnic_origin}</p>
-        </div>
-        <div style={{ border: '1px solid black', background: 'lightgreen', padding: '5px', marginBottom: '5px' }}>
-            <p style={{ margin: '0' }}>Marital Status: {selectedStaff.marital_status}</p>
-        </div>
-    </div>
-</Modal.Body>
-
-
-                            </div>
-                          ))}
-                    </div>
-                </Modal.Body>
+              <Modal.Body className="bg-light px-4 py-3">
+                {selectedStaff && (
+                  <div className="d-flex flex-column gap-3">
+                    {[
+                      ['First Name', selectedStaff.first_name],
+                      ['Last Name', selectedStaff.last_name],
+                      ['Email', selectedStaff.email],
+                      ['Gender', selectedStaff.gender],
+                      ['Address', selectedStaff.address],
+                      ['Nationality', selectedStaff.nationality],
+                      ['Category', selectedStaff.category],
+                      ['NI Number', selectedStaff.NI_number],
+                      ['Mobile', selectedStaff.mobile],
+                      ['Start Date', selectedStaff.start_date],
+                      ['Location', selectedStaff.location],
+                      ['Ethnic Origin', selectedStaff.ethnic_origin],
+                      ['Marital Status', selectedStaff.marital_status],
+                    ].map(([label, value], index) => (
+                      <div key={index} className="p-3 bg-white shadow-sm rounded border">
+                        <strong className="text-muted">{label}:</strong> <span className="ms-2 text-dark">{value}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </Modal.Body>
             </Modal>
         );
     };

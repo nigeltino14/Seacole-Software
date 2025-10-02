@@ -1,5 +1,6 @@
 import axios from "axios";
 import { toastdanger, } from '../components/utils/notifications'
+import { toastloading, } from '../components/utils/notifications'
 import Config from "../config.json";
 
 const baseURl = Config.BACKEND_HOST
@@ -34,11 +35,11 @@ const errorHandler = (error, ...args) => {
         toastdanger(JSON.parse(error.request.response).detail)
     } else if (status === 404) {
         toastdanger("Page not found")
-    } else {
-        toastdanger("Server Error Contact Admin.")
     }
 }
 export const getToken = (handler, url, body) => {
+    console.log("Sending login request to:", `${baseURl}${url}`);
+    console.log("With body:", body);
     axios.post(
         `${baseURl}${url}`,
         body,

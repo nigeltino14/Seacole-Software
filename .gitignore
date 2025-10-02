@@ -46,6 +46,10 @@ media
 
 # Backup files # 
 *.bak 
+*.save
+*.tar.gz
+*.json
+*media_backup_*.tar.gz
 
 import Config from './components/Config'
 import Canvas from './components/Canvas'

@@ -89,6 +89,7 @@ CATEGORY_TYPE = (
         "SupportWorkersViewsofIssuesNeedsorActions",
         "Support Worker's Views of Issues, Needs or Actions",
     ),
+    ("PhysicalHealth", "Physical Health "),
 )
 
 REPEAT_CHOICES = (
@@ -130,6 +131,7 @@ EMOTION_CHOICES = (
     ("angry", "Angry"),
     ("annoyed", "Annoyed"),
     ("sleeping", "Sleeping"),
+    ("tearful", "Tearful"),
 )
 MOOD = (
     ("moody", "moody"),
@@ -161,7 +163,20 @@ INFO_SRC_CHOICES = (
     ("REFERRER", "REFERRER"),
     ("OTHER AGENCIES", "OTHER AGENCIES"),
 )
+ETHNIC_CHOICES = (
+    ("ASIAN", "ASIAN"),
+    ("BLACK", "BLACK"),
+    ("MIDDLE-EASTERN", "MIDDLE-EASTERN"),
+    ("WHITE", "WHITE"),
+    ("OTHER", "OTHER"),
+)
+MARITAL_CHOICES = (
+    ("SINGLE", "SINGLE"),
+    ("MARRIED", "MARRIED"),
+    ("DIVORCED", "DIVORCED"),
+    ("SEPARATED","SEPARATED")
 
+)
 
 class Home(models.Model):
     id = models.AutoField(primary_key=True)
@@ -432,6 +447,7 @@ class BodyMap(models.Model):
     wound_depth = models.IntegerField()
     condition = models.CharField(max_length=150, blank=True, null=True)
     attachment = models.FileField(upload_to="attachments")
+
     next_assement_date = models.DateTimeField(
         _("Asssment date"), default=timezone.now
     )
@@ -440,7 +456,7 @@ class BodyMap(models.Model):
 class Resident(models.Model):
     """Resident"""
 
-    # make sure a discharged resident doesent show up @ queries
+    # make sure a discharged resident doesnt show up @ queries
     national_id = models.CharField(max_length=25, primary_key=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
@@ -454,24 +470,29 @@ class Resident(models.Model):
     is_discharged_status = models.BooleanField(
         default=False
     )  # we must be able to discharge a resident
-    height = models.FloatField(_("height"))
+    height = models.FloatField(_("height"), null=True, blank=True)
     NHS_number = models.CharField(max_length=255, null=True, blank=True)
 
     created_on = models.DateTimeField(_("Created On"), auto_now_add=True)
-    room = models.CharField(max_length=3)
+    room = models.CharField(max_length=3, blank=True, null=True)
     home = models.ForeignKey(
         "Home", on_delete=models.CASCADE, null=True
     )  # what info is recorded abt a home
     profile_pic = models.ImageField(
         upload_to="profiles/", null=True, blank=True
     )
-    phone = models.CharField(_("Contact"), max_length=20)
-    email = models.EmailField(max_length=255, unique=False)
-    address = models.TextField()
+    phone = models.CharField(_("Contact"), max_length=20, null=True, blank=True)
+    email = models.EmailField(max_length=255, unique=False, null=True, blank=True)
+    address = models.TextField(blank=True, null=True)
     created_by = models.ForeignKey('User', on_delete=models.CASCADE, null=True, blank=True)
-    clinical_diagnosis = models.CharField(max_length=1000, null=True, blank=True)
-    allergies = models.CharField(max_length=1000, blank=True, null=True)
-    risk = models.CharField(max_length=1000, blank=True, null=True)
+    clinical_diagnosis = models.TextField(null=True, blank=True)
+    medical_condition = models.TextField(null=True, blank=True)
+    allergies = models.TextField(blank=True, null=True)
+    risk = models.CharField(max_length=9999,blank=True, null=True)
+    date_of_admission = models.DateField(blank=True, null=True)
+    ethnic_origin = models.CharField(default= 'Unknown', max_length=30)
+    marital_status = models.CharField(default='NonApplicable', max_length=100)
+
 
     def __str__(self):
         return f"{self.first_name } {self.last_name } {self.national_id}"
@@ -578,10 +599,8 @@ class SuggestionComplains(models.Model):
     resident = models.ForeignKey(
         Resident, verbose_name="Family", on_delete=models.CASCADE
     )
-    next_assement_date = models.DateTimeField(
-        _("Asssment date"), default=timezone.now
-    )
-    discontinue = models.BooleanField(_("Discontibnue"), default=False)
+    next_assement_date = models.DateTimeField(blank=True, null=True)
+    discontinue = models.BooleanField(_("Discontinue"), default=False)
 
 
 class Rota(models.Model):
@@ -608,6 +627,7 @@ class Rota(models.Model):
         null=True,
         related_name="RotaHome",
     )
+
     start_date = models.DateField()
     end_date = models.DateField()
     created_on = models.DateTimeField(_("Created On"), auto_now_add=True)
@@ -619,15 +639,15 @@ class Rota(models.Model):
 class SupportPlan(models.Model):
     title = models.CharField(max_length=100, null=True, blank=True)
     created_on = models.DateTimeField(_("Created On"), auto_now_add=True)
-    care_rating = models.CharField(_("Care Rating"), choices=RATING_CHOICES, max_length=40, null=True, blank=True)
-    approved_by = models.CharField(max_length=100, null=True, blank=True)
+    care_rating = models.CharField(_("Care Rating"), max_length=40, null=True, blank=True)
+    approved_by = models.TextField(null=True, blank=True)
     cp_duration = models.CharField(choices=DURATION_CHOICES, max_length=40, null=True, blank=True)
-    issue = models.CharField(max_length=9999, null=True, blank=True)
-    action_plan = models.CharField(max_length=9999, null=True, blank=True)
-    by_who = models.CharField(max_length=500, null=True, blank=True)
-    by_when = models.CharField(max_length=100, null=True, blank=True)
-    goal = models.CharField(max_length=9999, null=True, blank=True)
-    achievements = models.CharField(max_length=9999, null=True, blank=True)
+    issue = models.TextField(null=True, blank=True)
+    action_plan = models.TextField(null=True, blank=True)
+    by_who = models.TextField(null=True, blank=True)
+    by_when = models.TextField(null=True, blank=True)
+    goal = models.TextField(null=True, blank=True)
+    achievements = models.TextField(null=True, blank=True)
     created_by = models.ForeignKey(
         "User", verbose_name=_(""), on_delete=models.CASCADE
     )
@@ -640,44 +660,50 @@ class SupportPlan(models.Model):
     next_eval_date = models.DateTimeField(
         _("Evaluation Date"), default=timezone.now
     )
-    evaluations = models.CharField(max_length=9999, null=True, blank=True)
+    evaluations = models.TextField(null=True, blank=True)
     discontinue = models.BooleanField(_("Discontinue"), default=False)
     category = models.CharField(choices=CATEGORY_TYPE, max_length=100)
     last_evaluated_date = models.DateTimeField(auto_now=True, blank=True, null=True)
     staff = models.CharField(max_length=100, blank=True, null=True)
     is_deleted = models.BooleanField(default=False)
     deletion_reason = models.TextField(null=True, blank=True, default="Not deleted")
+    attachment = models.FileField(upload_to='support_plans', null=True, blank=True, default=None)
 
     def __str__(self):
         return self.title
 
 
+class SupportPlanFile(models.Model):
+    plan = models.ForeignKey(SupportPlan, related_name='files', on_delete=models.CASCADE)
+    file = models.FileField(upload_to='support_plans/')
+    uploaded_date = models.DateTimeField(auto_now_add=True)
+
+
 class PlanEvaluation(models.Model):
     support_plan = models.ForeignKey(SupportPlan, on_delete=models.CASCADE)
-    text = models.CharField(max_length=500, null=True, blank=True, default="")
+    text = models.TextField(null=True, blank=True, default="")
     staff = models.ForeignKey("User", on_delete=models.CASCADE,
                               blank=True, null=True)
     resident = models.ForeignKey("RESIDENT",  on_delete=models.CASCADE,
                                  blank=True, null=True)
     date = models.DateTimeField(auto_now_add=True)
 
-
     def __str__(self):
         return f"Evaluation for {self.support_plan.resident} on {self.date}"
 
 
 class RiskActionPlan(models.Model):
-    title = models.CharField(max_length=30, null=True, blank=True)
+    title = models.TextField(null=True, blank=True)
     created_on = models.DateField(_("Created On"), auto_now_add=True)
-    identified_risk = models.CharField(max_length=100, null=True, blank=True)
+    identified_risk = models.TextField(null=True, blank=True)
     risk_level = models.CharField(_("Risk Levels"), choices=RISK_LEVELS, max_length=40, null=True, blank=True)
     at_risk = models.ManyToManyField( "AtRiskOption", choices= RISK_PERSONNEL)
-    likelihood = models.CharField(("Likelihood"), choices=LIKELIHOOD, max_length=40, null=True, blank=True)
+    likelihood = models.CharField(("Likelihood"), choices=LIKELIHOOD,max_length=1000, null=True, blank=True)
     severity = models.CharField(("Severity"), choices=SEVERITY, max_length=40, null=True, blank=True)
-    approved_by = models.CharField(max_length=40, null=True, blank=True)
+    approved_by = models.TextField(null=True, blank=True)
     details = models.TextField(null=True)
     triggers = models.TextField(null=True)
-    support_needs = models.CharField(max_length=30, null=True, blank=True)
+    support_needs = models.TextField(null=True, blank=True)
     information_sources_used = models.CharField(
         choices=INFO_SRC_CHOICES, default="REFERRER", max_length=50
     )
@@ -693,18 +719,18 @@ class RiskActionPlan(models.Model):
         _("Asssment date"), default=timezone.now
     )
     discontinue = models.BooleanField(_("Discontinue"), default=False)
-    category = models.CharField(
-        choices=CATEGORY_TYPE, default="Risk", max_length=100
-    )
 
     def __str__(self):
         return self.title
+
 
 class AtRiskOption(models.Model):
     name = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return self.name
+
+
 class Appointment(models.Model):
     created_on = models.DateTimeField(_("Created On"), auto_now_add=True)
     start_time = models.DateTimeField(_("Start On"))
@@ -738,6 +764,7 @@ class Appointment(models.Model):
     )
     is_deleted = models.BooleanField(default=False)
     deletion_reason = models.TextField(null=True, blank=True, default="Not deleted")
+    notify_email = models.EmailField(null=True, blank=True)
 
     class Meta:
         ordering = ["-created_on"]

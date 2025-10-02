@@ -71,15 +71,22 @@ const About = () => {
     const information = [
         { title: 'Full Name', text: `${selected_resident.first_name} ${selected_resident.last_name} ` },
         { title: 'Date Of Birth', text: `${selected_resident.date_of_birth}` },
-        { title: 'Phone Number', text: `${selected_resident.phone}` },
-        { title: 'Email Address', text: `${selected_resident.email}` },
-        { title: 'Gender', text: `${selected_resident.gender}` },
-        { title: 'Room', text: `${selected_resident.room}` },
-        { title: 'Address', text: `${selected_resident.address}` },
-        { title: 'Home', text: `${selectedHome(selected_resident.home, homes)}` },
+        { title: 'Date of admission', text: `${selected_resident.date_of_admission}` },
         { title: 'National insurance', text: `${selected_resident.national_id}` },
         { title: 'NHS Number', text: `${selected_resident.NHS_number}` },
+        { title: 'Clinical Diagnosis', text: `${selected_resident.clinical_diagnosis}` },
+        { title: 'Medical Condition', text: `${selected_resident.medical_condition}` },
+        { title: 'Risk', text: `${selected_resident.risk}` },
+        { title: 'Ethnicity', text: `${selected_resident.ethnic_origin}` },
+        { title: 'Marital Status', text: `${selected_resident.marital_status}` },
+        //{ title: 'Phone Number', text: `${selected_resident.phone}` },
+        //{ title: 'Email Address', text: `${selected_resident.email}` },
+        { title: 'Gender', text: `${selected_resident.gender}` },
+        //{ title: 'Room', text: `${selected_resident.room}` },
+        { title: 'Address', text: `${selected_resident.address}` },
+        { title: 'Home', text: `${selectedHome(selected_resident.home, homes)}` },
         { title: 'Next of Kin', text: `${selected_resident.next_of_kin}` },
+
     ];
 
     const columns = [

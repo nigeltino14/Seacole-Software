@@ -139,16 +139,24 @@ const AddDailyNote = (props) => {
                                 {errors.emotion && errors.emotion.map(err => { return (<p key={err} className='ms-text-danger'>{err}</p>) })}
                                 <InputGroup>
                                     <Form.Control as="select" onChange={handleChange}
-                                        name="emotion"
-                                        value={state.emotion}
+                                                  name="emotion"
+                                                  value={state.emotion}
                                     >
                                         <option value="unknown">❓ Unknown</option>
-                                        <option value="joyful">😊  Joyful</option>
+                                        <option value="joyful">😊 Joyful</option>
                                         <option value="sad">😔 Sad</option>
                                         <option value="tearful">😢 Tearful</option>
                                         <option value="angry">😡 Angry</option>
                                         <option value="annoyed">🙄 Annoyed</option>
                                         <option value="sleeping">😴 Sleeping</option>
+                                        <option value="sleepy">🥱 Sleepy</option>
+                                        <option value="content">🙂 Content</option>
+                                        <option value="content">🙂 Content</option>
+                                        <option value="worried">😟 Worried</option>
+                                        <option value="confused">😕 Confused</option>
+                                        <option value="fearful">😨 Fearful</option>
+
+
                                     </Form.Control>
                                 </InputGroup>
                             </Form.Group>

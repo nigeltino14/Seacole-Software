@@ -134,7 +134,7 @@ const AddWeight = (props) => {
                                         value={state.emotion}
                                     >
                                         <option value="unknown">❓ Unknown</option>
-                                        <option value="happy">😃 Happy</option>
+                                        <option value="content">🙂 Content</option>
                                         <option value="joyful">😊 Joyful</option>
                                         <option value="sad">😔 Sad</option>
                                         <option value="content">🙂 Content</option>

@@ -30,7 +30,6 @@ class UserSerializer(serializers.ModelSerializer):
     groups = GroupSerializer(many=True, read_only=True)
     user_permissions = PermissionnsSerializer(many=True, read_only=True)
 
-
     def create(self, validated_data):
         groups_data = validated_data.pop("groups", [])  # Get groups data if available
         user = User.objects.create(**validated_data)
@@ -107,7 +106,6 @@ class ResidentDischargeSerializer(serializers.ModelSerializer):
               }
 
 
-
 class DailyCareSerializer(serializers.ModelSerializer):
     class Meta:
         model = DailyCare
@@ -162,6 +160,20 @@ class RotaSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class SupportPlanFileSerializer(serializers.ModelSerializer):
+    file_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SupportPlanFile
+        fields = "__all__"
+
+    def get_file_url(self, obj):
+        request = self.context.get('request')
+        if request is not None:
+            return request.build_absolute_uri(obj.file.url)
+        return obj.file.url  # fallback relative URL
+
+
 class SupportPlanSerializer(serializers.ModelSerializer):
     name_first = serializers.CharField(source='created_by.first_name', read_only=True)
     name_last = serializers.CharField(source='created_by.last_name', read_only=True)
@@ -169,6 +181,8 @@ class SupportPlanSerializer(serializers.ModelSerializer):
     lastname = serializers.CharField(source='resident.last_name', read_only=True)
     next_assement_date = serializers.DateTimeField()
 
+    attachment = SupportPlanFileSerializer(source='supportplanfile_set', many=True, read_only=True)
+    created_by = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = SupportPlan

@@ -16,6 +16,8 @@ import dateToYMD from '../../../utils/dates';
 import ProtectedRoute from '../../../protected/ProtectedRoute';
 import Swal from 'sweetalert2';
 import PrintButton from '../../../utils/print';
+import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
 
 const Addform = () => {
     const [activeModal, setActiveModal] = useState(null);
@@ -31,12 +33,136 @@ const Addform = () => {
     const [selectedPlan, setSelectedPlan] = useState(null);
     const user = useSelector((state) => state.auth.user);
     const [selectedEvaluations, setSelectedEvaluations] = useState([]);
+    const BASE_BACKEND_URL = "http://127.0.0.1:8000";
 
+    //const contentRef = useRef();
 
 
     /*const handleRowClick = (row) => {
         setSelectedPlan(row);
     };*/
+
+
+   const saveAsPDF = () => {
+    if (!selectedPlan) return;
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    const brandColor = [152, 220, 141];
+    const headerTextColor = [255, 255, 255];
+    const labelColor = [0, 102, 102];
+    const highlightBg = [128, 137, 147];
+
+    const boxTop = 58;
+    const boxLeft = 14;
+    const boxWidth = pageWidth - 28;
+    const boxHeight = pageHeight - boxTop - 40; // dynamic height to avoid footer
+
+    const drawHeader = () => {
+        doc.setFillColor(...brandColor);
+        doc.rect(0, 20, pageWidth, 15, 'F');
+        doc.setFontSize(18);
+        doc.setTextColor(...headerTextColor);
+        doc.text("Seacole Healthcare", pageWidth / 2, 33, { align: 'center' });
+
+        doc.setFontSize(14);
+        doc.setTextColor(0, 0, 0);
+        doc.text("Support Plan Summary", pageWidth / 2, 43, { align: 'center' });
+
+        doc.setLineWidth(0.7);
+        doc.setDrawColor(...brandColor);
+        doc.line(15, 50, pageWidth - 15, 50);
+    };
+
+    const drawFooter = () => {
+        const footerLine1 = "Seacole Healthcare • Gateway to Community Integration";
+        const footerLine2 = `Generated on: ${new Date().toLocaleString()}`;
+
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text(footerLine1, pageWidth / 2, pageHeight - 15, { align: 'center' });
+
+        doc.setFontSize(9);
+        doc.setTextColor(100);
+        doc.text(footerLine2, pageWidth / 2, pageHeight - 8, { align: 'center' });
+
+        doc.setFontSize(9);
+        doc.text(`Page ${doc.internal.getNumberOfPages()}`, pageWidth - 20, pageHeight - 10);
+    };
+
+    const drawBox = () => {
+        doc.setDrawColor(0, 0, 0);
+        doc.rect(boxLeft, boxTop, boxWidth, boxHeight);
+    };
+
+    const wrapText = (text, width) => doc.splitTextToSize(text || '', width);
+    let y = boxTop + 10;
+    const margin = 18;
+    const maxY = boxTop + boxHeight - 10;
+    const lineSpacing = 8;
+
+    const drawLabelText = (label, value, isHighlight = false) => {
+        const lines = wrapText(value, pageWidth - margin * 2);
+        const contentHeight = lines.length * lineSpacing;
+        const totalHeight = contentHeight + 10;
+
+        if (y + totalHeight > maxY) {
+            drawFooter();
+            doc.addPage();
+            drawHeader();
+            drawBox();
+            y = boxTop + 10;
+        }
+
+        if (isHighlight) {
+            doc.setFillColor(...highlightBg);
+            doc.rect(margin - 4, y - 6, boxWidth - 8, contentHeight , 'F');
+        }
+
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...labelColor);
+        doc.text(`${label}:`, margin, y);
+        y += 5;
+
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(40, 40, 40);
+        doc.text(lines, margin, y);
+        y += lines.length * lineSpacing + 3;
+    };
+
+    // Start
+    drawHeader();
+    drawBox();
+
+    drawLabelText("Resident", `${selectedPlan.firstname} ${selectedPlan.lastname}`);
+    drawLabelText("Key-worker", `${selectedPlan.name_first} ${selectedPlan.name_last}`);
+    drawLabelText("Title", selectedPlan.title);
+    drawLabelText("Category", selectedPlan.category);
+    drawLabelText("Approved By", selectedPlan.approved_by);
+    drawLabelText("Care Rating", selectedPlan.care_rating);
+    drawLabelText("Plan Duration", selectedPlan.cp_duration);
+    drawLabelText("Created On", dateToYMD(selectedPlan.created_on));
+    drawLabelText("Next Evaluation Date", dateToYMD(selectedPlan.next_assement_date));
+    drawLabelText("Last Evaluated", dateToYMD(selectedPlan.last_evaluated_date));
+    drawLabelText("By Who", selectedPlan.by_who);
+    drawLabelText("By When", selectedPlan.by_when);
+    drawLabelText("Issue", selectedPlan.issue, false);
+    drawLabelText("Action Plan", selectedPlan.action_plan, false);
+    drawLabelText("Goal", selectedPlan.goal, false);
+    drawLabelText("Achievements", selectedPlan.achievements, false);
+
+
+    drawFooter();
+
+    const filename = `Support_Plan_${selectedPlan.firstname}_${selectedPlan.lastname}.pdf`;
+    doc.save(filename);
+};
+
+
+
+
 
     const getEvaluationColor = (dateString) => {
         const today = new Date();
@@ -75,6 +201,22 @@ const Addform = () => {
 
         //{ name: "CP Duration", selector: "cp_duration", sortable: true},
         { name: "Care Rating", selector: "care_rating", sortable: true},
+        {
+                name: "Attachment",
+                cell: row =>
+                row.attachment ? (
+                    <a
+                        href={row.attachment}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        View File
+                    </a>
+                ) : (
+                    "No File"
+                ),
+            sortable: true
+        },
         //{ name: "By Who", selector: "by_who", sortable: true },
         //{ name: "By When", selector: "by_when", sortable: true },
         //{ name: "Goal", selector: "goal", sortable: true },
@@ -103,6 +245,7 @@ const Addform = () => {
                     {dateToYMD(row.last_evaluated_date)}
                 </div>, sortable: true
         },
+
         {
             name: "Date of Next Evaluation", cell: row =>
                 <div style={{ color: getEvaluationColor(row.next_assement_date) }}>
@@ -125,7 +268,7 @@ const Addform = () => {
         {
             name: "", cell: row =>
                 <div data-tag="allowRowEvents">
-                    <ProtectedRoute perm="chnage_supportplan">
+                    <ProtectedRoute perm="change_supportplan">
                         <Link to='#' onClick={(event) => {
                             event.stopPropagation();
                             handleShowEdit(row.id);
@@ -316,131 +459,148 @@ const Addform = () => {
              return careRatingColors[rating] || "black"; // Default to black if rating is not found
         };
 
-        return (
-            <Modal show={activeModal === "details"} className="ms-modal-dialog-width ms-modal-content-width custom-modal" onHide={() => setActiveModal(null)} centered>
-                <Modal.Header className="ms-modal-header-radius-0 custom-modal-header">
-                    <table className="table table-bordered border style={{ borderColor: 'black' }}">
-                        <thead>
-                            <tr style={{ borderColor: 'red' }}>
-                                <td style={{ borderColor: 'orangered', fontSize: '20px', backgroundColor: 'black', color: 'white' }}>SEACOLE HEALTHCARE</td>
-                            </tr>
-                        </thead>
-                        <tbody className="table-group-divider">
-                        <tr style={{borderColor: 'red'}}>
-                            <td style={{
-                                borderColor: 'orangered',
-                                fontSize: '16px',
-                                color: 'whitesmoke',
-                                backgroundColor: 'black'
-                            }}>Support Plan
+
+
+    return (
+        <Modal
+            show={activeModal === "details"}
+            className="custom-modal"
+            onHide={() => setActiveModal(null)}
+            centered
+        >
+            <Modal.Header
+                className="ms-modal-header-radius-0 custom-modal-header"
+                style={{ backgroundColor: "rgba(120,120,120,0.1)", color: "white" }}
+            >
+                <table className="table table-bordered border">
+                    <thead>
+                        <tr>
+                            <td style={{ fontSize: '20px', backgroundColor: '#82d778', color: 'white' }}>
+                                SEACOLE HEALTHCARE
                             </td>
                         </tr>
-                        <tr style={{borderColor: 'red'}}>
-                            <td style={{
-                                borderColor: 'orangered',
-                                fontSize: '16px',
-                                backgroundColor: 'black',
-                                color: 'whitesmoke'
-                            }}>Date recorded: {dateToYMD(selectedPlan.created_on)}</td>
+                    </thead>
+                    <tbody className="table-group-divider">
+                        <tr>
+                            <td style={{ fontSize: '16px', backgroundColor: '#82d778', color: 'white' }}>
+                                Support Plan
+                            </td>
                         </tr>
-                        <tr style={{borderColor: 'red'}}>
-                            <td style={{
-                                borderColor: 'orangered',
-                                fontSize: '16px',
-                                backgroundColor: 'black',
-                                color: 'whitesmoke'
-                            }}>Next Evaluation Date: {dateToYMD(selectedPlan.next_assement_date)}</td>
+                        <tr>
+                            <td style={{ fontSize: '16px', backgroundColor: '#82d778', color: 'white' }}>
+                                Date recorded: {dateToYMD(selectedPlan.created_on)}
+                            </td>
                         </tr>
-                        <tr style={{
-                            borderColor: 'orangered',
-                            fontSize: '20px',
-                            color: 'red',
-                            backgroundColor: 'black'
-                        }}>
-                            <button type="button" className="custom-close-button no-print" onClick={() => setActiveModal(null)}>Close
+                        <tr>
+                            <td style={{ fontSize: '16px', backgroundColor: '#82d778', color: 'white' }}>
+                                Next Evaluation Date: {dateToYMD(selectedPlan.next_assement_date)}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style={{ backgroundColor: '#82d778' }}>
+                                <button
+                                    type="button"
+                                    className="custom-close-button no-print"
+                                    onClick={() => setActiveModal(null)}
+                                    style={{ backgroundColor: "#fff", color: "#82d778", border: "1px solid #A2D729", padding: "5px 10px", borderRadius: "4px" }}
+                                >
+                                    Close
+                                </button>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </Modal.Header>
+
+            <Modal.Body>
+                 {selectedPlan && (
+                    <>
+                      {user &&
+                        user.groups &&
+                        user.groups.some(group =>
+                          ['Senior Management', 'Management', 'Senior Support Worker'].includes(group.name)
+                        ) && (
+                          <div className="flex justify-end mt-6">
+                            <button className="btn btn-outline-secondary mt-3" onClick={saveAsPDF}>
+                              📄 Save as PDF
                             </button>
+                          </div>
+                      )}
+                    </>
+                  )}
+            </Modal.Body>
+            <Modal.Body style={{padding: '20px', fontSize: '16px', lineHeight: '1.5'}}>
+                <table className="plan-table">
+                    <tbody>
+                    <tr className="table-active">
+                        <td>Resident</td>
+                        <td>{`${selectedPlan.firstname} ${selectedPlan.lastname}`}</td>
+                    </tr>
+                    <tr>
+                        <td>Title</td>
+                        <td>{selectedPlan.title}</td>
+                    </tr>
+                    <tr>
+                        <td>Category</td>
+                        <td>{selectedPlan.category}</td>
+                    </tr>
+                    <tr>
+                        <td>Approved By</td>
+                        <td>{selectedPlan.approved_by}</td>
+                    </tr>
+                    <tr>
+                        <td>Care Rating</td>
+                        <td style={{ color: getCareRatingColor(selectedPlan.care_rating) }}>
+                                {selectedPlan.care_rating}
+                            </td>
                         </tr>
-                        <tr style={{
-                            borderColor: 'black',
-                            fontSize: '20px',
-                            color: 'red',
-                            backgroundColor: 'black',
-                            border: 'orangered'
-                        }}>
-                            <PrintButton style={{backgroundColor: 'black', color: 'red', border: 'black'}}/>
+                        <tr>
+                            <td>Care Plan Duration</td>
+                            <td>{selectedPlan.cp_duration}</td>
                         </tr>
-                        </tbody>
-                    </table>
-                </Modal.Header>
-                <Modal.Body style={{padding: '20px', fontSize: '16px', lineHeight: '1.5'}}>
-                    <table className="plan-table">
-                        <tbody>
-                        <tr className="table-active">
-                                <td>Resident</td>
-                                <td>{`${selectedPlan.firstname} ${selectedPlan.lastname}`}</td>
-                            </tr>
-                            <tr>
-                                <td>Title</td>
-                                <td>{selectedPlan.title}</td>
-                            </tr>
-                            <tr>
-                                <td>Category</td>
-                                <td>{selectedPlan.category}</td>
-                            </tr>
-                            <tr>
-                                <td>Approved By</td>
-                                <td>{selectedPlan.approved_by}</td>
-                            </tr>
-                            <tr>
-                                <td>Care Rating</td>
-                                <td style={{ color: getCareRatingColor(selectedPlan.care_rating) }}>{selectedPlan.care_rating}</td>
-                            </tr>
-                            <tr>
-                                <td>Care Plan Duration</td>
-                                <td>{selectedPlan.cp_duration}</td>
-                            </tr>
-                            <tr>
-                                <td>Issue</td>
-                                <td>{selectedPlan.issue}</td>
-                            </tr>
-                            <tr>
-                                <td>Action Plan</td>
-                                <td>{selectedPlan.action_plan}</td>
-                            </tr>
-                            <tr>
-                                <td>By who</td>
-                                <td>{selectedPlan.by_who}</td>
-                            </tr>
-                            <tr>
-                                <td>Key-worker</td>
-                                <td>{`${selectedPlan.name_first} ${selectedPlan.name_last}`}</td>
-                            </tr>
-                            <tr>
-                                <td>By When</td>
-                                <td>{selectedPlan.by_when}</td>
-                            </tr>
-                            <tr>
-                                <td>Goal</td>
-                                <td>{selectedPlan.goal}</td>
-                            </tr>
-                            <tr>
-                                <td>Achievements</td>
-                                <td>{selectedPlan.achievements}</td>
-                            </tr>
-                            <tr>
-                                <td>Next Evaluation Date</td>
-                                <td>{dateToYMD(selectedPlan.next_assement_date)}</td>
-                            </tr>
-                            <tr>
-                                <td>Last Evaluated</td>
-                                <td>{dateToYMD(selectedPlan.last_evaluated_date)}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </Modal.Body>
-            </Modal>
-        );
-    };
+                        <tr>
+                            <td>Issue</td>
+                            <td>{selectedPlan.issue}</td>
+                        </tr>
+                        <tr>
+                            <td>Action Plan</td>
+                            <td>{selectedPlan.action_plan}</td>
+                        </tr>
+                        <tr>
+                            <td>By who</td>
+                            <td>{selectedPlan.by_who}</td>
+                        </tr>
+                        <tr>
+                            <td>Key-worker</td>
+                            <td>{`${selectedPlan.name_first} ${selectedPlan.name_last}`}</td>
+                        </tr>
+                        <tr>
+                            <td>By When</td>
+                            <td>{selectedPlan.by_when}</td>
+                        </tr>
+                        <tr>
+                            <td>Goal</td>
+                            <td>{selectedPlan.goal}</td>
+                        </tr>
+                        <tr>
+                            <td>Achievements</td>
+                            <td>{selectedPlan.achievements}</td>
+                        </tr>
+                        <tr>
+                            <td>Next Evaluation Date</td>
+                            <td>{dateToYMD(selectedPlan.next_assement_date)}</td>
+                        </tr>
+                        <tr>
+                            <td>Last Evaluated</td>
+                            <td>{dateToYMD(selectedPlan.last_evaluated_date)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </Modal.Body>
+        </Modal>
+    );
+};
 
     return (
         <div className="ms-panel">
@@ -467,15 +627,14 @@ const Addform = () => {
                 <SelectedSupportPlanModal onClose={() => setActiveModal(false)} />
 
             </div>
-            <Modal show={activeModal === "edit"} className="ms-modal-dialog-width ms-modal-content-width" onHide={() => setActiveModal(null)} centered>
-                <Modal.Header className="ms-modal-header-radius-0">
-                    <tr>
-                        <button type="button" className="close text-white" onClick={() => setActiveModal(null)}>Close</button>
-                    </tr>
-
+            <Modal show={activeModal === "edit"}  onHide={() => setActiveModal(null)} centered size="lg" scrollable>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Support Plan</Modal.Title>
                 </Modal.Header>
-                <Modal.Body className="p-0 text-left">
-                    <EditPlan handleClose={() => setActiveModal(null)}/>
+                <Modal.Body >
+                    <EditPlan
+                        plan={selectedPlan}
+                        handleClose={() => setActiveModal(null)}/>
                 </Modal.Body>
             </Modal>
 
