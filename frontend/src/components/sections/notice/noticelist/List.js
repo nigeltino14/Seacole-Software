@@ -72,12 +72,12 @@ const SuggestionList = () => {
         //{ name: "Future  Action", selector: "future_preventative_action", sortable: true },
         { name: "Review Date", selector: "next_assement_date", sortable: true },
         //{ name: "Action Taken", selector: "action_taken", sortable: true },
-        {
+        /*{
             name: "Home", cell: row =>
                 <div >
                     {selectedHome(row.location, homes)}
                 </div>, sortable: true
-        },
+        },*/
         {
             name: "Staff", cell: row =>
                 <div >
@@ -138,7 +138,7 @@ const SuggestionList = () => {
                     <div>
                         <h5>Resident: {selectedSuggestion.resident}</h5>
                         <p>Report type: {selectedSuggestion.report_type}</p>
-						<p>Date: {selectedSuggestion.date_occured}</p>
+						<p>Date of Occurence: {selectedSuggestion.date_occured}</p>
 						<p>Next Assessment: {selectedSuggestion.next_assement_date}</p>
                         <p>Follow Up: {selectedSuggestion.follow_up_notes}</p>
                         <p>Preventative Action: {selectedSuggestion.future_preventative_action}</p>

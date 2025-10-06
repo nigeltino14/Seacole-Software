@@ -21,7 +21,7 @@ from django.views.decorators.cache import cache_control
 from django.db import models
 from .pagination import NotePagination
 from rest_framework.parsers import MultiPartParser, FormParser
-
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from .models import PlanEvaluation
@@ -455,7 +455,7 @@ class RotaViewSet(viewsets.ModelViewSet):
 class SupportPlanViewSet(viewsets.ModelViewSet):
     queryset = SupportPlan.objects.all()
     serializer_class = SupportPlanSerializer
-    permission_classes = [permissions.DjangoModelPermissions]
+    permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
 
     def get_serializer(self, *args, **kwargs):
@@ -463,38 +463,35 @@ class SupportPlanViewSet(viewsets.ModelViewSet):
         return super().get_serializer(*args, **kwargs)
 
     def perform_create(self, serializer):
-        if serializer.is_valid():
-            instance = serializer.save(created_by=self.request.user)
+        print("DEBUG request.user:", self.request.user, self.request.user.is_authenticated)
+        instance = serializer.save(created_by=self.request.user)
 
-            files = self.request.FILES.getlist('files')
-            for f in files:
-                SupportPlanFile.objects.create(support_plan=instance, file=f)
+        # Save uploaded files
+        files = self.request.FILES.getlist('files')
+        for f in files:
+            SupportPlanFile.objects.create(support_plan=instance, file=f)
 
-            UserHistory.objects.create(
-                user=self.request.user,
-                action='Support Plans',
-                details=f'Recorded Support Plan for: {instance.resident_id} ',
-            )
-
-            return Response(status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
+        # Save user history
+        UserHistory.objects.create(
+            user=self.request.user,
+            action='Support Plans',
+            details=f'Recorded Support Plan for: {instance.resident_id}',
+        )
 
     def perform_update(self, serializer):
-        if serializer.is_valid():
-            instance = serializer.save()
+        instance = serializer.save()
 
-            files = self.request.FILES.getlist('files')
-            for f in files:
-                SupportPlanFile.objects.create(support_plan=instance, file=f)
+        # Save uploaded files
+        files = self.request.FILES.getlist('files')
+        for f in files:
+            SupportPlanFile.objects.create(support_plan=instance, file=f)
 
-            UserHistory.objects.create(
-                user=self.request.user,
-                action='Accident/Incidents',
-                details=f'Recorded {instance.report_type} for: {instance.resident_id} ',
-            )
-
-            return Response(status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
+        # Save user history
+        UserHistory.objects.create(
+            user=self.request.user,
+            action='Support Plans',
+            details=f'Updated Support Plan for: {instance.resident_id}',
+        )
 
 
 class PlanEvaluationViewSet(viewsets.ModelViewSet):
@@ -1063,35 +1060,7 @@ class AssignHomeUserViewset(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
 
 
-class SupportPlanViewset(viewsets.ModelViewSet):
-    queryset = SupportPlan.objects.all()
-    serializer_class = SupportPlanSerializer
-    permission_classes = [permissions.DjangoModelPermissions]
-
-    def perform_create(self, serializer):
-        if serializer.is_valid():
-            instance = serializer.save()
-
-            resident_first_name = instance.resident.first_name
-            resident_last_name = instance.resident.last_name
-
-            UserHistory.objects.create(
-                user=self.request.user,
-                action='Support Plan',
-                details=f'Added Support plan for resident: {resident_first_name} {resident_last_name}',
-            )
-            return Response(status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
-
-    def perform_update(self, serializer):
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
-
-
-
-class RiskActionPlanViewset(viewsets.ModelViewSet):
+class RiskActionPlanViewSet(viewsets.ModelViewSet):
     queryset = RiskActionPlan.objects.all()
     serializer_class = RiskActionPlanSerializer
     permission_classes = [permissions.DjangoModelPermissions]
@@ -1105,8 +1074,8 @@ class RiskActionPlanViewset(viewsets.ModelViewSet):
 
             UserHistory.objects.create(
                 user=self.request.user,
-                action='Support Plan',
-                details=f'Added Support Plan for resident: {resident_first_name} {resident_last_name}',
+                action='Risk Plan',
+                details=f'Added Risk Plan for resident: {resident_first_name} {resident_last_name}',
             )
             return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
@@ -1120,8 +1089,8 @@ class RiskActionPlanViewset(viewsets.ModelViewSet):
 
             UserHistory.objects.create(
                 user=self.request.user,
-                action='Support Plan',
-                details=f'Edited Support plan for resident: {resident_first_name} {resident_last_name}',
+                action='Risk Plan',
+                details=f'Edited Risk plan for resident: {resident_first_name} {resident_last_name}',
             )
             return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
@@ -1145,8 +1114,7 @@ class AtRiskOptionViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
 
 
-
-class RiskSchedulerViewset(viewsets.ModelViewSet):
+class RiskSchedulerViewSet(viewsets.ModelViewSet):
     queryset = RiskScheduler.objects.all()
     serializer_class = RiskSchedulerSerializer
     permission_classes = [permissions.DjangoModelPermissions]
@@ -1164,7 +1132,7 @@ class RiskSchedulerViewset(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
 
 
-class PlanSchedulerViewset(viewsets.ModelViewSet):
+class PlanSchedulerViewSet(viewsets.ModelViewSet):
     queryset = SupportScheduler.objects.all()
     serializer_class = SupportPlanSchedulerSerializer
     permission_classes = [permissions.DjangoModelPermissions]
@@ -1182,7 +1150,7 @@ class PlanSchedulerViewset(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
 
 
-class AccidentSchedulerViewset(viewsets.ModelViewSet):
+class AccidentSchedulerViewSet(viewsets.ModelViewSet):
     queryset = SuggestionComplainsScheduler.objects.all()
     serializer_class = AccidentPlanSchedulerSerializer
     permission_classes = [permissions.DjangoModelPermissions]
@@ -1200,7 +1168,7 @@ class AccidentSchedulerViewset(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_409_CONFLICT)
 
 
-class EvaluationSchedulerViewset(viewsets.ModelViewSet):
+class EvaluationSchedulerViewSet(viewsets.ModelViewSet):
     queryset = ReminderEvaluationScheduler.objects.all()
     serializer_class = EvaluationPlanSchedulerSerializer
     permission_classes = [permissions.DjangoModelPermissions]

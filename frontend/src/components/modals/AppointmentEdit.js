@@ -86,7 +86,7 @@ const AppointmentEdit = (props) => {
         <div className="col-xl-12 col-md-12">
             <div className="ms-panel ms-panel-bshadow-none">
                 <div className="ms-panel-header">
-                    <h6>Appointment Information</h6>
+                    <h6>Appointment Details </h6>
                 </div>
                 <div className="ms-panel-body">
                     <Form noValidate validated={validated} onSubmit={handleSubmit}>
@@ -129,7 +129,7 @@ const AppointmentEdit = (props) => {
                                         name="start_time"
                                         required
                                         onChange={handleChange}
-                                        value={start_time}
+                                        value={selected_appointment.start_time}
                                         type="datetime-local"
                                         placeholder="Start Time"
                                     />
@@ -143,7 +143,7 @@ const AppointmentEdit = (props) => {
                                         name="due_time"
                                         required
                                         onChange={handleChange}
-                                        value={due_time}
+                                        value={selected_appointment.due_time}
                                         type="datetime-local"
                                         placeholder="Due Time"
                                     />

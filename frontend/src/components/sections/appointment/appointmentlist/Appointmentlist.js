@@ -291,7 +291,7 @@ const Appointmentlist = () => {
                 <Modal.Header>
                     <div>
                         <h4 className="modal-title text-white">Appointment Details</h4>
-                        <p>Date: {selectedAppointment && dateToYMD(selectedAppointment.start_time)}</p>
+                        <p>Date of appointment: {selectedAppointment && dateToYMD(selectedAppointment.start_time)}</p>
                     </div>
                     <button type="button" className="close text-white" onClick={() => setSelectedAppointment(null)}>
                         x

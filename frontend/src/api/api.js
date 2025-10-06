@@ -1,9 +1,12 @@
 import axios from "axios";
 import { toastdanger, } from '../components/utils/notifications'
 import { toastloading, } from '../components/utils/notifications'
-import Config from "../config.json";
 
-const baseURl = Config.BACKEND_HOST
+
+const baseURl = process.env.REACT_APP_BACKEND_HOST || "http://127.0.0.1:8000";
+
+console.log("Using backend host:", baseURl);
+
 
 const errorHandler = (error, ...args) => {
 
