@@ -34,7 +34,9 @@ const Addform = () => {
         last_evaluated_date: '',
         next_assement_date: '',
         //evaluations: '',
-        attachemnt: "",
+        attachment: "",
+        resident: '',
+
 
 
     }

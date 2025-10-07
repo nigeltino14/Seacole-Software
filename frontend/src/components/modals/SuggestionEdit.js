@@ -96,7 +96,7 @@ const SuggestionEdit = (props) => {
             case 'next_assement_date':
                 dispatch(suggestionActions.setSelectedSuggestion({
                     ...selected_suggestion,
-                    next_assement_datecd: event.target.value
+                    next_assement_date: event.target.value
                 }))
                 break;
 

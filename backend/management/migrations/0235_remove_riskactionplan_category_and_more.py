@@ -9,10 +9,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name="riskactionplan",
-            name="category",
-        ),
+#        migrations.RemoveField(
+#            model_name="riskactionplan",
+#            name="category",
+#        ),
         migrations.AlterField(
             model_name="supportplan",
             name="care_rating",
