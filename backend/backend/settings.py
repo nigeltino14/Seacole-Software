@@ -31,9 +31,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 # settings.py
 
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+
+ALLOWED_HOSTS = [
+    "seacolehealthsystems.co.uk", "www.seacolehealthsystems.co.uk",
+    "localhost",
+    "165.227.229.113",
+]
+
 
 # Application definition
 
@@ -108,7 +114,7 @@ LOGIN_REDIRECT_URL = "management:mainmenu"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "staging",
+        "NAME": "seacole_staging",
         "USER": "doadmin",
         "PASSWORD": "AVNS_P2v-z3kK_178BxBTvfO",
         "HOST": "seacole-do-user-14823812-0.c.db.ondigitalocean.com",
@@ -262,10 +268,10 @@ BACKEND_HOST = os.environ.get("BACKEND_HOST", default="http://localhost:8000")
 #]
 
 HOST_SCHEME = "http://"
-SECURE_PROXY_SSL_HEADER = None
-SECURE_SSL_REDIRECT = False
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
-SECURE_HSTS_SECONDS = False
-SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = None
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_FRAME_DENY = False
